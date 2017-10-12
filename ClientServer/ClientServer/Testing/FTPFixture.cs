@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace ClientServer.Testing
 {
     [TestFixture]
-    class FTPFixture
+    class FTPFixture_Client
     {
 
         //# Connection

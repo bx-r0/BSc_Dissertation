@@ -10,17 +10,16 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace ClientServer
+namespace ClientServer.HTTP
 {
     /// <summary>
-    /// Interaction logic for MainWindow.xaml
+    /// Interaction logic for HTTPServer.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class HTTPServerWindow : Window
     {
-        public MainWindow()
+        public HTTPServerWindow()
         {
             InitializeComponent();
         }
