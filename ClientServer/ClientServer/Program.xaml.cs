@@ -14,6 +14,11 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
+
+//================= TODO LIST ======================//
+//TODO: Tidy up HTTP and Client server code
+//TODO: Add tests for HTTP Server and Client functionality testing
+//==================================================//
 namespace ClientServer
 {
     /// <summary>
@@ -35,36 +40,41 @@ namespace ClientServer
         {
             //Grabs the command line arguments
             string[] args = Environment.GetCommandLineArgs();
-            
+
             try
             {
                 switch (args[1])
                 {
                     //# FTP
                     case "-f":
-                        if (ServerOrClient(args[2]))
+                        switch (ServerOrClient(args[2]))
                         {
                             //# FTP Server
-                            ShowWindow(new FTPServerWindow());
-                        }
-                        else
-                        {
-                            //# FTP Client
-                            ShowWindow(new FTPClientWindow());
-
-                        }
+                            case WindowToShow.Server:
+                                ShowWindow(new FTPServerWindow());
+                                break;
+                            case WindowToShow.Client:
+                                ShowWindow(new FTPClientWindow());
+                                break;
+                            case WindowToShow.Both:
+                                ShowTwoWindows(new FTPClientWindow(), new FTPServerWindow());
+                                break;
+                        } 
                         break;
                     //# HTTP
                     case "-h":
-                        if (ServerOrClient(args[2]))
+                        switch (ServerOrClient(args[2]))
                         {
-                            //# HTTP Server
-                            ShowWindow(new HTTPServerWindow());
-                        }
-                        else
-                        {
-                            //# HTTP Client
-                            ShowWindow(new HTTPClientWindow());
+                            //# FTP Server
+                            case WindowToShow.Server:
+                                ShowWindow(new HTTPServerWindow());
+                                break;
+                            case WindowToShow.Client:
+                                ShowWindow(new HTTPClientWindow());
+                                break;
+                            case WindowToShow.Both:
+                                ShowTwoWindows(new HTTPClientWindow(), new HTTPServerWindow());
+                                break;
                         }
                         break;
                     //# INVALID
@@ -80,32 +90,45 @@ namespace ClientServer
 
         }
 
+        enum WindowToShow
+        {
+            Server,
+            Client,
+            Both,
+            Error
+        }
+
         /// <summary>
-        /// RETURN: --
-        /// TRUE: SERVER --
-        /// FALSE: CLIENT --
+        /// 
         /// </summary>
         /// <param name="parameter"></param>
         /// <returns></returns>
-        private bool ServerOrClient(string parameter)
+        private WindowToShow ServerOrClient(string parameter)
         {
             //# Server
             if (parameter == "s")
             {
-                return true;
+                return WindowToShow.Server;
             }
             else
             //# Client
             if (parameter == "c")
             {
-                return false;
+                return WindowToShow.Client;
+            }
+            else
+            //# Both
+            if (parameter == "b")
+            {
+                return WindowToShow.Both;
             }
             //# Invalid
             else
             {
                 Error("Invalid second parameter passed for FTP");
             }
-            return false;
+            //Shouldn't reach here
+            return WindowToShow.Error;
         }
 
         /// <summary>
@@ -117,7 +140,13 @@ namespace ClientServer
             window.Show();
             this.Hide();
         }
-        
+        private void ShowTwoWindows(Window window1, Window window2)
+        {
+            window1.Show();
+            window2.Show();
+            this.Hide();
+        }
+
         /// <summary>
         /// Methods used to throw an exception, and print to the console
         /// </summary>

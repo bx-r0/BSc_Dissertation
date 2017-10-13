@@ -5,8 +5,16 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ClientServer.HTTP"
         mc:Ignorable="d"
-        Title="HTTPServer" Height="300" Width="300">
-    <Grid>
-        
+        Title="HTTPServer" Height="199.308" Width="352.941" ResizeMode="NoResize">
+    <Grid Margin="0,0,4,0">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <Label Content="SERVER" HorizontalAlignment="Left" Margin="10,4,0,0" VerticalAlignment="Top"/>
+        <ListBox x:Name="WindowOutput" Margin="10,35,10,10"/>
+        <Button x:Name="StopButton" Content="STOP" HorizontalAlignment="Left" Margin="258,7,0,0" VerticalAlignment="Top" Width="75" Click="StopButton_Click"/>
     </Grid>
 </Window>

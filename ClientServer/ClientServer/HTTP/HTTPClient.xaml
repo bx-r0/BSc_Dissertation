@@ -5,8 +5,17 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ClientServer"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525">
+        Title="MainWindow" Height="208.304" Width="361.505" ResizeMode="NoResize" WindowStartupLocation="CenterScreen">
     <Grid>
-        
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <Button Content="GET" Margin="271,10,10,0" Click="Button_Click" Height="20" VerticalAlignment="Top"/>
+        <ListBox x:Name="WindowOutput" Height="100" Margin="10,0,10,22" VerticalAlignment="Bottom"/>
+        <Label Content="CLIENT&#xD;&#xA;" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
+
     </Grid>
 </Window>

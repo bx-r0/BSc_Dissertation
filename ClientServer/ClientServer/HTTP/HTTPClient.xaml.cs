@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ClientServer.HTTP;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -23,6 +24,12 @@ namespace ClientServer
         public HTTPClientWindow()
         {
             InitializeComponent();
+        }
+
+        private async void Button_Click(object sender, RoutedEventArgs e)
+        {
+            string output = await HTTPClient.GET();
+            WindowOutput.Items.Add(output);
         }
     }
 }
