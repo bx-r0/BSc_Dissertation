@@ -10,15 +10,12 @@ namespace ClientServer.HTTP
 {
     class HTTPClient
     {
+        //# Local host for initial testing
         private const string serverAddress = "http://127.0.0.1:80/";
 
         //One client create and init
         private static readonly HttpClient client = new HttpClient();
 
-        public async static Task<string> POST(object values)
-        {
-            return "";
-        }
 
         public async static Task<string> GET()
         {
@@ -26,13 +23,15 @@ namespace ClientServer.HTTP
             string value = "";
             try
             {
-                //Sends the response
-                HttpResponseMessage response = await client.GetAsync(serverAddress + "data/");
+                //# Sends the response
+                HttpResponseMessage response = await client.GetAsync(serverAddress + "location/");
                 
+                //# If the response is positive
                 if (response.IsSuccessStatusCode)
                 {
                     value = await response.Content.ReadAsStringAsync();
                 }
+                //# If the response is negative
                 else
                 {
                     MessageBox.Show(response.ReasonPhrase);
@@ -45,5 +44,9 @@ namespace ClientServer.HTTP
             return value;
         }
 
+        public async static Task<string> POST(object values)
+        {
+            return "";
+        }
     }
 }

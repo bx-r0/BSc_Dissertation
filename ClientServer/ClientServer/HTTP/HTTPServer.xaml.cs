@@ -46,10 +46,10 @@ namespace ClientServer.HTTP
 
         private void StopButton_Click(object sender, RoutedEventArgs e)
         {
-            //Sets the loop bool to false
+            //# Sets the loop bool to false
             server.RUNNING = false;
 
-            //Stops anywaiting threads
+            //# Stops any waiting threads
             server.server.Abort();
             WindowOutput.Items.Add("SERVER HAS BEEN STOPPED");
         }

@@ -11,57 +11,57 @@ namespace ClientServer.HTTP
 {
     class HTTPServer
     {
+        //# Address components
+        // + = Localhost
         private const string address = "+";
         private const int port = 80;
-        private string socket = "http://";
+        private string socket;
         
+        //# String array that holds the prefixes for the server
         private string[] prefixes = new string[] { "/" };
-        public HttpListener server = new HttpListener();
+        
+        //# Server variable
+        public readonly HttpListener server = new HttpListener();
 
-        //Bool for the loop
+        //# Bool for the loop
         public bool RUNNING = true;
 
+        /// <summary>
+        /// Setup for the server
+        /// </summary>
         public void Setup()
         {
-            //Creates the socket
-            socket = $"{socket}{address}:{port.ToString()}";
+            //# Creates the socket
+            socket = $"http://{socket}{address}:{port.ToString()}";
 
-            //Adds the suported prexies
+            //# Adds the supported prefixes
             foreach (string prefix in prefixes)
             {
                 server.Prefixes.Add($"{socket}{prefix}");
             }
+
+            //# Starts the server
+            server.Start();
         }
 
-        public async Task Start()
+        /// <summary>
+        /// Starts the endless execution of the server
+        /// </summary>
+        public void Start()
         {
             try
             {
                 Setup();
 
+                //# Boolean that keeps the server running
                 while (RUNNING)
                 {
-                    //Starts the server
-                    server.Start();
-
-                    //This blocks progress while it waits
+                    //# This blocks progress while it waits for a request
                     HttpListenerContext serverContext = server.GetContext();
-
-                    //Request
-                    HttpListenerRequest request = serverContext.Request;
-
-                    //Response
-                    HttpListenerResponse response = serverContext.Response;
-
-                    string responseString = "Hello!";
-                    byte[] buffer = Encoding.UTF8.GetBytes(responseString);
-
-                    // Get a response stream and write the response to it.
-                    response.ContentLength64 = buffer.Length;
-                    System.IO.Stream output = response.OutputStream;
-                    output.Write(buffer, 0, buffer.Length);
-
-                    output.Close();
+                    
+                    //# Spawns a thread to deal with a client
+                    Task r = new Task(() => DealWithClientRequest(serverContext));
+                    r.Start();
                 }
             }
             catch (Exception e)
@@ -72,5 +72,41 @@ namespace ClientServer.HTTP
             
         }
 
+        /// <summary>
+        /// Multi threaded task that will be used to deal with a clients request
+        /// </summary>
+        /// <param name="serverContext"></param>
+        public void DealWithClientRequest(HttpListenerContext serverContext)
+        {
+            //# Response
+            HttpListenerResponse response = serverContext.Response;
+
+            //# Grabs the request data
+            HttpListenerRequest request = serverContext.Request;
+
+            //# Switch case to deal with prefixes
+            //TODO: Add methods that deal with different prefixes
+            //STRUCTURE:
+            //      /location/<location_name>
+            //
+            string responseString = "";
+            switch (request.RawUrl)
+            {
+                case ("/data/"):
+                    responseString = "data!";
+           
+                    break;
+                case ("/location/"):
+                    responseString = "location!";
+                    break;
+            }
+            
+            //# Creates a response stream and writes the response to it
+            byte[] buffer = Encoding.UTF8.GetBytes(responseString);
+            response.ContentLength64 = buffer.Length;
+            System.IO.Stream output = response.OutputStream;
+            output.Write(buffer, 0, buffer.Length);
+            output.Close();
+        }
     }
 }
