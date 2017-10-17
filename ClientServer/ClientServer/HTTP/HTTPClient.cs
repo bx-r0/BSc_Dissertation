@@ -10,43 +10,59 @@ namespace ClientServer.HTTP
 {
     class HTTPClient
     {
+        public HTTPClient()
+        {
+
+        }
+        public HTTPClient(string address)
+        {
+            serverAddress = address;
+        }
+
+
         //# Local host for initial testing
-        private const string serverAddress = "http://127.0.0.1:80/";
+        private string serverAddress = "http://127.0.0.1:80/";
 
         //One client create and init
         private static readonly HttpClient client = new HttpClient();
 
 
-        public async static Task<string> GET()
+        public async Task<HttpResponseMessage> GET()
         {
-            //The value to return
-            string value = "";
+            HttpResponseMessage response = null;
             try
             {
                 //# Sends the response
-                HttpResponseMessage response = await client.GetAsync(serverAddress + "location/");
-                
-                //# If the response is positive
-                if (response.IsSuccessStatusCode)
-                {
-                    value = await response.Content.ReadAsStringAsync();
-                }
-                //# If the response is negative
-                else
-                {
-                    MessageBox.Show(response.ReasonPhrase);
-                }
+                response = await client.GetAsync(serverAddress);
             }
             catch (Exception e)
             {
-                MessageBox.Show(e.Message);
+                //TODO:Log message
             }
-            return value;
+
+            return response;
         }
 
-        public async static Task<string> POST(object values)
+        public async Task<HttpResponseMessage> UPDATE(object value)
         {
-            return "";
+            HttpResponseMessage response = null;
+            try
+            {
+                //# Creates a content object
+                var content = new StringContent(value.ToString());
+
+                //# Sends the response
+                response = await client.PostAsync(serverAddress, content);
+            }
+            catch (Exception e)
+            {
+                //TODO: Log message
+            }
+
+
+            return response;
         }
     }
+
+   
 }

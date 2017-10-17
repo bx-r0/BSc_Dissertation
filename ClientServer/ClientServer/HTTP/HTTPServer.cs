@@ -24,7 +24,7 @@ namespace ClientServer.HTTP
         public readonly HttpListener server = new HttpListener();
 
         //# Bool for the loop
-        public bool RUNNING = true;
+        public bool KEEP_RUNNING = true;
 
         /// <summary>
         /// Setup for the server
@@ -43,7 +43,7 @@ namespace ClientServer.HTTP
             //# Starts the server
             server.Start();
         }
-
+        
         /// <summary>
         /// Starts the endless execution of the server
         /// </summary>
@@ -54,20 +54,20 @@ namespace ClientServer.HTTP
                 Setup();
 
                 //# Boolean that keeps the server running
-                while (RUNNING)
+                do
                 {
                     //# This blocks progress while it waits for a request
                     HttpListenerContext serverContext = server.GetContext();
-                    
+
                     //# Spawns a thread to deal with a client
                     Task r = new Task(() => DealWithClientRequest(serverContext));
                     r.Start();
-                }
+                } while (KEEP_RUNNING);
             }
             catch (Exception e)
             {
+                //TODO: Add logging
                 MessageBox.Show(e.Message);
-                //Output("ERROR: " + e.Message);
             }
             
         }
@@ -98,6 +98,13 @@ namespace ClientServer.HTTP
                     break;
                 case ("/location/"):
                     responseString = "location!";
+                    break;
+                    
+                case ("/testing"):
+                    responseString = "TEST_VALID";
+                    break;
+                default:
+                    responseString = "Error: Non supported prefix";
                     break;
             }
             

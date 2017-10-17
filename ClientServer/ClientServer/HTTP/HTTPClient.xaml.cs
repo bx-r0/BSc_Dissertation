@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -26,10 +27,17 @@ namespace ClientServer
             InitializeComponent();
         }
 
-        private async void Button_Click(object sender, RoutedEventArgs e)
+        private async void GET_Click(object sender, RoutedEventArgs e)
         {
-            string output = await HTTPClient.GET();
-            WindowOutput.Items.Add(output);
+            //# Creates client and grabs response
+            HTTPClient client = new HTTPClient();
+            HttpResponseMessage output = await client.GET();
+
+            //# Obtains the value
+            string value = await output.Content.ReadAsStringAsync();
+
+            //# Adds the value to the list box
+            WindowOutput.Items.Add(value);
         }
     }
 }

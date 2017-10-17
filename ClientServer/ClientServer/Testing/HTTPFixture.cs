@@ -1,7 +1,10 @@
-﻿using NUnit.Framework;
+﻿using ClientServer.HTTP;
+using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -10,32 +13,89 @@ namespace ClientServer.Testing
     [TestFixture]
     class HTTPFixture_Client
     {
-        //# Connection
-        [Test]
-        public void HTTP_SucessfulConnection()
-        {
-            throw new NotImplementedException();
-        }
-
-        [Test]
-        public void HTTP_UnsucessfulConnection()
-        {
-            throw new NotImplementedException();
-        }
+        //# Testing variables
+        string validAddress = "http://httpbin.org";
+        string invalidAddress = "http://shdajshdakjhsdahjsdhajsdh.io";
 
         //# GET
-        [Test]
-        public void SendGETRequest()
+        public HttpResponseMessage GET(string address)
         {
-            throw new NotImplementedException();
+            //# Creates the client with a custom URL
+            HTTPClient client = new HTTPClient(address);
+
+            //# Sets of the GET thread
+            var t = Task.Run(() => client.GET());
+            t.Wait();
+
+            //# Obtains the result
+            return t.Result;
         }
-        
+        [Test]
+        public void SendGETRequest_ValidAddress()
+        {
+            //# Creates client and grabs response
+            HttpResponseMessage msg = GET(validAddress + "/get");
+            Assert.IsTrue(msg.IsSuccessStatusCode);
+        }
+        [Test]
+        public void SendGETRequest_InvalidAddress()
+        {
+            //# Creates client and grabs response
+            HttpResponseMessage msg = GET(invalidAddress);
+            Assert.IsTrue(msg == null);
+        }
+        [Test]
+        public void SendGETRequest_CheckExactResponse()
+        {
+            //# Starts and runs a server
+            HTTPServer server = new HTTPServer();
+            server.KEEP_RUNNING = false; //Makes sure it only runs once
+            new Task(() => server.Start()).Start();
+          
+            //# Creates client and makes response
+            HttpResponseMessage msg = GET("http://127.0.0.1:80/testing");
+            Assert.IsTrue(msg.IsSuccessStatusCode);
+
+            //# Reads content from response
+            var t = Task.Run(() => msg.Content.ReadAsStringAsync());
+            t.Wait();
+
+            //# Checks if the response string is exactly what it should be
+            string responseStr = t.Result;
+            Assert.IsTrue(responseStr == "TEST_VALID");
+        }
+
+
         //# UPDATE
-        [Test]
-        public void SendUPDATERequest()
+        public HttpResponseMessage UPDATE(string address, object values)
         {
-            throw new NotImplementedException();
+            //# Creates the client with a custom URL
+            HTTPClient client = new HTTPClient(address);
+
+            //# Sets of the GET thread
+            var t = Task.Run(() => client.UPDATE(values));
+            t.Wait();
+
+            //# Obtains the result
+            return t.Result;
         }
+        [Test]
+        public void SendUPDATERequest_ValidAddress()
+        {
+            //# Creates a client and returns the response
+            HttpResponseMessage msg = UPDATE(validAddress + "/post", 2);
+            Assert.IsTrue(msg.IsSuccessStatusCode);
+        }
+        [Test]
+        public void SendUPDATERequest_InValidAddress()
+        {
+            //# Creates a client and returns the response
+            HttpResponseMessage msg = UPDATE(invalidAddress, 2);
+            Assert.IsTrue(msg == null);
+        }
+
+        //#TIMEOUTS
+        //TODO: Timeout tests
     }
 
     [TestFixture]
@@ -45,61 +105,41 @@ namespace ClientServer.Testing
         [Test]
         public void StartServer()
         {
-            //Could this use a test client to check if it's working?
-            throw new NotImplementedException();
+            HTTPServer server = new HTTPServer();
         }
 
-        [Test]
-        public void StopServer()
-        {
-            throw new NotImplementedException();
-        }
-
-        //# Dealing with requests
         //# GET
         [Test]
         public void GET_Valid()
         {
-            throw new NotImplementedException();
+            //# Creates a new server
+            HTTPServer server = new HTTPServer();
+            server.KEEP_RUNNING = false;
+            new Task(() => server.Start()).Start();
+
+            //# Creates a new client and sends a GET request
+            HTTPClient client = new HTTPClient();
+            new Task(() => client.GET()).Start();
         }
 
         //# UPDATE
         [Test]
         public void UPDATE_Valid()
         {
-            throw new NotImplementedException();
+            //# Creates a new server
+            HTTPServer server = new HTTPServer();
+            server.KEEP_RUNNING = false;
+            new Task(() => server.Start()).Start();
+
+            //# Creates a new client and sends a GET request
+            HTTPClient client = new HTTPClient();
+            new Task(() => client.UPDATE(4)).Start();
         }
 
-        //# Logging
-        [Test]
-        public void AddToLog_ValidAction()
-        {
-            throw new NotImplementedException();
-        }
-        public void AddToLog_Exception()
-        {
-            throw new NotImplementedException();
-        }
+        //-Update received and check for saved value
 
-        //# Saving
-        public void SaveLog()
-        {
-            throw new NotImplementedException();
-        }
+        //# LOGGING
 
-        public void SaveDatabase()
-        {
-            throw new NotImplementedException();
-        }
-
-        //# Loading
-        public void LoadLog()
-        {
-            throw new NotImplementedException();
-        }
-        public void LoadDatabase()
-        {
-            throw new NotImplementedException();
-        }
+        //# SAVING - Data needs to be persistent
     }
 }

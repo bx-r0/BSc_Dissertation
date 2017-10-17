@@ -13,7 +13,7 @@
         <Grid.RowDefinitions>
             <RowDefinition/>
         </Grid.RowDefinitions>
-        <Button Content="GET" Margin="271,10,10,0" Click="Button_Click" Height="20" VerticalAlignment="Top"/>
+        <Button Content="GET" Margin="271,10,10,0" Click="GET_Click" Height="20" VerticalAlignment="Top"/>
         <ListBox x:Name="WindowOutput" Height="100" Margin="10,0,10,22" VerticalAlignment="Bottom"/>
         <Label Content="CLIENT&#xD;&#xA;" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
 
