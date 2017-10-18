@@ -15,7 +15,7 @@
         </Grid.RowDefinitions>
         <Button Content="GET" Margin="271,10,10,0" Click="GET_Click" Height="20" VerticalAlignment="Top"/>
         <ListBox x:Name="WindowOutput" Height="161" Margin="10,0,96,10" VerticalAlignment="Bottom"/>
-        <Label Content="CLIENT&#xD;&#xA;" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
+        <Label Content="CLIENT&#xD;&#xA;" HorizontalAlignment="Left" Margin="10,5,0,0" VerticalAlignment="Top" Height="27"/>
         <Button Content="AUTO" Margin="271,37,10,0" VerticalAlignment="Top" Click="AUTO_Click"/>
         <Button Content="SPAM" Margin="271,170,10,0" Click="SPAM_Click" Height="20" VerticalAlignment="Top"/>
 

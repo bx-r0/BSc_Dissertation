@@ -46,24 +46,12 @@ namespace ClientServer
             WindowOutput.Items.Add(value);
         }
        
-        Random rnd = new Random();
-        bool STOP_AUTO = false;
         private void AUTO_Click(object sender, RoutedEventArgs e)
         {
-            //Timer create
-
             int maxSeconds = 5;
 
-            while (!STOP_AUTO)
-            {
-                //Grabs the time to wait in seconds
-                double wait = maxSeconds * rnd.NextDouble();
-
-                //Random number of time to wait
-
-                //SEND GET as TASK
-            };
-           
+            //TODO: Create an automatic click
+            throw new NotImplementedException();
         }
 
         private async void SPAM_Click(object sender, RoutedEventArgs e)

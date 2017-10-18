@@ -10,19 +10,18 @@ namespace ClientServer.HTTP
 {
     class HTTPClient
     {
-        private static readonly HttpClient client = new HttpClient();
+        private HttpClient client = new HttpClient();
 
-        public HTTPClient()
-        {
+        //# Local host for initial testing
+        private string address = "http://127.0.0.1:80/";
+        private int port = 80;
 
-        }
+        //# Constructors
+        public HTTPClient(){ }
         public HTTPClient(string address)
         {
-            serverAddress = address;
+            this.address = address;
         }
-        
-        //# Local host for initial testing
-        private string serverAddress = "http://127.0.0.1:80/";
         
         //# Task for client tasks
         public async Task<HttpResponseMessage> GET()
@@ -31,7 +30,7 @@ namespace ClientServer.HTTP
             try
             {
                 //# Sends the response
-                response = await client.GetAsync(serverAddress);
+                response = await client.GetAsync(address);
             }
             catch (Exception e)
             {
@@ -49,7 +48,7 @@ namespace ClientServer.HTTP
                 var content = new StringContent(value.ToString());
 
                 //# Sends the response
-                response = await client.PostAsync(serverAddress, content);
+                response = await client.PostAsync(address, content);
             }
             catch (Exception e)
             {
@@ -59,9 +58,5 @@ namespace ClientServer.HTTP
 
             return response;
         }
-
-       
     }
-
-   
 }

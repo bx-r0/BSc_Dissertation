@@ -7,6 +7,9 @@
         mc:Ignorable="d"
         Title="FTPClient" Height="300" Width="300">
     <Grid>
-        
+        <TextBox x:Name="FileTextBox" HorizontalAlignment="Left" Height="23" Margin="10,28,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="272" IsEnabled="False"/>
+        <Button Content="Upload" HorizontalAlignment="Left" Margin="90,56,0,0" VerticalAlignment="Top" Width="192" Height="23" Click="Upload_Click"/>
+        <Label Content="Upload" HorizontalAlignment="Left" Margin="10,2,0,0" VerticalAlignment="Top"/>
+        <Button Content="Browse&#xD;&#xA;" HorizontalAlignment="Left" Margin="10,56,0,0" VerticalAlignment="Top" Width="75" Height="23" Click="Browse_Click"/>
     </Grid>
 </Window>
