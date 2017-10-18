@@ -10,6 +10,8 @@ namespace ClientServer.HTTP
 {
     class HTTPClient
     {
+        private static readonly HttpClient client = new HttpClient();
+
         public HTTPClient()
         {
 
@@ -18,15 +20,11 @@ namespace ClientServer.HTTP
         {
             serverAddress = address;
         }
-
-
+        
         //# Local host for initial testing
         private string serverAddress = "http://127.0.0.1:80/";
-
-        //One client create and init
-        private static readonly HttpClient client = new HttpClient();
-
-
+        
+        //# Task for client tasks
         public async Task<HttpResponseMessage> GET()
         {
             HttpResponseMessage response = null;
@@ -42,7 +40,6 @@ namespace ClientServer.HTTP
 
             return response;
         }
-
         public async Task<HttpResponseMessage> UPDATE(object value)
         {
             HttpResponseMessage response = null;
@@ -62,6 +59,8 @@ namespace ClientServer.HTTP
 
             return response;
         }
+
+       
     }
 
    

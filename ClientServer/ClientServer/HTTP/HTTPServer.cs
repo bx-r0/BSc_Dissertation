@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Net.Http;
 using System.Net;
 using System.Windows;
+using System.Windows.Threading;
 
 namespace ClientServer.HTTP
 {
@@ -22,6 +23,22 @@ namespace ClientServer.HTTP
         
         //# Server variable
         public readonly HttpListener server = new HttpListener();
+
+        private int _numberOfClients;
+        int numberOfClients
+        {
+            get { return _numberOfClients; }
+
+            set
+            {
+                _numberOfClients = value;
+
+                
+                Application.Current.Dispatcher.Invoke(() => { HTTPServerWindow.Clients.Content = _numberOfClients.ToString(); });
+
+                
+            }
+        }
 
         //# Bool for the loop
         public bool KEEP_RUNNING = true;
@@ -59,6 +76,9 @@ namespace ClientServer.HTTP
                     //# This blocks progress while it waits for a request
                     HttpListenerContext serverContext = server.GetContext();
 
+                    //Increments the number of clients
+                    numberOfClients = numberOfClients + 1;
+                    
                     //# Spawns a thread to deal with a client
                     Task r = new Task(() => DealWithClientRequest(serverContext));
                     r.Start();
@@ -114,6 +134,8 @@ namespace ClientServer.HTTP
             System.IO.Stream output = response.OutputStream;
             output.Write(buffer, 0, buffer.Length);
             output.Close();
+
+            numberOfClients = numberOfClients - 1;
         }
     }
 }

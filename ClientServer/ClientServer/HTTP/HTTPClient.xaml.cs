@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -29,6 +30,11 @@ namespace ClientServer
 
         private async void GET_Click(object sender, RoutedEventArgs e)
         {
+            await GetRequest();
+        }
+        
+        async Task GetRequest()
+        {
             //# Creates client and grabs response
             HTTPClient client = new HTTPClient();
             HttpResponseMessage output = await client.GET();
@@ -38,6 +44,36 @@ namespace ClientServer
 
             //# Adds the value to the list box
             WindowOutput.Items.Add(value);
+        }
+       
+        Random rnd = new Random();
+        bool STOP_AUTO = false;
+        private void AUTO_Click(object sender, RoutedEventArgs e)
+        {
+            //Timer create
+
+            int maxSeconds = 5;
+
+            while (!STOP_AUTO)
+            {
+                //Grabs the time to wait in seconds
+                double wait = maxSeconds * rnd.NextDouble();
+
+                //Random number of time to wait
+
+                //SEND GET as TASK
+            };
+           
+        }
+
+        private async void SPAM_Click(object sender, RoutedEventArgs e)
+        {
+            int maxClients = 1000;
+
+            for (int i = 0; i < maxClients; i++)
+            {
+                await GetRequest();
+            }
         }
     }
 }
