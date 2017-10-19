@@ -30,7 +30,7 @@ namespace ClientServer.FTP
         public void Setup()
         {
             //# Creates a new FTP connection
-            client = new FtpClient(address + port);
+            client = new FtpClient(address);
             
             //# Attempts a connection
             try
@@ -54,6 +54,26 @@ namespace ClientServer.FTP
         }
         
         //# Download file
+        public void Download()
+        {
+            throw new NotImplementedException();
+        }
 
+        //# Files
+        public FtpListItem[] GetAllListing(string uri)
+        {
+            return client.GetListing(uri);
+        }
+        public List<FtpListItem> GetAllFiles(string uri)
+        {
+            List<FtpListItem> return_list = new List<FtpListItem>();
+
+            foreach (FtpListItem item in client.GetListing(uri))
+            {
+                return_list.Add(item);
+            }
+
+            return return_list;
+        }
     }
 }

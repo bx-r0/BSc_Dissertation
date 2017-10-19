@@ -115,11 +115,15 @@ namespace ClientServer.Testing
             //# Creates a new server
             HTTPServer server = new HTTPServer();
             server.KEEP_RUNNING = false;
-            new Task(() => server.Start()).Start();
+
+            Assert.DoesNotThrowAsync(
+                new AsyncTestDelegate(async () => { Task.Run(() => server.Start()); }));
 
             //# Creates a new client and sends a GET request
             HTTPClient client = new HTTPClient();
-            new Task(() => client.GET()).Start();
+
+            Assert.DoesNotThrowAsync(
+                new AsyncTestDelegate(async () => { await Task.Run(() => client.GET()); }));
         }
 
         //# UPDATE
@@ -134,6 +138,13 @@ namespace ClientServer.Testing
             //# Creates a new client and sends a GET request
             HTTPClient client = new HTTPClient();
             new Task(() => client.UPDATE(4)).Start();
+        }
+
+
+ 
+        private async Task Client_GET(HTTPClient client)
+        {
+            new Task(() => client.GET()).Start();
         }
 
         //-Update received and check for saved value
