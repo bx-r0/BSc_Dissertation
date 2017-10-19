@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.Win32;
 using System.Windows;
+using FluentFTP;
 
 namespace ClientServer.FTP
 {
