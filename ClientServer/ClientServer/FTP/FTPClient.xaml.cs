@@ -45,7 +45,7 @@ namespace ClientServer.FTP
                 string fileName = parts[parts.Length - 1];
 
                 //TODO: Allow the choice of a directory?
-                client.Upload(FileTextBox.Text, $"/data/{fileName}");
+                client.Upload(FileTextBox.Text, $"{currentDir}/{fileName}");
 
 
             }

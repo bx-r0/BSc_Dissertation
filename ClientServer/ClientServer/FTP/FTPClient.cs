@@ -20,7 +20,7 @@ namespace ClientServer.FTP
 
 
         //# Constructors
-        public FTPClient() {}
+        public FTPClient() { }
         public FTPClient(string address)
         {
             this.address = address;
@@ -31,7 +31,7 @@ namespace ClientServer.FTP
         {
             //# Creates a new FTP connection
             client = new FtpClient(address);
-            
+
             //# Attempts a connection
             try
             {
@@ -39,7 +39,7 @@ namespace ClientServer.FTP
             }
             catch (Exception e)
             {
-                MessageBox.Show("Error in connection: " + e.Message) ;
+                MessageBox.Show("Error in connection: " + e.Message);
             }
 
         }
@@ -50,9 +50,16 @@ namespace ClientServer.FTP
         //# Upload file
         public void Upload(string currentFilePath, string FTPFilePath)
         {
-
+            try
+            {
+                client.UploadFile(currentFilePath, FTPFilePath);
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(e.InnerException.Message);
+            }
         }
-        
+
         //# Download file
         public void Download()
         {
@@ -63,17 +70,6 @@ namespace ClientServer.FTP
         public FtpListItem[] GetAllListing(string uri)
         {
             return client.GetListing(uri);
-        }
-        public List<FtpListItem> GetAllFiles(string uri)
-        {
-            List<FtpListItem> return_list = new List<FtpListItem>();
-
-            foreach (FtpListItem item in client.GetListing(uri))
-            {
-                return_list.Add(item);
-            }
-
-            return return_list;
         }
     }
 }
