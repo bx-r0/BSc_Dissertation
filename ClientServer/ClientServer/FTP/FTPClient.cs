@@ -16,7 +16,7 @@ namespace ClientServer.FTP
         //# Connection details 
         private string address = "http://127.0.0.1";
         private int port = 21;
-        private string mainDir = "/data";
+        private string mainDir = "/";
 
 
         //# Constructors
