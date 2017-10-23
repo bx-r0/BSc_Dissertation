@@ -20,6 +20,7 @@ namespace ClientServer.FTP
         //# DEBUG
         string testAddress = "ftp://speedtest.tele2.net/";
 
+        //# Constructor
         public FTPClientWindow()
         {
             InitializeComponent();

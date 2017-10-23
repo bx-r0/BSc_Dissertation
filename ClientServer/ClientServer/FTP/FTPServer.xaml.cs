@@ -19,9 +19,15 @@ namespace ClientServer.FTP
     /// </summary>
     public partial class FTPServerWindow : Window
     {
+        //# Variables
+        FTPServer server;
+
+        //# Constructor
         public FTPServerWindow()
         {
             InitializeComponent();
+
+            server = new FTPServer();
         }
     }
 }

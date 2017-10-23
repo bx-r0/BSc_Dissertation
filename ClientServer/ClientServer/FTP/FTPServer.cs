@@ -1,5 +1,7 @@
-﻿using System;
+﻿using ClientServer.FTP.FTP_Server;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
@@ -20,6 +22,7 @@ namespace ClientServer.FTP
         public FTPServer()
         {
             Setup();
+            Start();
         }
 
         //# Setup
@@ -35,13 +38,26 @@ namespace ClientServer.FTP
             server.BeginAcceptTcpClient(HandleAcceptTcpClient, server);
         }
 
+        //# Stop
+        public void Stop()
+        {
+            if (server != null)
+            {
+                server.Stop();
+            }
+        }
 
+        //# Handling code
         private void HandleAcceptTcpClient(IAsyncResult result)
         {
             TcpClient client = server.EndAcceptTcpClient(result);
             server.BeginAcceptTcpClient(HandleAcceptTcpClient, server);
 
-            // DO SOMETHING.
+            //Creates a new connection obj
+            Connection connection = new Connection(client);
+
+            //Sets of a new thread
+            Task t = Task.Run(() => connection.HandleClient(client));
         }
 
     }
