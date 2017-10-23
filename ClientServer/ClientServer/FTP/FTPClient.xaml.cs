@@ -26,7 +26,7 @@ namespace ClientServer.FTP
             InitializeComponent();
 
             //# Creates new client
-            client = new FTPClient(testAddress);
+            client = new FTPClient();
             client.Setup();
 
             File_TreeView.MouseDoubleClick += File_TreeView_MouseDoubleClick;

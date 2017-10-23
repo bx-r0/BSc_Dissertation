@@ -14,7 +14,7 @@ namespace ClientServer.FTP
         private FtpClient client;
 
         //# Connection details 
-        private string address = "http://127.0.0.1";
+        private string address = "http://127.0.0.1:21";
         private int port = 21;
         private string mainDir = "/";
 
