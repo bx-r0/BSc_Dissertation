@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ClientServer.FTP.FTP_Server;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -58,7 +59,7 @@ namespace ClientServer.FTP.FTP_Server
         public void HandleClient(object obj)
         {
             //Response back to the client
-            _controlWriter.WriteLine("220 Service Ready.");
+            _controlWriter.WriteLine(FTP_Responses.ServiceReady);
             _controlWriter.Flush();
 
             string line;
@@ -127,11 +128,11 @@ namespace ClientServer.FTP.FTP_Server
                                 break;
 
                             case "QUIT":
-                                response = "221 Service closing control connection";
+                                response = FTP_Responses.ConnectionClosing;
                                 break;
                             //Default error
                             default:
-                                response = "502 Command not implemented";
+                                response = FTP_Responses.CommandNotImplemented;
                                 break;
                         }
                     }
@@ -170,7 +171,7 @@ namespace ClientServer.FTP.FTP_Server
         {
             _currentDirectory = pathname;
 
-            return "250 Changed to new directory";
+            return FTP_Responses.FileActionOK;
         }
 
         //User login
@@ -180,10 +181,10 @@ namespace ClientServer.FTP.FTP_Server
 
             if (username == "anonymous")
             {
-                return "230 User logged in";
+                return FTP_Responses.UserLoggedIn;
             }
 
-            return "331 Username okay, need password";
+            return FTP_Responses.UsernameOKNeedPassword;
         }
         private string Password(string password)
         {
@@ -209,7 +210,8 @@ namespace ClientServer.FTP.FTP_Server
             typeCode = splitArgs[0];
             formatControl = splitArgs.Length > 1 ? splitArgs[1] : null;
 
-            string response = "500: ERROR";
+            //Sets up for error
+            string response = FTP_Responses.Error500;
 
             switch (typeCode)
             {
@@ -218,10 +220,10 @@ namespace ClientServer.FTP.FTP_Server
                 case "A":
                 case "I":
                     _transferType = typeCode;
-                    response = "200: OK";
+                    response = FTP_Responses.OK;
                     break;
                 default:
-                    response = "504: Command not implemented for the parameter";
+                    response = FTP_Responses.CommandNotImplementedForParameter;
                     break;
             }
 
@@ -230,14 +232,14 @@ namespace ClientServer.FTP.FTP_Server
                 switch (formatControl)
                 {
                     case "N":
-                        response = "200: OK";
+                        response = FTP_Responses.OK;
                         break;
                     case "T":
                         break;
                     case "C":
                         break;
                     default:
-                        response = "504: Command not implemented for the parameter";
+                        response = FTP_Responses.CommandNotImplementedForParameter;
                         break;
 
                 }
@@ -266,7 +268,7 @@ namespace ClientServer.FTP.FTP_Server
             //Assigns the dataEndPoint
             _dataEndpoint = new IPEndPoint(new IPAddress(ipAddress), BitConverter.ToInt16(port, 0));
 
-            return "200 OK";
+            return FTP_Responses.OK;
         }
 
         //Tells the server to open a port to listen on it
@@ -294,7 +296,7 @@ namespace ClientServer.FTP.FTP_Server
                 Array.Reverse(portArray);
 
 
-            return $"227 Entering Passive Mode ({address[0]},{address[1]},{address[2]},{address[3]},{portArray[0]},{portArray[1]})";
+            return FTP_Responses.EnteringPassiveMode(address, portArray);
         }
 
         //LIST command tells the server to list out a given directory
@@ -324,11 +326,11 @@ namespace ClientServer.FTP.FTP_Server
                     _passiveListener.BeginAcceptTcpClient(Connection_Logic, pathname);
                 }
 
-                return string.Format("150 Opening {0} mode data transfer for LIST", _dataConnectionType);
+                return FTP_Responses.FileStatusOK;
             }
 
             //Returns an error is the file path doesn't exist
-            return "450 Requested file action not taken";
+            return FTP_Responses.FileActionNotTaken;
         }
         private void Connection_Logic(IAsyncResult result)
         {
@@ -360,10 +362,10 @@ namespace ClientServer.FTP.FTP_Server
                 //Writes the files
                 foreach (string dir in directories)
                 {
-                    DirectoryInfo d = new DirectoryInfo(dir);
-                    
+                    DirectoryInfo directory = new DirectoryInfo(dir);
+
                     //Creates a response string    
-                    string line = string.Format("drwxr-xr-x    2 2003     2003     {0,8} {1}", "4096", d.Name);
+                    string line = FTP_Responses.PrintDirectory(directory.Name);
 
 
                     //Writes data
@@ -379,7 +381,7 @@ namespace ClientServer.FTP.FTP_Server
                     FileInfo f = new FileInfo(file);
 
                     //Creates response string   
-                    string line = string.Format("-rw-r--r--    2 2003     2003     {0,8} {1}", f.Length, f.Name);
+                    string line = FTP_Responses.PrintFile(f.Name, f.Length);
 
                     //Writes data
                     _dataWriter.WriteLine(line);
@@ -392,7 +394,7 @@ namespace ClientServer.FTP.FTP_Server
             _dataClient.Close();
             _dataClient = null;
 
-            _controlWriter.WriteLine("226 Transfer complete");
+            _controlWriter.WriteLine(FTP_Responses.SucessfullAction);
             _controlWriter.Flush();
         }
     }
