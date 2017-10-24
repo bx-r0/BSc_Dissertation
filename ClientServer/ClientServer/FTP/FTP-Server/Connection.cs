@@ -112,6 +112,14 @@ namespace ClientServer.FTP.FTP_Server
                                 response = $"257 /{_currentDirectory} is current directory.";
                                 break;
 
+                            case "RMD":
+                                response = DeleteDir(arguments);
+                                break;
+                            
+                            case "DELE":
+                                response = DeleteFile(arguments);
+                                break;
+
                             case "TYPE":
                                 response = Type(arguments);
                                 break;
@@ -134,6 +142,7 @@ namespace ClientServer.FTP.FTP_Server
                             case "QUIT":
                                 response = FTP_Responses.ConnectionClosing;
                                 break;
+
                             //Default error
                             default:
                                 response = FTP_Responses.CommandNotImplemented;
@@ -178,6 +187,11 @@ namespace ClientServer.FTP.FTP_Server
             return FTP_Responses.FileActionOK;
         }
 
+        private string ResolvePath(string pathname)
+        {
+            return new DirectoryInfo(Path.Combine(_currentDirectory, pathname)).FullName;
+        }
+
         //USER
         private string User(string username)
         {
@@ -197,13 +211,52 @@ namespace ClientServer.FTP.FTP_Server
             //TODO: implement actual validation
             if (true)
             {
-                return "230 User logged in";
+                return FTP_Responses.UserLoggedIn;
             }
             else
             {
+                //TODO: add this as response
                 return "530 Not logged in";
             }
         }
+
+        //DELE
+        private string DeleteFile(string pathname)
+        {
+            //Resolves the path name
+            pathname = ResolvePath(pathname);
+
+            //TODO: Add delete functionality
+            return FTP_Responses.CommandNotImplemented;
+        }
+
+        //RMD
+        private string DeleteDir(string pathname)
+        {
+            //Resolves the path name
+            pathname = ResolvePath(pathname);
+
+            //TODO: have dir deleting functionality
+            return FTP_Responses.CommandNotImplemented;
+        }
+
+        //MKD
+        private string MakeDir(string pathname)
+        {
+            //Resolves the path name
+            pathname = ResolvePath(pathname);
+
+            //TODO: Makes a directory
+            return FTP_Responses.CommandNotImplemented;
+        }
+
+        //STOR
+        private string UploadFile(string pathname)
+        {
+            //TODO: Implemented Upload
+            return FTP_Responses.CommandNotImplemented;
+        }
+    
 
         //TYPE - Handles Type coding -- http://www.nsftools.com/tips/RawFTP.htm#TYPE
         private string Type(string arguments)
@@ -315,7 +368,7 @@ namespace ClientServer.FTP.FTP_Server
             }
 
             //Creates the path and checks if it is valid
-            pathname = new DirectoryInfo(Path.Combine(_currentDirectory, pathname)).FullName;
+            pathname = ResolvePath(pathname);
 
             //Checks if the pathname is a valid pathname
             if (Directory.Exists(pathname))
@@ -428,13 +481,14 @@ namespace ClientServer.FTP.FTP_Server
                 using (FileStream fs = new FileStream(pathname, FileMode.Open, FileAccess.Read))
                 {
                     CopyStream(fs, dataStream);
+
+                    _dataClient.Close();
+                    _dataClient = null;
+
+                    _controlWriter.Write(FTP_Responses.SucessfullAction);
+                    _controlWriter.Flush();
+
                 }
-
-                _dataClient.Close();
-                _dataClient = null;
-
-                _controlWriter.Write(FTP_Responses.SucessfullAction);
-                _controlWriter.Flush();
             }
         }
 
@@ -461,9 +515,9 @@ namespace ClientServer.FTP.FTP_Server
             //Grabs the directory listing
             return (string)result.AsyncState;
         }
-
-
-        //BREAK THIS DOWN
+        
+        //## Code from
+        //https://www.codeproject.com/articles/380769/creating-an-ftp-server-in-csharp-with-ipv-support
         private static long CopyStream(Stream input, Stream output, int bufferSize)
         {
             byte[] buffer = new byte[bufferSize];
@@ -478,7 +532,6 @@ namespace ClientServer.FTP.FTP_Server
 
             return total;
         }
-
         private static long CopyStreamAscii(Stream input, Stream output, int bufferSize)
         {
             char[] buffer = new char[bufferSize];
@@ -499,7 +552,6 @@ namespace ClientServer.FTP.FTP_Server
 
             return total;
         }
-
         private long CopyStream(Stream input, Stream output)
         {
             if (_transferType == "I")
