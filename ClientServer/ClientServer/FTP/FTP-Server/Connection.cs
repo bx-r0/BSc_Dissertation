@@ -47,7 +47,6 @@ namespace ClientServer.FTP.FTP_Server
         public Connection(TcpClient client)
         {
             _controlClient = client;
-
             _controlStream = client.GetStream();
 
             //# Creates the new stream objects
