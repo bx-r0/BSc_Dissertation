@@ -123,6 +123,10 @@ namespace ClientServer.FTP.FTP_Server
                                 response = Pasv();
                                 break;
 
+                            case "RETR":
+                                response = Retr(arguments);
+                                break;
+
                             case "LIST":
                                 response = List(arguments == null ? _currentDirectory : arguments);
                                 break;
@@ -174,7 +178,7 @@ namespace ClientServer.FTP.FTP_Server
             return FTP_Responses.FileActionOK;
         }
 
-        //User login
+        //USER
         private string User(string username)
         {
             _username = username;
@@ -186,6 +190,8 @@ namespace ClientServer.FTP.FTP_Server
 
             return FTP_Responses.UsernameOKNeedPassword;
         }
+
+        //PASS
         private string Password(string password)
         {
             //TODO: implement actual validation
@@ -199,7 +205,7 @@ namespace ClientServer.FTP.FTP_Server
             }
         }
 
-        //Handles Type coding -- http://www.nsftools.com/tips/RawFTP.htm#TYPE
+        //TYPE - Handles Type coding -- http://www.nsftools.com/tips/RawFTP.htm#TYPE
         private string Type(string arguments)
         {
             string typeCode = "";
@@ -248,7 +254,7 @@ namespace ClientServer.FTP.FTP_Server
             return response;
         }
 
-        //Tells the server to connect to a given sockets
+        //PORT - tells the server to connect to a given sockets
         private string Port(string arguments)
         {
             string[] argumentSplit = arguments.Split(',');
@@ -271,7 +277,7 @@ namespace ClientServer.FTP.FTP_Server
             return FTP_Responses.OK;
         }
 
-        //Tells the server to open a port to listen on it
+        //PASV - tells the server to open a port to listen on it
         private string Pasv()
         {
             //Changes the connection type
@@ -299,7 +305,7 @@ namespace ClientServer.FTP.FTP_Server
             return FTP_Responses.EnteringPassiveMode(address, portArray);
         }
 
-        //LIST command tells the server to list out a given directory
+        //LIST - tells the server to list out a given directory
         private string List(string pathname)
         {
             //if no file path is specified we assume the current working directory
@@ -310,7 +316,7 @@ namespace ClientServer.FTP.FTP_Server
 
             //Creates the path and checks if it is valid
             pathname = new DirectoryInfo(Path.Combine(_currentDirectory, pathname)).FullName;
-            
+
             //Checks if the pathname is a valid pathname
             if (Directory.Exists(pathname))
             {
@@ -318,12 +324,12 @@ namespace ClientServer.FTP.FTP_Server
                 if (_dataConnectionType == DataConnectionType.Active)
                 {
                     _dataClient = new TcpClient();
-                    _dataClient.BeginConnect(_dataEndpoint.Address.ToString(), _dataEndpoint.Port, Connection_Logic, pathname);
+                    _dataClient.BeginConnect(_dataEndpoint.Address.ToString(), _dataEndpoint.Port, ListCommand, pathname);
                 }
                 //Passive   
                 else
                 {
-                    _passiveListener.BeginAcceptTcpClient(Connection_Logic, pathname);
+                    _passiveListener.BeginAcceptTcpClient(ListCommand, pathname);
                 }
 
                 return FTP_Responses.FileStatusOK;
@@ -332,23 +338,10 @@ namespace ClientServer.FTP.FTP_Server
             //Returns an error is the file path doesn't exist
             return FTP_Responses.FileActionNotTaken;
         }
-        private void Connection_Logic(IAsyncResult result)
+        private void ListCommand(IAsyncResult result)
         {
-            //Ending the connection type 
-            //Active
-            if (_dataConnectionType == DataConnectionType.Active)
-            {
-                _dataClient.EndConnect(result);
-            }
-            //Passive
-            else
-            {
-                _dataClient = _passiveListener.EndAcceptTcpClient(result);
-            }
-
-            //Grabs the directory listing
-            string pathname = (string)result.AsyncState;
-            
+            //Closes the connections and grabs the pathname
+            string pathname = RetrieveLogic(result);
 
             using (NetworkStream dataStream = _dataClient.GetStream())
             {
@@ -396,6 +389,127 @@ namespace ClientServer.FTP.FTP_Server
 
             _controlWriter.WriteLine(FTP_Responses.SucessfullAction);
             _controlWriter.Flush();
+        }
+
+        //RETR - tells the server to start downloading a file
+        private string Retr(string pathname)
+        {
+            //Resolves the path name
+            pathname = new DirectoryInfo(Path.Combine(_currentDirectory, pathname)).FullName;
+
+            if (Directory.Exists(_currentDirectory) && File.Exists(pathname))
+            {
+                //Active
+                if (_dataConnectionType == DataConnectionType.Active)
+                {
+                    _dataClient = new TcpClient();
+                    _dataClient.BeginConnect(_dataEndpoint.Address, _dataEndpoint.Port, RetrCommand, pathname);
+                }
+                //Passive
+                else
+                {
+                    _passiveListener.BeginAcceptTcpClient(RetrCommand, pathname);
+                }
+
+                return FTP_Responses.FileStatusOK;
+            }
+
+            //If there are errors with it not being a valid path or file
+            return FTP_Responses.FileNotFound;
+        }
+        private void RetrCommand(IAsyncResult result)
+        {
+            //Closes the connections and grabs the pathname
+            string pathname = RetrieveLogic(result);
+
+            using (NetworkStream dataStream = _dataClient.GetStream())
+            {
+                //Opens the file for reading
+                using (FileStream fs = new FileStream(pathname, FileMode.Open, FileAccess.Read))
+                {
+                    CopyStream(fs, dataStream);
+                }
+
+                _dataClient.Close();
+                _dataClient = null;
+
+                _controlWriter.Write(FTP_Responses.SucessfullAction);
+                _controlWriter.Flush();
+            }
+        }
+
+        /// <summary>
+        /// Method uses for the List and Retr command, it will close a connection
+        /// then grab the parameter
+        /// </summary>
+        /// <param name="result"></param>
+        /// <returns></returns>
+        private string RetrieveLogic(IAsyncResult result)
+        {
+            // Ending the connection type
+            //Active
+            if (_dataConnectionType == DataConnectionType.Active)
+            {
+                _dataClient.EndConnect(result);
+            }
+            //Passive
+            else
+            {
+                _dataClient = _passiveListener.EndAcceptTcpClient(result);
+            }
+
+            //Grabs the directory listing
+            return (string)result.AsyncState;
+        }
+
+
+        //BREAK THIS DOWN
+        private static long CopyStream(Stream input, Stream output, int bufferSize)
+        {
+            byte[] buffer = new byte[bufferSize];
+            int count = 0;
+            long total = 0;
+
+            while ((count = input.Read(buffer, 0, buffer.Length)) > 0)
+            {
+                output.Write(buffer, 0, count);
+                total += count;
+            }
+
+            return total;
+        }
+
+        private static long CopyStreamAscii(Stream input, Stream output, int bufferSize)
+        {
+            char[] buffer = new char[bufferSize];
+            int count = 0;
+            long total = 0;
+
+            using (StreamReader rdr = new StreamReader(input))
+            {
+                using (StreamWriter wtr = new StreamWriter(output, Encoding.ASCII))
+                {
+                    while ((count = rdr.Read(buffer, 0, buffer.Length)) > 0)
+                    {
+                        wtr.Write(buffer, 0, count);
+                        total += count;
+                    }
+                }
+            }
+
+            return total;
+        }
+
+        private long CopyStream(Stream input, Stream output)
+        {
+            if (_transferType == "I")
+            {
+                return CopyStream(input, output, 4096);
+            }
+            else
+            {
+                return CopyStreamAscii(input, output, 4096);
+            }
         }
     }
 }
