@@ -15,7 +15,7 @@ namespace ClientServer.FTP
         FTPClient client;
         bool fileSelected = false;
 
-        string currentDir = null; 
+        string currentDir = null;
 
         //# DEBUG
         string testAddress = "ftp://speedtest.tele2.net/";
@@ -25,12 +25,7 @@ namespace ClientServer.FTP
         {
             InitializeComponent();
 
-            //# Creates new client
-            client = new FTPClient();
-            client.Setup();
 
-            File_TreeView.MouseDoubleClick += File_TreeView_MouseDoubleClick;
-            LoadFilesIntoTreeView("/");
         }
 
         //# Buttons
@@ -40,18 +35,14 @@ namespace ClientServer.FTP
             if (fileSelected)
             {
                 //Splits the file path by separators
-                string[] parts = FileTextBox.Text.Split('\\');
+                string[] parts = TextBox_File.Text.Split('\\');
 
                 //The last item will be the file name
                 string fileName = parts[parts.Length - 1];
 
                 //TODO: Allow the choice of a directory?
-                client.Upload(FileTextBox.Text, $"{currentDir}/{fileName}");
-
-
+                client.Upload(TextBox_File.Text, $"{currentDir}/{fileName}");
             }
-
-
         }
         private void Browse_Click(object sender, RoutedEventArgs e)
         {
@@ -63,19 +54,50 @@ namespace ClientServer.FTP
             //# File selected
             if (result == true)
             {
-                FileTextBox.Text = dlg.FileName;
+                TextBox_File.Text = dlg.FileName;
                 fileSelected = true;
             }
             //# File not selected
             else
             {
-                if (FileTextBox.Text == "")
+                if (TextBox_File.Text == "")
                 {
                     fileSelected = false;
                 }
             }
         }
+        private void Connect_Click(object sender, RoutedEventArgs e)
+        {
+            string address = TextBox_Address.Text;
+            string port = TextBox_Port.Text;
 
+            //Default for a port
+            if (port.Trim() == "")
+            {
+                port = "21";
+            }
+
+            //Checks if address is valid
+            if (address.Trim() == "")
+            {
+                //Error
+                MessageBox.Show("Invalid address entered");
+            }
+            else
+            {
+
+                //# Creates new client
+                client = new FTPClient(address);
+
+                //If the client is successful in connection
+                if (client.Setup())
+                {
+                    File_TreeView.MouseDoubleClick += File_TreeView_MouseDoubleClick;
+                    LoadFilesIntoTreeView("/");
+                }
+            }
+        }
+        
         //# Tree view
         private void LoadFilesIntoTreeView(string uri)
         {
@@ -106,7 +128,7 @@ namespace ClientServer.FTP
         {
             //# Guard
             if (!(File_TreeView.SelectedItem == null))
-            { 
+            {
                 //# A messy way to grab uri the directory
                 string selectedIndexStr = File_TreeView.SelectedItem.ToString();
                 selectedIndexStr = selectedIndexStr.Replace("   ", "/");
@@ -143,5 +165,6 @@ namespace ClientServer.FTP
                 }
             }
         }
+
     }
 }

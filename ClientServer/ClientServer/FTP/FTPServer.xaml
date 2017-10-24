@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ClientServer.FTP"
         mc:Ignorable="d"
-        Title="FTPServer" Height="300" Width="300">
+        Title="FTPServer" Height="300" Width="300" Background="{DynamicResource {x:Static SystemColors.ActiveCaptionBrushKey}}" Foreground="{x:Null}" WindowStyle="ToolWindow">
     <Grid>
         
     </Grid>

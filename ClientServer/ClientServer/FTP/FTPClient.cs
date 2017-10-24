@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -15,10 +16,7 @@ namespace ClientServer.FTP
 
         //# Connection details 
         private string address = "http://127.0.0.1:21";
-        private int port = 21;
-        private string mainDir = "/";
-
-
+       
         //# Constructors
         public FTPClient() { }
         public FTPClient(string address)
@@ -27,7 +25,7 @@ namespace ClientServer.FTP
         }
 
         //# Setup code
-        public void Setup()
+        public bool Setup()
         {
             //# Creates a new FTP connection
             client = new FtpClient(address);
@@ -35,18 +33,18 @@ namespace ClientServer.FTP
             //# Attempts a connection
             try
             {
+                client.Credentials = new NetworkCredential("anonymous", "");
                 client.Connect();
+                
+                return true;
             }
             catch (Exception e)
             {
                 MessageBox.Show("Error in connection: " + e.Message);
             }
-
+            return false;
         }
-
-
-        //# File code
-
+        
         //# Upload file
         public void Upload(string currentFilePath, string FTPFilePath)
         {

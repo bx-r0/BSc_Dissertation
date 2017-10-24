@@ -74,6 +74,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="FTP\FTP-Server\Connection.cs" />
+    <Compile Include="FTP\FTP-Server\FTP_Responses.cs" />
     <Compile Include="FTP\FTPClient.cs" />
     <Compile Include="FTP\FTPClient.xaml.cs">
       <DependentUpon>FTPClient.xaml</DependentUpon>

@@ -1,4 +1,5 @@
 ﻿using ClientServer.FTP.FTP_Server;
+using FluentFTP;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -17,8 +18,8 @@ namespace ClientServer.FTP.FTP_Server
         private TcpClient _controlClient;
         private TcpClient _dataClient;
 
-        private NetworkStream _controlStream;
-        private StreamReader _controlReader;
+        private Stream _controlStream;
+        private StreamReader  _controlReader;
         private StreamWriter _controlWriter;
 
         private StreamWriter _dataWriter;
@@ -47,8 +48,15 @@ namespace ClientServer.FTP.FTP_Server
         public Connection(TcpClient client)
         {
             _controlClient = client;
-            _controlStream = client.GetStream();
+        
+            //Check
+            if (!client.Connected)
+            {
+                throw new Exception("Client disconnected!");
+            }
 
+            _controlStream = client.GetStream();
+            
             //# Creates the new stream objects
             _controlReader = new StreamReader(_controlStream);
             _controlWriter = new StreamWriter(_controlStream);
@@ -176,6 +184,9 @@ namespace ClientServer.FTP.FTP_Server
                 MessageBox.Show(ex.Message);
             }
         }
+
+
+
 
         //## ----------------------- Commands --------------------------------- ##//
         //Changes the working directory

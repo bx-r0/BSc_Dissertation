@@ -16,8 +16,7 @@ namespace ClientServer.FTP
         private TcpListener server;
 
         //# Connection details
-
-
+        
         //# Constructors
         public FTPServer()
         {
@@ -51,6 +50,8 @@ namespace ClientServer.FTP
         private void HandleAcceptTcpClient(IAsyncResult result)
         {
             TcpClient client = server.EndAcceptTcpClient(result);
+
+            //Restarts the async method
             server.BeginAcceptTcpClient(HandleAcceptTcpClient, server);
 
             //Creates a new connection obj
