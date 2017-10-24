@@ -13,14 +13,14 @@ namespace ClientServer.HTTP
         private HttpClient client = new HttpClient();
 
         //# Local host for initial testing
-        private string address = "http://127.0.0.1:80/";
-        private int port = 80;
+        private static string _address = $"http://127.0.0.1:{_port}/";
+        private static int _port = 80;
 
         //# Constructors
         public HTTPClient(){ }
         public HTTPClient(string address)
         {
-            this.address = address;
+            _address = address;
         }
         
         //# Task for client tasks
@@ -30,9 +30,9 @@ namespace ClientServer.HTTP
             try
             {
                 //# Sends the response
-                response = await client.GetAsync(address);
+                response = await client.GetAsync(_address);
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 //TODO:Log message
             }
@@ -48,9 +48,9 @@ namespace ClientServer.HTTP
                 var content = new StringContent(value.ToString());
 
                 //# Sends the response
-                response = await client.PostAsync(address, content);
+                response = await client.PostAsync(_address, content);
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 //TODO: Log message
             }

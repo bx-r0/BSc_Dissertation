@@ -9,6 +9,8 @@ namespace ClientServer.FTP
     /// <summary>
     /// Interaction logic for FTPClient.xaml
     /// </summary>
+    /// 
+    [Obsolete()]
     public partial class FTPClientWindow : Window
     {
         //# Variables

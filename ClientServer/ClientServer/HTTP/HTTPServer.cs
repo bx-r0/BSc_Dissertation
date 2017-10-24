@@ -17,15 +17,18 @@ namespace ClientServer.HTTP
         private const string address = "+";
         private const int port = 80;
         private string socket;
-        
+
         //# String array that holds the prefixes for the server
         private string[] prefixes = new string[] { "/" };
-        
+
         //# Server variable
         public readonly HttpListener server = new HttpListener();
 
         //# Bool for the loop
         public bool KEEP_RUNNING = true;
+
+        //This is used when testing, it makes sure the server doesn't wait for a TCP connection
+        public bool DO_NOT_RUN = false;
 
         /// <summary>
         /// Setup for the server
@@ -44,17 +47,17 @@ namespace ClientServer.HTTP
             //# Starts the server
             server.Start();
         }
-        
+
         /// <summary>
         /// Starts the endless execution of the server
         /// </summary>
         public void Start()
         {
-            try
-            {
-                Setup();
+            Setup();
 
-                //# Boolean that keeps the server running
+            //# Boolean that keeps the server running
+            if (!DO_NOT_RUN)
+            {
                 do
                 {
                     //# This blocks progress while it waits for a request
@@ -65,12 +68,6 @@ namespace ClientServer.HTTP
                     r.Start();
                 } while (KEEP_RUNNING);
             }
-            catch (Exception e)
-            {
-                //TODO: Add logging
-                MessageBox.Show(e.Message);
-            }
-            
         }
 
         /// <summary>
@@ -95,12 +92,12 @@ namespace ClientServer.HTTP
             {
                 case ("/data/"):
                     responseString = "data!";
-           
+
                     break;
                 case ("/location/"):
                     responseString = "location!";
                     break;
-                    
+
                 case ("/testing"):
                     responseString = "TEST_VALID";
                     break;
@@ -108,7 +105,7 @@ namespace ClientServer.HTTP
                     responseString = "Error: Non supported prefix";
                     break;
             }
-            
+
             //# Creates a response stream and writes the response to it
             byte[] buffer = Encoding.UTF8.GetBytes(responseString);
             response.ContentLength64 = buffer.Length;

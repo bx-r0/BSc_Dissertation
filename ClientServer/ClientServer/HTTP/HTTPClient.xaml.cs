@@ -48,8 +48,6 @@ namespace ClientServer
        
         private void AUTO_Click(object sender, RoutedEventArgs e)
         {
-            int maxSeconds = 5;
-
             //TODO: Create an automatic click
             throw new NotImplementedException();
         }

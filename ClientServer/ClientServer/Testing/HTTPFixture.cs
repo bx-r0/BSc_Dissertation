@@ -51,7 +51,7 @@ namespace ClientServer.Testing
             HTTPServer server = new HTTPServer();
             server.KEEP_RUNNING = false; //Makes sure it only runs once
             new Task(() => server.Start()).Start();
-          
+
             //# Creates client and makes response
             HttpResponseMessage msg = GET("http://127.0.0.1:80/testing");
             Assert.IsTrue(msg.IsSuccessStatusCode);
@@ -64,7 +64,6 @@ namespace ClientServer.Testing
             string responseStr = t.Result;
             Assert.IsTrue(responseStr == "TEST_VALID");
         }
-
 
         //# UPDATE
         public HttpResponseMessage UPDATE(string address, object values)
@@ -101,56 +100,17 @@ namespace ClientServer.Testing
     [TestFixture]
     public class HTTPFixture_Server
     {
-        //# Running
         [Test]
-        public void StartServer()
+        public void ServerStartTest()
         {
+            //Creates the server
             HTTPServer server = new HTTPServer();
+
+            //Makes sure the server doesn't try and listen for a connection
+            server.DO_NOT_RUN = true;
+
+            //Runs the server
+            server.Start();
         }
-
-        //# GET
-        [Test]
-        public void GET_Valid()
-        {
-            //# Creates a new server
-            HTTPServer server = new HTTPServer();
-            server.KEEP_RUNNING = false;
-
-            Assert.DoesNotThrowAsync(
-                new AsyncTestDelegate(async () => { Task.Run(() => server.Start()); }));
-
-            //# Creates a new client and sends a GET request
-            HTTPClient client = new HTTPClient();
-
-            Assert.DoesNotThrowAsync(
-                new AsyncTestDelegate(async () => { await Task.Run(() => client.GET()); }));
-        }
-
-        //# UPDATE
-        [Test]
-        public void UPDATE_Valid()
-        {
-            //# Creates a new server
-            HTTPServer server = new HTTPServer();
-            server.KEEP_RUNNING = false;
-            new Task(() => server.Start()).Start();
-
-            //# Creates a new client and sends a GET request
-            HTTPClient client = new HTTPClient();
-            new Task(() => client.UPDATE(4)).Start();
-        }
-
-
- 
-        private async Task Client_GET(HTTPClient client)
-        {
-            new Task(() => client.GET()).Start();
-        }
-
-        //-Update received and check for saved value
-
-        //# LOGGING
-
-        //# SAVING - Data needs to be persistent
     }
 }

@@ -9,6 +9,7 @@ using System.Windows;
 
 namespace ClientServer.FTP
 {
+    [Obsolete("This client will not be used; It's being kept for referencing")]
     class FTPClient
     {
         //# Client
