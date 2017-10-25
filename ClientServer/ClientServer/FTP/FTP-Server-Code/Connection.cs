@@ -1,4 +1,5 @@
 ﻿using ClientServer.FTP.FTP_Server;
+using ClientServer.Logging;
 using FluentFTP;
 using System;
 using System.Collections.Generic;
@@ -99,6 +100,9 @@ namespace ClientServer.FTP.FTP_Server
 
                     if (response == null)
                     {
+                        //Logs the connection type
+                        Log_Manager.Write($"Handling command: {cmd} {arguments}");
+
                         //Switch case for command types - This can be expanded
                         switch (cmd)
                         {
@@ -180,8 +184,7 @@ namespace ClientServer.FTP.FTP_Server
             }
             catch (Exception ex)
             {
-                //TODO: error handling
-                MessageBox.Show(ex.Message);
+                Log_Manager.Write(new LogMessage(ex, "Error when handling FTP client"));
             }
         }
 
