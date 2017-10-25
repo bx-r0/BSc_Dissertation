@@ -1,12 +1,9 @@
 ﻿using ClientServer.FTP.FTP_Server;
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Net;
 using System.Net.Sockets;
-using System.Text;
 using System.Threading.Tasks;
+using ClientServer.Logging;
 
 namespace ClientServer.FTP
 {
@@ -14,8 +11,6 @@ namespace ClientServer.FTP
     {
         //# Server
         private TcpListener server;
-
-        //# Connection details
         
         //# Constructors
         public FTPServer()
@@ -27,14 +22,31 @@ namespace ClientServer.FTP
         //# Setup
         public void Setup()
         {
-            server = new TcpListener(IPAddress.Any, 21);
+            try
+            {
+                server = new TcpListener(IPAddress.Any, 21);
+            }
+            catch (Exception exception)
+            {
+                Log_Manager.Write(new LogMessage(exception, "Error when setting up the server"));
+            }
+          
         }
 
         //# Start
         public void Start()
         {
-            server.Start();
-            server.BeginAcceptTcpClient(HandleAcceptTcpClient, server);
+            try
+            {
+                server.Start();
+                server.BeginAcceptTcpClient(HandleAcceptTcpClient, server);
+                Log_Manager.Write(new LogMessage("Server started"));
+            }
+            catch (Exception exception)
+            {
+                Log_Manager.Write(new LogMessage(exception, "Error when starting the server"));
+            }
+            
         }
 
         //# Stop
@@ -60,6 +72,5 @@ namespace ClientServer.FTP
             //Sets of a new thread
             Task t = Task.Run(() => connection.HandleClient(client));
         }
-
     }
 }

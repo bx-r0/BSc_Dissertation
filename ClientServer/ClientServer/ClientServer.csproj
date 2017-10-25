@@ -73,8 +73,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="FTP\FTP-Server\Connection.cs" />
-    <Compile Include="FTP\FTP-Server\FTP_Responses.cs" />
+    <Compile Include="FTP\FTP-Server-Code\Connection.cs" />
+    <Compile Include="FTP\FTP-Server-Code\FTP_Responses.cs" />
+    <Compile Include="Logging\Log_Manager.cs" />
     <Compile Include="Obsolete\FTPClient.cs" />
     <Compile Include="Obsolete\FTPClient.xaml.cs">
       <DependentUpon>FTPClient.xaml</DependentUpon>
@@ -153,7 +154,13 @@
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="HTTP\HTTP-Client-Code\" />
+    <Folder Include="HTTP\HTTP-Server-Code\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Logging\LOG.txt" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
