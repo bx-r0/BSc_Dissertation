@@ -67,7 +67,7 @@ namespace ClientServer.FTP
             server.BeginAcceptTcpClient(HandleAcceptTcpClient, server);
 
             //Creates a new connection obj
-            Connection connection = new Connection(client);
+            FTP_Connection connection = new FTP_Connection(client);
 
             //Sets of a new thread
             Task t = Task.Run(() => connection.HandleClient(client));

@@ -13,7 +13,7 @@ using System.Windows;
 
 namespace ClientServer.FTP.FTP_Server
 {
-    class Connection
+    class FTP_Connection
     {
         //# Vars
         private TcpClient _controlClient;
@@ -46,7 +46,7 @@ namespace ClientServer.FTP.FTP_Server
         private string _transferType;
 
         //# Constructor
-        public Connection(TcpClient client)
+        public FTP_Connection(TcpClient client)
         {
             _controlClient = client;
         
@@ -82,8 +82,8 @@ namespace ClientServer.FTP.FTP_Server
                     //reset
                     string response = null;
 
+                    //Grabs the command and arguments
                     string[] command = line.Split(' ');
-
                     string cmd = command[0].ToUpperInvariant();
 
                     //If the command.length is greater than 1 make it equal to the command
@@ -97,7 +97,6 @@ namespace ClientServer.FTP.FTP_Server
                     }
 
                     //# Command action #//
-
                     if (response == null)
                     {
                         //Logs the connection type
@@ -160,9 +159,7 @@ namespace ClientServer.FTP.FTP_Server
                                 break;
                         }
                     }
-
-                    //# Return of message #//
-
+                    
                     //Used to break out of the loop
                     if (_controlClient == null || !_controlClient.Connected)
                     {

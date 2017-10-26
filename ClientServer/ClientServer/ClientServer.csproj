@@ -73,7 +73,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="FTP\FTP-Server-Code\Connection.cs" />
+    <Compile Include="FTP\FTP-Server-Code\FTP_Connection.cs" />
     <Compile Include="FTP\FTP-Server-Code\FTP_Responses.cs" />
     <Compile Include="Logging\Log_Manager.cs" />
     <Compile Include="Obsolete\FTPClient.cs" />
