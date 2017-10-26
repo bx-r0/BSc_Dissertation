@@ -63,7 +63,7 @@ namespace ClientServer.FTP.FTP_Server
             _controlWriter = new StreamWriter(_controlStream);
         }
 
-        //# Handle code
+        //#---------MAIN------------#//
         public void HandleClient(object obj)
         {
             //Response back to the client
@@ -109,7 +109,7 @@ namespace ClientServer.FTP.FTP_Server
                                 response = User(arguments);
                                 break;
                             case "PASS":
-                                response = User(arguments);
+                                response = Password(arguments);
                                 break;
 
                             case "CWD":
@@ -184,9 +184,8 @@ namespace ClientServer.FTP.FTP_Server
                 Log_Manager.Write(new LogMessage(ex, "Error when handling FTP client"));
             }
         }
-
-
-
+        //#-------------------------#//
+        
 
         //## ----------------------- Commands --------------------------------- ##//
         //Changes the working directory
@@ -205,12 +204,10 @@ namespace ClientServer.FTP.FTP_Server
         //USER
         private string User(string username)
         {
+            //Saves the username
             _username = username;
-
-            if (username == "anonymous")
-            {
-                return FTP_Responses.UserLoggedIn;
-            }
+            
+            //Checks for users would go here
 
             return FTP_Responses.UsernameOKNeedPassword;
         }
@@ -218,16 +215,8 @@ namespace ClientServer.FTP.FTP_Server
         //PASS
         private string Password(string password)
         {
-            //TODO: implement actual validation
-            if (true)
-            {
-                return FTP_Responses.UserLoggedIn;
-            }
-            else
-            {
-                //TODO: add this as response
-                return "530 Not logged in";
-            }
+            //No password needed
+            return FTP_Responses.UserLoggedIn;
         }
 
         //DELE
@@ -408,6 +397,8 @@ namespace ClientServer.FTP.FTP_Server
 
             using (NetworkStream dataStream = _dataClient.GetStream())
             {
+
+                //TODO: Add error catch here for files that cannot be opened
                 //## DIRECTORIES ##//
                 IEnumerable<string> directories = Directory.EnumerateDirectories(pathname);
 
@@ -474,7 +465,7 @@ namespace ClientServer.FTP.FTP_Server
                     _passiveListener.BeginAcceptTcpClient(RetrCommand, pathname);
                 }
 
-                return FTP_Responses.FileStatusOK;
+                return $"150: Opening {_dataConnectionType} mode data transfer for RETR";
             }
 
             //If there are errors with it not being a valid path or file
@@ -487,6 +478,7 @@ namespace ClientServer.FTP.FTP_Server
 
             using (NetworkStream dataStream = _dataClient.GetStream())
             {
+                //TODO: Error catch here for files being used by other processes
                 //Opens the file for reading
                 using (FileStream fs = new FileStream(pathname, FileMode.Open, FileAccess.Read))
                 {
@@ -497,7 +489,6 @@ namespace ClientServer.FTP.FTP_Server
 
                     _controlWriter.Write(FTP_Responses.SucessfullAction);
                     _controlWriter.Flush();
-
                 }
             }
         }

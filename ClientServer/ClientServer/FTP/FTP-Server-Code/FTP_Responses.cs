@@ -76,6 +76,10 @@ namespace ClientServer.FTP.FTP_Server
         /// </summary>
         public static readonly string CommandNotImplementedForParameter = "504: Command not implemented for that parameter";
         /// <summary>
+        /// 530
+        /// </summary>
+        public static readonly string UserNotLoggedIn = "530: Not logged in";
+        /// <summary>
         /// 550
         /// </summary>
         public static readonly string FileNotFound = "550: File not found";
