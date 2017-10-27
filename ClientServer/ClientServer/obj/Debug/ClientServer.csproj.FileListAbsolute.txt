@@ -2,6 +2,3 @@ C:\Users\User\AppData\Local\Temporary Projects\ClientServer\bin\Debug\ClientServ
 C:\Users\User\Documents\GitHub\Dissertation_Project\ClientServer\ClientServer\bin\Debug\ClientServer.exe.config
 C:\Users\User\Documents\GitHub\Dissertation_Project\ClientServer\ClientServer\obj\Debug\ClientServer.exe
 C:\Users\User\Documents\GitHub\Dissertation_Project\ClientServer\ClientServer\obj\Debug\ClientServer.pdb
-C:\Users\afray\Documents\GitHub\Dissertation_Project\ClientServer\ClientServer\bin\Debug\ClientServer.exe.config
-C:\Users\afray\Documents\GitHub\Dissertation_Project\ClientServer\ClientServer\obj\Debug\ClientServer.exe
-C:\Users\afray\Documents\GitHub\Dissertation_Project\ClientServer\ClientServer\obj\Debug\ClientServer.pdb
