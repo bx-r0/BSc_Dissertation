@@ -7,12 +7,11 @@ To restore full internet connection run:
 
         "sudo iptables -F"
 '''
-
 import time
 import random
 from scapy.all import *
 from netfilterqueue import NetfilterQueue
-
+from Window import *
 
 def print_packet(packet):
     print("[!] ", end='')
@@ -23,9 +22,6 @@ def edit_packet(packet):
     # Converts into Scapy compatible string
     pkt = IP(packet.get_payload())
 
-    # ------------------ #
-    # EDIT PACKET HERE
-    # ------------------ #
 
     # Sets the packet to the modified version
     packet.set_payload(bytes(pkt))
@@ -57,7 +53,7 @@ def packet_loss(packet):
 
 
 # -------VARIABLES---------- #
-mode = packet_loss  # <-- Change this variable to change the network degradation type
+mode = edit_packet # <-- Change this variable to change the network degradation type
 
 # Degradation characteristic
 packet_loss_percentage = 10
@@ -70,6 +66,10 @@ nfqueue = NetfilterQueue()
 # 0 is the default NFQUEUE
 nfqueue.bind(0, mode)
 
+if __name__ == "__main__":
+    hwg = HelloWorldGTK()
+    gtk.main()
+
 try:
     # Prints the mode the program is running in
     print("[*] Mode is: ", end='')
@@ -80,3 +80,7 @@ try:
     nfqueue.run()
 except KeyboardInterrupt:
     pass
+
+
+
+
