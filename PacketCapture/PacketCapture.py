@@ -1,4 +1,4 @@
-'''
+"""
 This iptables command needs to be run to push all packets into the NFQUEUE:
 
         "sudo iptables -A INPUT -j NFQUEUE"
@@ -6,12 +6,11 @@ This iptables command needs to be run to push all packets into the NFQUEUE:
 To restore full internet connection run:
 
         "sudo iptables -F"
-'''
-import time
-import random
+"""
 from scapy.all import *
 from netfilterqueue import NetfilterQueue
-from Window import *
+from Window import PacketCaptureGTK
+
 
 def print_packet(packet):
     print("[!] ", end='')
@@ -21,7 +20,6 @@ def print_packet(packet):
 def edit_packet(packet):
     # Converts into Scapy compatible string
     pkt = IP(packet.get_payload())
-
 
     # Sets the packet to the modified version
     packet.set_payload(bytes(pkt))
@@ -52,34 +50,36 @@ def packet_loss(packet):
         packet.accept()
 
 
+def run():
+    try:
+        # Prints the mode the program is running in
+        print("[*] Mode is: ", end='')
+        print(mode.__name__)
+
+        # Shows the start waiting message
+        print("[*] Waiting ")
+        nfqueue.run()
+    except KeyboardInterrupt:
+        pass
+
+
 # -------VARIABLES---------- #
-mode = edit_packet # <-- Change this variable to change the network degradation type
+mode = print_packet  # <-- Change this variable to change the network degradation type
 
 # Degradation characteristic
 packet_loss_percentage = 10
 latency_value_second = 1
 # -------------------------- #
 
-# Creates the object
+# Loads up the packet window
+packet_window = PacketCaptureGTK()
+
+# Setup for the NQUEUE
 nfqueue = NetfilterQueue()
+nfqueue.bind(0, mode)  # 0 is the default NFQUEUE
 
-# 0 is the default NFQUEUE
-nfqueue.bind(0, mode)
 
-if __name__ == "__main__":
-    hwg = HelloWorldGTK()
-    gtk.main()
 
-try:
-    # Prints the mode the program is running in
-    print("[*] Mode is: ", end='')
-    print(mode.__name__)
-
-    # Shows the start waiting message
-    print("[*] Waiting ")
-    nfqueue.run()
-except KeyboardInterrupt:
-    pass
 
 
 
