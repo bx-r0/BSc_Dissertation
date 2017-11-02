@@ -1,3 +1,6 @@
+from scapy.all import *
+from netfilterqueue import NetfilterQueue
+
 """
 This iptables command needs to be run to push all packets into the NFQUEUE:
 
@@ -7,9 +10,6 @@ To restore full internet connection run:
 
         "sudo iptables -F"
 """
-from scapy.all import *
-from netfilterqueue import NetfilterQueue
-from Window import PacketCaptureGTK
 
 
 def print_packet(packet):
@@ -50,8 +50,15 @@ def packet_loss(packet):
         packet.accept()
 
 
-def run():
+def run_packet_manipulation():
     try:
+        # Runs the IPTABLES command
+        os.system("iptables -A INPUT -j NFQUEUE")
+
+        # Setup for the NQUEUE
+        nfqueue = NetfilterQueue()
+        nfqueue.bind(0, mode)  # 0 is the default NFQUEUE
+
         # Prints the mode the program is running in
         print("[*] Mode is: ", end='')
         print(mode.__name__)
@@ -59,9 +66,42 @@ def run():
         # Shows the start waiting message
         print("[*] Waiting ")
         nfqueue.run()
+
+        # Clears the set IPTABLES rule
+        os.system("iptables -F")
+
     except KeyboardInterrupt:
         pass
 
+
+"""
+Parameter format:
+                  (0)      (1)         (2)
+    sudo python Packet.py <mode> <value_for_mode>
+    
+"""
+# Assigns parameter values
+mode_arg = str(sys.argv[1])
+if len(sys.argv) > 2:
+    mode_value_arg = str(sys.argv[2])
+else:
+    raise Exception("Not enough parameters passed when calling Packet.py")
+
+# ------SWITCH CASE FOR PARAMETERS PASSED -----#
+if mode_arg == "-p":
+    mode = print_packet
+
+elif mode_arg == "-e":
+    mode = edit_packet
+
+elif mode_arg == "-l":
+    mode = packet_latency
+    latency_value_second = mode_value_arg
+
+elif mode_arg == "-pl":
+    mode = packet_loss
+    packet_loss_percentage = mode_value_arg
+# ----------------------------------------------#
 
 # -------VARIABLES---------- #
 mode = print_packet  # <-- Change this variable to change the network degradation type
@@ -71,16 +111,4 @@ packet_loss_percentage = 10
 latency_value_second = 1
 # -------------------------- #
 
-# Loads up the packet window
-packet_window = PacketCaptureGTK()
-
-# Setup for the NQUEUE
-nfqueue = NetfilterQueue()
-nfqueue.bind(0, mode)  # 0 is the default NFQUEUE
-
-
-
-
-
-
-
+run_packet_manipulation()

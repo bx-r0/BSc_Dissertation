@@ -1,6 +1,9 @@
+from gi.repository import Gtk
+import subprocess
+import shlex
+import getpass
 import gi
 gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk
 
 
 class Handler:
@@ -9,16 +12,19 @@ class Handler:
         Gtk.main_quit(*args)
 
     def latency_Clicked(self, button):
-        # TODO: Add latency logic here
-        print("L")
+        self.run_packet_capture("-l 1")
 
     def packet_loss_Clicked(self, button):
-        # TODO: Add packet loss logic here
-        print("P")
+        self.run_packet_capture("-pl 10")
+
+    def run_packet_capture(self, parameters):
+        # Elevates user to run packet script
+        print("root privileges needed:")
+        subprocess.call(shlex.split("sudo python Packet.py " + parameters))
+        print("Password: " + getpass.getuser())
 
 
 class PacketCaptureGTK:
-    """This is an Hello World GTK application"""
 
     # Loads and shows the window
     def __init__(self):
@@ -30,5 +36,3 @@ class PacketCaptureGTK:
         win.show_all()
 
         Gtk.main()
-
-
