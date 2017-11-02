@@ -74,6 +74,19 @@ def run_packet_manipulation():
         pass
 
 
+def help_message():
+    print(
+        """
+        Options:
+        #===============================================#
+        |-p                           - Print packet    |
+        |-e                           - Packet edit     |
+        |-l <latency_seconds>         - Latency         |
+        |-pl <loss_percentage>        - Packet loss     |
+        #===============================================#
+        """)
+
+
 """
 Parameter format:
                   (0)      (1)         (2)
@@ -84,31 +97,31 @@ Parameter format:
 mode_arg = str(sys.argv[1])
 if len(sys.argv) > 2:
     mode_value_arg = str(sys.argv[2])
-else:
-    raise Exception("Not enough parameters passed when calling Packet.py")
 
 # ------SWITCH CASE FOR PARAMETERS PASSED -----#
+# Print packet
 if mode_arg == "-p":
     mode = print_packet
-
+# Edit packet
 elif mode_arg == "-e":
     mode = edit_packet
-
+# Latency
 elif mode_arg == "-l":
     mode = packet_latency
     latency_value_second = mode_value_arg
-
+# Packet Loss
 elif mode_arg == "-pl":
     mode = packet_loss
     packet_loss_percentage = mode_value_arg
+# Help
+elif mode_arg == "-h":
+    help_message()
+# Default
+else:
+    mode = print_packet
 # ----------------------------------------------#
 
-# -------VARIABLES---------- #
-mode = print_packet  # <-- Change this variable to change the network degradation type
+# Default mode is no values selected
 
-# Degradation characteristic
-packet_loss_percentage = 10
-latency_value_second = 1
-# -------------------------- #
 
 run_packet_manipulation()
