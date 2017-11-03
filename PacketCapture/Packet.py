@@ -1,5 +1,5 @@
-from scapy.all import *
 from netfilterqueue import NetfilterQueue
+from scapy.all import *
 
 """
 This iptables command needs to be run to push all packets into the NFQUEUE:
@@ -10,6 +10,7 @@ To restore full internet connection run:
 
         "sudo iptables -F"
 """
+
 
 def print_packet(packet):
     print("[!] ", end='')
@@ -61,9 +62,11 @@ def run_packet_manipulation():
         # Shows the start waiting message
         print("[*] Waiting ")
         nfqueue.run()
-
-    except KeyboardInterrupt:
-        pass
+    except (KeyboardInterrupt, SystemExit):
+        print("\n[!] Process aborted")
+        os.system("iptables -F")
+        print("[!] iptables refreshed")
+        print("[*] Waiting")
 
 
 def help_message():
@@ -88,6 +91,7 @@ Parameter format:
 """
 # Assigns parameter values
 mode_arg = str(sys.argv[1])
+mode_value_arg = 0
 if len(sys.argv) > 2:
     mode_value_arg = str(sys.argv[2])
 
@@ -113,4 +117,5 @@ elif mode_arg == "-h":
 else:
     mode = print_packet
 # ----------------------------------------------#
+
 run_packet_manipulation()

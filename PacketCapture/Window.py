@@ -1,10 +1,10 @@
-import subprocess
-import shlex
 import getpass
+import subprocess
+
 import gi
+
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
-
 
 class PacketCaptureGTK:
 
@@ -23,6 +23,7 @@ class PacketCaptureGTK:
 
         Gtk.main()
     # --------------------------Control Events------------------------------------- #
+
     def onDeleteWindow(self, *args):
         Gtk.main_quit(*args)
 
@@ -32,10 +33,7 @@ class PacketCaptureGTK:
 
         # Checks if the value is a valid int a checks for it's range
         if self.validation(value, 1, 1000):
-            try:
                 self.run_packet_capture("-l " + str(value))
-            except:
-                self.reset_iptables()
         else:
             print(error_message)
 
@@ -44,26 +42,18 @@ class PacketCaptureGTK:
         value = self.textBox_PacketLoss.get_text()
 
         # Checks if it is a valid int and if its within a specified range
-        if self.validation(value, 10, 100):
-            try:
+        if self.validation(value, 1, 100):
                 self.run_packet_capture("-pl " + str(value))
-            except:
-                self.reset_iptables()
         else:
             print(error_message)
     # ----------------------------------------------------------------------------- #
 
     # # Method runs the sub process to manipulate packets
     def run_packet_capture(self, parameters):
-            # Elevates user to run packet script
-            print("root privileges needed:")
-            subprocess.call(shlex.split("sudo python Packet.py " + parameters))
-            print("Password: " + getpass.getuser())
-
-    # # Used to reset the iptables
-    def reset_iptables(self):
-        print("Execution ended")
-        subprocess.call(shlex.split("sudo iptables -F"))
+                # Elevates user to run packet script
+                print("root privileges needed:")
+                self.packet = subprocess.Popen(['sudo', 'python', 'Packet.py', parameters])
+                print("Password: " + getpass.getuser())
 
     # # Helper method used to check the validity of a value
     def validation(self, string, start, stop):
