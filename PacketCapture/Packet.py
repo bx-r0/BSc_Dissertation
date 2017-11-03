@@ -11,10 +11,16 @@ To restore full internet connection run:
         "sudo iptables -F"
 """
 
+# Default Vars
+latency_value_second = 0
+packet_loss_percentage = 0
+#
+
 
 def print_packet(packet):
     print("[!] ", end='')
     print(packet)
+    packet.accept()
 
 
 def edit_packet(packet):
@@ -34,6 +40,7 @@ def packet_latency(packet):
 
     # Issues latency of the entered value
     time.sleep(latency_value_second)
+
     packet.accept()
 
 
@@ -55,6 +62,8 @@ def run_packet_manipulation():
         # Runs the IPTABLES command
         os.system("iptables -A INPUT -j NFQUEUE")
 
+        print("[*] Mode is: " + mode.__name__)
+
         # Setup for the NQUEUE
         nfqueue = NetfilterQueue()
         nfqueue.bind(0, mode)  # 0 is the default NFQUEUE
@@ -70,17 +79,16 @@ def run_packet_manipulation():
 
 
 def help_message():
-    print(
-        """
-        Options:
-        #=================================================#
-        |-p                             - Print packet    |
-        |-e                             - Packet edit     |
-        |-l <latency_seconds>           - Latency         |
-        |-pl <loss_percentage>          - Packet loss     |
-        |-h                             - Help            |
-        #=================================================#
-        """)
+    print("""
+Options:
+#=================================================#
+|-p                             - Print packet    |
+|-e                             - Packet edit     |
+|-l <latency_seconds>           - Latency         |
+|-pl <loss_percentage>          - Packet loss     |
+|-h                             - Help            |
+#=================================================#
+""")
 
 
 """
@@ -89,33 +97,56 @@ Parameter format:
     sudo python Packet.py <mode> <value_for_mode>
     
 """
+# Default
+mode = print_packet
+run = True
+mode_arg = ""
+
 # Assigns parameter values
-mode_arg = str(sys.argv[1])
+if len(sys.argv) == 1:
+    print("Not enough parameters!")
+    help_message()
+
+    # Stops it from running
+    run = False
+else:
+    mode_arg = str(sys.argv[1])
+
+# Assigning second parameter value
 mode_value_arg = 0
 if len(sys.argv) > 2:
     mode_value_arg = str(sys.argv[2])
 
 # ------SWITCH CASE FOR PARAMETERS PASSED -----#
-# Print packet
 if mode_arg == "-p":
     mode = print_packet
-# Edit packet
+
 elif mode_arg == "-e":
     mode = edit_packet
-# Latency
+
 elif mode_arg == "-l":
     mode = packet_latency
     latency_value_second = int(mode_value_arg) / 1000
-# Packet Loss
+
 elif mode_arg == "-pl":
     mode = packet_loss
     packet_loss_percentage = int(mode_value_arg)
-# Help
+
 elif mode_arg == "-h":
     help_message()
-# Default
+    run = False
+
+# No parameters
+elif mode_arg == "":
+    print()
+
+# Invalid parameters
 else:
-    mode = print_packet
+    print("Unsupported parameters included")
+    help_message()
+    run = False
 # ----------------------------------------------#
 
-run_packet_manipulation()
+# If everything is valid run == true
+if run:
+    run_packet_manipulation()
