@@ -11,6 +11,7 @@ To restore full internet connection run:
         "sudo iptables -F"
 """
 
+
 def ignore_packet(packet):
     """This is just used a default 'do nothing' function """
 
