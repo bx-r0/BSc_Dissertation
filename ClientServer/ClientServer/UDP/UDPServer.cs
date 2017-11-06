@@ -27,15 +27,12 @@ namespace ClientServer.UDP
         {
             try
             {
-                int _port = port; 
+                int _port = port;
 
                 //IPEndPoint object will allow us to read datagrams sent from any source.
                 IPEndPoint RemoteIpEndPoint = new IPEndPoint(0, 0);
-                
-                // Blocks until a message returns on this socket from a remote host.
-                byte[] receiveBytes = Server.Receive(ref RemoteIpEndPoint);
 
-                //TODO: Need to add a loop here to receive multiple datagrams
+                byte[] receiveBytes = NewMethod(ref RemoteIpEndPoint);
 
                 //saves the image
                 UDP_Image = BytesToImage(receiveBytes);
@@ -49,6 +46,30 @@ namespace ClientServer.UDP
                 throw;
             }
             
+        }
+
+        private byte[] NewMethod(ref IPEndPoint RemoteIpEndPoint)
+        {
+            byte[] returnBytes = Server.Receive(ref RemoteIpEndPoint);
+
+            //Bool to keep looping
+            bool recieving = true;
+            while(recieving)
+            {
+                byte[] newReceieve = Server.Receive(ref RemoteIpEndPoint);
+                if (newReceieve.Length == 1)
+                {
+                    //Check for EOF
+                    break;
+                }
+                else
+                {
+                   //TODO: Join two byte arrays
+                }
+            }
+
+            // Blocks until a message returns on this socket from a remote host.
+            return returnBytes;
         }
 
         /// <summary>

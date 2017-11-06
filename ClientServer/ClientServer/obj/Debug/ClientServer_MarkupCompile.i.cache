@@ -10,11 +10,11 @@ none
 false
 DEBUG;TRACE
 C:\Users\User\Documents\GitHub\Dissertation_Project\ClientServer\ClientServer\App.xaml
-51946733394
+7-1714803450
 7379315395
-20-857121343
-22660455719
-FTP\FTPClient.xaml;FTP\FTPServer.xaml;HTTP\HTTPClient.xaml;HTTP\HTTPServer.xaml;Program.xaml;
+26-1019119846
+22-1711617848
+Obsolete\FTPClient.xaml;FTP\FTPServer.xaml;HTTP\HTTPClient.xaml;HTTP\HTTPServer.xaml;Program.xaml;UDP\UDPClient.xaml;UDP\UDPServer.xaml;
 
-False
+True
 

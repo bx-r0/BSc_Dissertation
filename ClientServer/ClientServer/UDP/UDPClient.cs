@@ -81,6 +81,12 @@ namespace ClientServer.UDP
                     //When a blank value is encountered stop looping
                     else
                     {
+                        //Sends the EOF ID
+                        //TODO: Check this works
+                        //TODO: Need a timeout in case the packet doesn't send
+                        byte[] end = Encoding.ASCII.GetBytes("#");
+                        Client.Send(end, 1);
+
                         break;
                     }
                 }
