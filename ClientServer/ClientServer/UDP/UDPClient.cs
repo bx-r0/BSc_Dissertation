@@ -22,7 +22,7 @@ namespace ClientServer.UDP
         private string _pictureFileName;
 
         //The maximum size a UDP packet can hold
-        private const int ipSize = 65000;
+        private const int ipSize = 10000;
 
         //# Files
         //Large file
@@ -112,25 +112,32 @@ namespace ClientServer.UDP
         /// <returns></returns>
         private byte[][] CutImageIntoChunks(byte[] imageBytes)
         {
-            //Used to hold the chunck
-            //TODO: Dynamic sizing
-            byte[][] split = new byte[1000][];
+            //Used to hold the chunk
+            List<byte[]> split = new List<byte[]>();
 
-            for (int i = 0; i < 100; i++)
+            //Loops until a break
+            bool splitLoop = true;
+            int count = 0;
+            while(splitLoop)
             {
                 //Grabs sections
-                byte[] bytes = imageBytes.Skip(i * ipSize).Take(ipSize).ToArray();
+                byte[] bytes = imageBytes.Skip(count * ipSize).Take(ipSize).ToArray();
 
                 if (bytes.Length < ipSize)
                 {
-                    split[i] = bytes;
+                    //Adds to the list
+                    split.Add(bytes);
+                    splitLoop = false;
                     break;
                 }
 
-                split[i] = bytes;
-
+                //Adds to the list
+                split.Add(bytes);
+                ++count;
             }
-            return split;
+            
+            //Turns the list to an array
+            return split.ToArray();
         }
 
         /// <summary>
