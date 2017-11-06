@@ -1,5 +1,6 @@
 ﻿using ClientServer.FTP;
 using ClientServer.HTTP;
+using ClientServer.UDP;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -74,6 +75,23 @@ namespace ClientServer
                                 break;
                             case WindowToShow.Both:
                                 ShowTwoWindows(new HTTPClientWindow(), new HTTPServerWindow());
+                                break;
+                        }
+                        break;
+                    //#UDP
+                    case "-u":
+                        switch (ServerOrClient(args[2]))
+                        {
+                            case WindowToShow.Server:
+                                ShowWindow(new UDPServerWindow());
+                                break;
+                            case WindowToShow.Client:
+                                ShowWindow(new UDPClientWindow());
+                                break;
+                            case WindowToShow.Both:
+                                ShowTwoWindows(new UDPClientWindow(), new UDPServerWindow());
+                                break;
+                            default:
                                 break;
                         }
                         break;

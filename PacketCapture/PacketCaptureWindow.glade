@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Generated with glade 3.20.0 -->
+<interface>
+  <requires lib="gtk+" version="3.20"/>
+  <object class="GtkWindow" id="window1">
+    <property name="width_request">740</property>
+    <property name="height_request">500</property>
+    <property name="can_focus">False</property>
+    <property name="resizable">False</property>
+    <property name="window_position">center</property>
+    <signal name="delete-event" handler="onDeleteWindow" swapped="no"/>
+    <child>
+      <object class="GtkFixed">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <child>
+          <object class="GtkButton" id="Button_latency">
+            <property name="label" translatable="yes">Latency</property>
+            <property name="width_request">120</property>
+            <property name="height_request">35</property>
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="receives_default">True</property>
+            <signal name="clicked" handler="latency_Clicked" swapped="no"/>
+          </object>
+          <packing>
+            <property name="x">535</property>
+            <property name="y">59</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkButton" id="Button_packet_loss">
+            <property name="label" translatable="yes">Packet Loss</property>
+            <property name="width_request">120</property>
+            <property name="height_request">35</property>
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="receives_default">True</property>
+            <signal name="clicked" handler="packet_loss_Clicked" swapped="no"/>
+          </object>
+          <packing>
+            <property name="x">535</property>
+            <property name="y">108</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkLabel">
+            <property name="width_request">100</property>
+            <property name="height_request">80</property>
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="margin_bottom">3</property>
+            <property name="label" translatable="yes">Packet Capture</property>
+            <attributes>
+              <attribute name="foreground" value="#ffffffffffff"/>
+            </attributes>
+          </object>
+          <packing>
+            <property name="x">265</property>
+            <property name="y">-20</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkEntry" id="TextBox_Latency">
+            <property name="width_request">500</property>
+            <property name="height_request">35</property>
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="input_purpose">number</property>
+          </object>
+          <packing>
+            <property name="x">29</property>
+            <property name="y">59</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkEntry" id="TextBox_PacketLoss">
+            <property name="width_request">500</property>
+            <property name="height_request">35</property>
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+          </object>
+          <packing>
+            <property name="x">29</property>
+            <property name="y">108</property>
+          </packing>
+        </child>
+      </object>
+    </child>
+    <child type="titlebar">
+      <placeholder/>
+    </child>
+  </object>
+</interface>
