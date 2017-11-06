@@ -5,13 +5,13 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ClientServer.UDP"
         mc:Ignorable="d"
-        Title="UDPServer" Height="300" Width="300">
+        Title="UDPServer" Height="690" Width="897">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
-        <Button x:Name="Button_Start" Content="START" HorizontalAlignment="Left" Margin="107,53,0,0" VerticalAlignment="Top" Width="75" Click="Start_Click"/>
-        <Image x:Name="Image_TransferedImage" HorizontalAlignment="Left" Height="100" Margin="94,89,0,0" VerticalAlignment="Top" Width="100"/>
+        <Button x:Name="Button_Start" Content="START" HorizontalAlignment="Left" Margin="410,62,0,0" VerticalAlignment="Top" Width="75" Click="Start_Click"/>
+        <Image x:Name="Image_TransferedImage" Margin="0,156,10,10" HorizontalAlignment="Right" Width="869" Stretch="UniformToFill"/>
 
     </Grid>
 </Window>

@@ -6,6 +6,7 @@ using System.Linq;
 using System.Net.Sockets;
 using System.Reflection;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace ClientServer.UDP
@@ -13,7 +14,7 @@ namespace ClientServer.UDP
     class UDPClient
     {
         //# Setup
-        UdpClient Client = new UdpClient();
+        UdpClient Client;
 
         //# Connection details
         private string _address;
@@ -21,13 +22,13 @@ namespace ClientServer.UDP
         private string _pictureFileName;
 
         //The maximum size a UDP packet can hold
-        private const int ipSize = 60000;
+        private const int ipSize = 65000;
 
         //# Files
         //Large file
-        //private string fileName = "castle.png";
+        private string fileName = "castle.png";
         //Small single datagram file
-        private string fileName = "puppy.jpg";
+        //private string fileName = "puppy.jpg";
 
         //# Constructor 
         public UDPClient(string address, int port)
@@ -46,6 +47,7 @@ namespace ClientServer.UDP
         //# Functions
         public void Connect()
         {
+            Client = new UdpClient();
             Client.Connect(_address, _port);
             SendImage();
             Disconnect();
@@ -75,15 +77,16 @@ namespace ClientServer.UDP
                 {
                     if (bytes != null)
                     {
+                        //HACK: This is because packets come in too quickly
+                        Thread.Sleep(10);
+
                         //Sends the data
                         Client.Send(bytes, bytes.Length);
                     }
                     //When a blank value is encountered stop looping
                     else
                     {
-                        //Sends the EOF ID
-                        //TODO: Check this works
-                        //TODO: Need a timeout in case the packet doesn't send
+                        //Sends the EOF
                         byte[] end = Encoding.ASCII.GetBytes("#");
                         Client.Send(end, 1);
 
