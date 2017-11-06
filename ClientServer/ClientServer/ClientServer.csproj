@@ -94,6 +94,14 @@
     </Compile>
     <Compile Include="Testing\FTPFixture.cs" />
     <Compile Include="Testing\HTTPFixture.cs" />
+    <Compile Include="UDP\UDPClient.cs" />
+    <Compile Include="UDP\UDPClient.xaml.cs">
+      <DependentUpon>UDPClient.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UDP\UDPServer.cs" />
+    <Compile Include="UDP\UDPServer.xaml.cs">
+      <DependentUpon>UDPServer.xaml</DependentUpon>
+    </Compile>
     <Page Include="Obsolete\FTPClient.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -119,6 +127,14 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Program.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UDP\UDPClient.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UDP\UDPServer.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -160,6 +176,12 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Logging\LOG.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="UDP\UDP_Images\puppy.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="UDP\UDP_Images\castle.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
