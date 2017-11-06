@@ -20,7 +20,7 @@ namespace ClientServer.UDP
     public partial class UDPClientWindow : Window
     {
         //# Client
-        UDPClient Client = new UDPClient("localhost", UDPServer.port);
+        UDPClient Client = new UDPClient("192.168.1.10", UDPServer.port);
 
         //# Constructor
         public UDPClientWindow()

@@ -26,15 +26,15 @@ namespace ClientServer.UDP
 
         //# Files
         //Large file
-        private string fileName = "castle.png";
+        //private string fileName = "castle.png";
         //Small single datagram file
-        //private string fileName = "puppy.jpg";
+        private string fileName = "puppy.jpg";
 
         //# Constructor 
         public UDPClient(string address, int port)
         {
             //TODO: Dynamic file paths
-            string path = @"C:\Users\User\Documents\GitHub\Dissertation_Project\ClientServer\ClientServer\UDP\UDP_Images\";
+            string path = @"C:\Users\afray\Documents\GitHub\Dissertation_Project\ClientServer\ClientServer\UDP\UDP_Images\";
 
             //Create file dynamic file path
             _pictureFileName =
@@ -98,6 +98,10 @@ namespace ClientServer.UDP
             {
                 //Sends the data
                 Client.Send(imageBytes, imageBytes.Length);
+
+                //Sends the EOF
+                byte[] end = Encoding.ASCII.GetBytes("#");
+                Client.Send(end, 1);
             }
         }
 
@@ -109,7 +113,8 @@ namespace ClientServer.UDP
         private byte[][] CutImageIntoChunks(byte[] imageBytes)
         {
             //Used to hold the chunck
-            byte[][] split = new byte[100][];
+            //TODO: Dynamic sizing
+            byte[][] split = new byte[1000][];
 
             for (int i = 0; i < 100; i++)
             {
