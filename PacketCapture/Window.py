@@ -6,6 +6,7 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
+
 class PacketCaptureGTK:
     """A GUI for controlling the Packet.py script"""
 
@@ -22,6 +23,7 @@ class PacketCaptureGTK:
         # Grabs and saves objects
         self.textBox_Latency = builder.get_object("TextBox_Latency")
         self.textBox_PacketLoss = builder.get_object("TextBox_PacketLoss")
+        self.textView_ConsoleOutput = builder.get_object("TextView_ConsoleOutput")
 
         Gtk.main()
     # --------------------------Control Events------------------------------------- #
@@ -34,7 +36,8 @@ class PacketCaptureGTK:
     def latency_Clicked(self, button):
         """Event that runs when the latency button is clicked"""
 
-        error_message = "Latency value entered is incorrect, it needs to be in the range of 1-1000ms"
+        error_message = \
+            "Latency value entered is incorrect, it needs to be in the range of 1-1000ms"
         value = self.textBox_Latency.get_text()
 
         # Checks if the value is a valid int a checks for it's range
@@ -46,7 +49,8 @@ class PacketCaptureGTK:
     def packet_loss_Clicked(self, button):
         """Event that runs when the packet loss button is clicked"""
 
-        error_message = "Packet loss value entered is incorrect, it needs to be in the range of 1-100!"
+        error_message = \
+            "Packet loss value entered is incorrect, it needs to be in the range of 1-100!"
         value = self.textBox_PacketLoss.get_text()
 
         # Checks if it is a valid int and if its within a specified range
@@ -61,7 +65,10 @@ class PacketCaptureGTK:
 
         # Elevates user to run packet script
         print("root privileges needed:")
-        self.packet = subprocess.Popen(['sudo', 'python', 'Packet.py', parameters])
+
+        textViewBuffer = self.textView_ConsoleOutput.get_buffer()
+        textViewBuffer.set_text(subprocess.Popen(['sudo', 'python', 'Packet.py', parameters]))
+
         print("Password: " + getpass.getuser())
 
     # # Helper method used to check the validity of a value

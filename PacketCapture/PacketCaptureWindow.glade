@@ -85,6 +85,18 @@
             <property name="y">108</property>
           </packing>
         </child>
+        <child>
+          <object class="GtkTextView" id="TextView_ConsoleOutput">
+            <property name="width_request">625</property>
+            <property name="height_request">200</property>
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+          </object>
+          <packing>
+            <property name="x">29</property>
+            <property name="y">179</property>
+          </packing>
+        </child>
       </object>
     </child>
     <child type="titlebar">

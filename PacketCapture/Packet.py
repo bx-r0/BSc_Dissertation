@@ -1,3 +1,5 @@
+import getopt
+
 from netfilterqueue import NetfilterQueue
 from scapy.all import *
 
@@ -12,30 +14,51 @@ To restore full internet connection run:
 """
 
 
+def affect_packet(packet):
+    """This function checks if the packet should be affected or not"""
+
+    if target_packet_type == "ALL":
+        return True
+    else:
+        # Grabs the first section of the Packet
+        packet_string = str(packet)
+        split = packet_string.split(' ')
+
+        # Checks for the target packet type
+        if target_packet_type == split[0]:
+            return True
+        else:
+            return False
+
+
 def ignore_packet(packet):
     """This is just used a default 'do nothing' function """
 
+    # Accepts and lets the packet leave the queue
     packet.accept()
 
 
 def print_packet(packet):
     """This function just prints the packet"""
 
-    print("[!] ", end='')
-    print(packet)
+    if affect_packet(packet):
+        print("[!]", packet)
+
+    # Accepts and lets the packet leave the queue
     packet.accept()
 
 
 def edit_packet(packet):
     """This function will be used to edit sections of a packet, this is currently incomplete"""
 
-    # Converts into Scapy compatible string
-    pkt = IP(packet.get_payload())
+    if affect_packet(packet):
+        # Converts into Scapy compatible string
+        pkt = IP(packet.get_payload())
 
-    # TODO: Packet editing here
+        # TODO: Packet editing here
 
-    # Sets the packet to the modified version
-    packet.set_payload(bytes(pkt))
+        # Sets the packet to the modified version
+        packet.set_payload(bytes(pkt))
 
     # Accepts and lets the packet leave the queue
     packet.accept()
@@ -44,12 +67,16 @@ def edit_packet(packet):
 def packet_latency(packet):
     """This function is used to incur latency on packets"""
 
-    # Shows the packet
-    print(packet)
+    # TODO: Issues with ^c not working when latency is active
 
-    # Issues latency of the entered value
-    time.sleep(latency_value_second)
+    if affect_packet(packet):
+        # Shows the packet
+        print("[!]", packet)
 
+        # Issues latency of the entered value
+        time.sleep(latency_value_second)
+
+    # Accepts and lets the packet leave the queue
     packet.accept()
 
 
@@ -58,14 +85,18 @@ def packet_loss(packet):
     a percentage is defined and anything
     lower is dropped and anything else is accepted"""
 
-    # random value from 1 to 100
-    random_value = random.uniform(1, 100)
+    if affect_packet(packet):
+        # random value from 1 to 100
+        random_value = random.uniform(1, 100)
 
-    # If the generated value is smaller than the percentage discard
-    if packet_loss_percentage > random_value:
-        packet.drop()
-        print("[!] Packet dropped!")
-    # Accept the packet
+        # If the generated value is smaller than the percentage discard
+        if packet_loss_percentage > random_value:
+            packet.drop()
+            print("[!] Packet dropped!")
+        # Accept the packet
+        else:
+            packet.accept()
+    # This else is needed because the packet would be blocked if it's not the target
     else:
         packet.accept()
 
@@ -86,13 +117,14 @@ def run_packet_manipulation():
         # Shows the start waiting message
         print("[*] Waiting ")
         nfqueue.run()
+
     except (KeyboardInterrupt, SystemExit):
         print("\n[!] Process aborted")
         print("[!] iptables reverted")
         os.system("iptables -F")
 
 
-def help_message():
+def usage():
     """Issues a terminal help message"""
 
     print("""
@@ -101,77 +133,58 @@ def help_message():
     |-p                             - Print packet    |
     |-e                             - Packet edit     |
     |-l <latency_seconds>           - Latency         |
-    |-pl <loss_percentage>          - Packet loss     |
+    |-z <loss_percentage>           - Packet loss     |
+    |-t <target_packet_protocol>    - Target protocol |
     |-h                             - Help            |
     #=================================================#
     """)
 
 
 def parameters():
-    """This function deals with the actions attached to parameters"""
+    """This function deals with parameters passed to the script
+    most of the handling is performed by the 'getopt' module"""
 
+    # Defines globals to be used above
     global mode
     global latency_value_second
     global packet_loss_percentage
+    global target_packet_type
 
-    # --- default vars --- #
-    mode_arg = ""
-    mode_value_arg = ""
-    run = True
-    # -------------------- #
+    try:
+        # The 2nd parameter for getopt() specifies the expected parameters
+        # "p"   = "-p"
+        # "t:"  = "-t <value>" Note: ":" is used to specify a value will preced
+        opts, args = getopt.getopt(sys.argv[1:], 'pel:z:ht:', '')
 
-    """Assigning Parameters"""
-    # Note: The script name i.e "Python.py" is counted as a parameter
-    length = len(sys.argv)
-    if length == 3:
-        mode_arg = str(sys.argv[1])
-        mode_value_arg = str(sys.argv[2])
+        for opt, arg in opts:
+            # ---------- Flags ---------- # - Parameters without values
+            if opt == "-h":
+                usage()
+                sys.exit(0)
 
-    elif length == 2:
-        mode_arg = str(sys.argv[1])
+            elif opt == "-p":
+                mode = print_packet
 
-    elif length == 1:
-        print("Not enough parameters!")
-        help_message()
-        run = False
+            # ---------- Arguments ---------- # - Parameters with values
+            elif opt == "-l":
+                mode = packet_latency
+                latency_value_second = int(arg)
 
-    """Parameter List"""
-    if mode_arg == "-p":
-        mode = print_packet
+            elif opt == "-z":
+                mode = packet_loss
+                packet_loss_percentage = int(arg)
 
-    elif mode_arg == "-e":
-        mode = edit_packet
+            elif opt == "-t":
+                print("[!] Only affecting", arg, "packets")
+                target_packet_type = arg
 
-    elif mode_arg == "-l":
-        mode = packet_latency
-        latency_value_second = int(mode_value_arg) / 1000
-
-    elif mode_arg == "-pl":
-        mode = packet_loss
-        packet_loss_percentage = int(mode_value_arg)
-
-    elif mode_arg == "-h":
-        help_message()
-        run = False
-
-    elif mode_arg == "-i":
-        mode = ignore_packet
-
-    #       <--- Add more parameters here
-
-    # No parameters
-    elif mode_arg == "":
-        print()
-
-    # Invalid parameters
-    else:
-        print("Unsupported parameters included")
-        help_message()
-        run = False
-
-    # If everything is valid run == true
-    if run:
+        # When all parameters are handled
         run_packet_manipulation()
+
+    except getopt.GetoptError:
+        print("Error: incorrect parameters")
+        usage()
+        sys.exit(2)
 
 # ------------------------DEFINITION END ------------------------------ #
 
@@ -180,6 +193,7 @@ def parameters():
 packet_loss_percentage = 0
 latency_value_second = 0
 mode = ignore_packet
+target_packet_type = "ALL"
 
 # Parameter handling
 parameters()
