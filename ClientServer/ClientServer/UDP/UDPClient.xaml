@@ -5,9 +5,9 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ClientServer.UDP"
         mc:Ignorable="d"
-        Title="UDPClient" Height="300" Width="300">
+        Title="UDPClient" Height="83.824" Width="300">
     <Grid>
-        <Button Content="Connect" HorizontalAlignment="Left" Margin="108,52,0,0" VerticalAlignment="Top" Width="75" Click="Connect_Click"/>
+        <Button x:Name="Button_Connect" Content="Connect" Margin="10,10,10,8" Click="Connect_Click"/>
 
     </Grid>
 </Window>

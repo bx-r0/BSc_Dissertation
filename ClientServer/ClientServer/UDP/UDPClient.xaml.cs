@@ -21,6 +21,7 @@ namespace ClientServer.UDP
     {
         //# Client
         UDPClient Client = new UDPClient("localhost", UDPServer.port);
+        //UDPClient Client = new UDPClient("192.168.1.9", UDPServer.port);
 
         //# Constructor
         public UDPClientWindow()
@@ -31,6 +32,9 @@ namespace ClientServer.UDP
         //# Connection click
         private void Connect_Click(object sender, RoutedEventArgs e)
         {
+            //Shows the button has been clicked
+            Button_Connect.IsEnabled = false;
+            
             //# Connects
             Client.Connect();
         }

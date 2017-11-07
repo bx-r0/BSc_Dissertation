@@ -177,12 +177,6 @@
   <ItemGroup>
     <Resource Include="Logging\LOG.txt" />
   </ItemGroup>
-  <ItemGroup>
-    <Resource Include="UDP\UDP_Images\puppy.jpg" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="UDP\UDP_Images\castle.png" />
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>

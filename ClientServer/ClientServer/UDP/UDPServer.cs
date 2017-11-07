@@ -6,6 +6,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 using System.Drawing;
+using System.Timers;
 
 namespace ClientServer.UDP
 {
@@ -15,15 +16,22 @@ namespace ClientServer.UDP
         UdpClient Server = new UdpClient(port);
         public static int port = 1000;
 
-        //# Image var
-        Image UDP_Image;
+        //Timeout in ms
+        private const int timeOut = 5000;
+       
+        //# Size of the grid
+        public const int GRID_SIZE = UDPClient.GRID_SIZE;
+        public bool[] GRID_Obtained = new bool[GRID_SIZE * GRID_SIZE];
 
         //# Constructor 
         public UDPServer()
         {
-
         }
 
+        /// <summary>
+        /// What runs when the server is started
+        /// </summary>
+        /// <returns></returns>
         public async Task Start()
         {
             try
@@ -33,12 +41,9 @@ namespace ClientServer.UDP
                 //IPEndPoint object will allow us to read datagrams sent from any source.
                 IPEndPoint RemoteIpEndPoint = new IPEndPoint(0, 0);
 
-                byte[] receiveBytes = ReadMultiPacketMessage(ref RemoteIpEndPoint);
+                //Image_Processing(ref RemoteIpEndPoint);
+                Grid_Processing(ref RemoteIpEndPoint);
 
-                //saves the image
-                UDP_Image = BytesToImage(receiveBytes);
-                UDP_Image.Save("image.png");
-                
                 Server.Close();
             }
             catch (Exception e)
@@ -48,47 +53,31 @@ namespace ClientServer.UDP
 
         }
 
-        private byte[] ReadMultiPacketMessage(ref IPEndPoint RemoteIpEndPoint)
+        //# Reading grid packages
+        private void Grid_Processing(ref IPEndPoint RemoteIpEndPoint)
         {
-            byte[] returnBytes = Server.Receive(ref RemoteIpEndPoint);
-
-            //Bool to keep looping
-            bool recieving = true;
-            while (recieving)
+            try
             {
-                //Read messages
-                byte[] newReceieve = Server.Receive(ref RemoteIpEndPoint);
+                //Sets a timeouts
+                Server.Client.ReceiveTimeout = timeOut;
 
-                if (newReceieve.Length == 1 || newReceieve == null)
+                //Loops and receives the incoming packets
+                while (true)
                 {
-                    //Checks for the # symbol
-                    //TODO: Better way to end stream that EOF UDP Packet
-                    if (newReceieve[0] == 35)
-                    {
-                        recieving = false;
-                        break;
-                    }
-                }
-                else
-                {
-                    //Joins the arrays
-                    returnBytes = returnBytes.Concat(newReceieve).ToArray();
+                    byte[] returnBytes = Server.Receive(ref RemoteIpEndPoint);
+
+                    //Grabs the value
+                    int value = int.Parse(Encoding.ASCII.GetString(returnBytes));
+
+                    //Sets the value to received
+                    GRID_Obtained[value] = true;
                 }
             }
-
-            // Blocks until a message returns on this socket from a remote host.
-            return returnBytes;
-        }
-
-        /// <summary>
-        /// Function used to convert a byte array into an Image
-        /// </summary>
-        /// <param name="bytes"></param>
-        /// <returns></returns>
-        private Image BytesToImage(byte[] bytes)
-        {
-            ImageConverter converter = new ImageConverter();
-            return (Image)converter.ConvertFrom((byte[])bytes);
+            //This is where the program will end up after a timeout
+            catch (Exception e)
+            {
+                //TODO: Handle exception
+            }
         }
     }
 }
