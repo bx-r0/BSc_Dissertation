@@ -91,6 +91,13 @@
             <property name="height_request">200</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
+            <property name="hexpand">True</property>
+            <property name="vexpand">True</property>
+            <property name="resize_mode">immediate</property>
+            <property name="hscroll_policy">natural</property>
+            <property name="vscroll_policy">natural</property>
+            <property name="wrap_mode">word</property>
+            <property name="input_purpose">alpha</property>
           </object>
           <packing>
             <property name="x">29</property>

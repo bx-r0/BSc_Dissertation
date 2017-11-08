@@ -1,10 +1,12 @@
-import getpass
+import fcntl
+import os
 import subprocess
 
 import gi
 
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
+from gi.repository import GObject
 
 
 class PacketCaptureGTK:
@@ -30,7 +32,7 @@ class PacketCaptureGTK:
 
     def onDeleteWindow(self, *args):
         """Event that runs when the window is closed"""
-
+        self.sub_proc.kill()
         Gtk.main_quit(*args)
 
     def latency_Clicked(self, button):
@@ -63,13 +65,13 @@ class PacketCaptureGTK:
     def run_packet_capture(self, parameters):
         """This method is used to run the Packet.py script"""
 
-        # Elevates user to run packet script
-        print("root privileges needed:")
+        # TODO: Script is running by output is not being displayed
+        cmd = ['pkexec', 'python', 'Packet.py', '-p']
 
-        textViewBuffer = self.textView_ConsoleOutput.get_buffer()
-        textViewBuffer.set_text(subprocess.Popen(['sudo', 'python', 'Packet.py', parameters]))
+        self.sub_proc = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        self.sub_outp = ""
 
-        print("Password: " + getpass.getuser())
+        GObject.timeout_add(100, self.update_terminal)
 
     # # Helper method used to check the validity of a value
     def validation(self, string, start, stop):
@@ -86,8 +88,40 @@ class PacketCaptureGTK:
                 return True
             else:
                 return False
-
         except ValueError:
             return False
+
+    def update_terminal(self):
+        """Used to pipe terminal output to a TextView"""
+
+        # Grabs the buffer and finds the end
+        buffer = self.textView_ConsoleOutput.get_buffer()
+
+        end = buffer.get_end_iter()
+        mark = buffer.create_mark('', end, False)
+
+        # Grabs the console output
+        bytes = self.non_block_read(self.sub_proc.stdout)
+
+        if bytes is not None:
+            # Display the output of the console
+            buffer.insert(end, bytes.decode())
+
+            # Keeps the most recent line on screen
+            self.textView_ConsoleOutput.scroll_mark_onscreen(mark)
+
+        return self.sub_proc.poll() is None
+
+    def non_block_read(self, output):
+        """Code for this was taken from @torfbolt answer on:
+        https://stackoverflow.com/questions/17038063/show-terminal-output-in-a-gui-window-using-python-gtk
+        """
+        fd = output.fileno()
+        fl = fcntl.fcntl(fd, fcntl.F_GETFL)
+        fcntl.fcntl(fd, fcntl.F_SETFL, fl | os.O_NONBLOCK)
+        try:
+            return output.read()
+        except:
+            return ''
 
 
