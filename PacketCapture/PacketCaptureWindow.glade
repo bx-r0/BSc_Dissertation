@@ -100,8 +100,23 @@
             <property name="input_purpose">alpha</property>
           </object>
           <packing>
-            <property name="x">29</property>
-            <property name="y">179</property>
+            <property name="x">24</property>
+            <property name="y">178</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkButton" id="Button_stop">
+            <property name="label" translatable="yes">X</property>
+            <property name="width_request">50</property>
+            <property name="height_request">34</property>
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="receives_default">True</property>
+            <signal name="clicked" handler="onStop_Clicked" swapped="no"/>
+          </object>
+          <packing>
+            <property name="x">604</property>
+            <property name="y">12</property>
           </packing>
         </child>
       </object>

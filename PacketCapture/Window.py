@@ -1,7 +1,7 @@
 import fcntl
 import os
 import subprocess
-
+import sys
 import gi
 
 gi.require_version('Gtk', '3.0')
@@ -30,9 +30,15 @@ class PacketCaptureGTK:
         Gtk.main()
     # --------------------------Control Events------------------------------------- #
 
+    def onStop_Clicked(self, button):
+        try:
+            self.sub_proc.kill()
+            print('SIGINT Send')
+        except:
+            print("Error: Cannot stop process")
+
     def onDeleteWindow(self, *args):
         """Event that runs when the window is closed"""
-        self.sub_proc.kill()
         Gtk.main_quit(*args)
 
     def latency_Clicked(self, button):
@@ -57,7 +63,7 @@ class PacketCaptureGTK:
 
         # Checks if it is a valid int and if its within a specified range
         if self.validation(value, 1, 100):
-                self.run_packet_capture("-pl " + str(value))
+            self.run_packet_capture("-pl " + str(value))
         else:
             print(error_message)
     # ----------------------------------------------------------------------------- #
@@ -65,15 +71,25 @@ class PacketCaptureGTK:
     def run_packet_capture(self, parameters):
         """This method is used to run the Packet.py script"""
 
-        # TODO: Script is running by output is not being displayed
-        cmd = ['pkexec', 'python', 'Packet.py', '-p']
+        # The exact location of the file needs to specified
+        file_name = "Packet.py"
+        file_path = "/home/user_1/PycharmProjects/Dissertation_Project/PacketCapture/" + file_name
 
-        self.sub_proc = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        # Command parameters
+        cmd = ['pkexec', 'python', file_path, parameters]
+
+        # TODO: This is not working
+        # -It will display commands that are not run under root perfectly
+        # -But if a command requires elevation it will not work and will only display error messages?
+        # -Maybe it's to do with different streams for root and regular users
+        #self.sub_proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+
+        # Runs the command - will display on a console for the time being
+        self.sub_proc = subprocess.call(cmd)
         self.sub_outp = ""
 
-        GObject.timeout_add(100, self.update_terminal)
+        #GObject.timeout_add(100, self.update_terminal)
 
-    # # Helper method used to check the validity of a value
     def validation(self, string, start, stop):
         """This function is used to validate the passed parameter values
             it checks if the value can be parsed as an int and a range is
