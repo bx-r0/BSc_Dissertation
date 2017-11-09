@@ -5,9 +5,11 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ClientServer.UDP"
         mc:Ignorable="d"
-        Title="UDPClient" Height="83.824" Width="300">
+        Title="UDPClient" Height="131.797" Width="300">
     <Grid>
-        <Button x:Name="Button_Connect" Content="Connect" Margin="10,10,10,8" Click="Connect_Click"/>
+        <Button x:Name="Button_Connect" Content="Connect" Margin="10,0,10,10" Click="Connect_Click" Height="38" VerticalAlignment="Bottom"/>
+        <TextBox x:Name="TextBox_Address" Height="23" Margin="10,0,10,53" TextWrapping="Wrap" VerticalAlignment="Bottom"/>
+        <Label Content="Address" HorizontalAlignment="Left" Margin="113,-6,0,0" VerticalAlignment="Top"/>
 
     </Grid>
 </Window>

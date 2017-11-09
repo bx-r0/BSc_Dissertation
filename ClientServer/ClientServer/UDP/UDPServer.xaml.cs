@@ -109,7 +109,6 @@ namespace ClientServer.UDP
                     {
                         //INCORRECT
                         c.Dispatcher.Invoke(() => c.Background = Brushes.Red);
-
                     }
 
                     //Moves the index along

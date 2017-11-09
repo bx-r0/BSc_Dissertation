@@ -88,16 +88,29 @@ namespace ClientServer.HTTP
             //      /location/<location_name>
             //
             string responseString = "";
-            switch (request.RawUrl)
+
+            //The first index will be blank
+            string[] split = request.RawUrl.Split('/');
+
+            switch (split[1])
             {
-                case ("/data/"):
-                    responseString = "data!";
-
-                    break;
-                case ("/location/"):
-                    responseString = "location!";
+                case ("add"):
+                    responseString = Operation(split[2], split[3], Add);
                     break;
 
+                case ("sub"):
+                    responseString = Operation(split[2], split[3], Sub);
+                    break;
+
+                case("mul"):
+                    responseString = Operation(split[2], split[3], Mul);
+                    break;
+
+                case ("div"):
+                    responseString = Operation(split[2], split[3], Div);
+                    break;
+
+                //# Used for the test scripts
                 case ("/testing"):
                     responseString = "TEST_VALID";
                     break;
@@ -113,5 +126,37 @@ namespace ClientServer.HTTP
             output.Write(buffer, 0, buffer.Length);
             output.Close();
         }
+
+       /// <summary>
+       /// Takes values as strings and parses them 
+       /// operation is a passed in function that call the necessary method
+       /// </summary>
+       /// <param name="num1"></param>
+       /// <param name="num2"></param>
+       /// <param name="operation"></param>
+       /// <returns></returns>
+        private string Operation(string num1, string num2, Func<int,int,int> operation)
+        {
+            int value = operation(int.Parse(num1), int.Parse(num2));
+            return value.ToString();
+        }
+
+        //Operations
+        private int Add(int n1, int n2)
+        {
+            return n1 + n2;
+        }
+        private int Sub(int n1, int n2)
+        {
+            return n1 - n2;
+        }
+        private int Mul(int n1, int n2)
+        {
+            return n1 * n2;
+        }
+        private int Div(int n1, int n2)
+        {
+            return n1 / n2;
+        }
     }
-}
+}   
