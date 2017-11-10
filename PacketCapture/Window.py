@@ -1,13 +1,10 @@
 import fcntl
 import os
 import subprocess
-import sys
 import gi
-
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 from gi.repository import GObject
-
 
 class PacketCaptureGTK:
     """A GUI for controlling the Packet.py script"""
@@ -78,17 +75,12 @@ class PacketCaptureGTK:
         # Command parameters
         cmd = ['pkexec', 'python', file_path, parameters]
 
-        # TODO: This is not working
-        # -It will display commands that are not run under root perfectly
-        # -But if a command requires elevation it will not work and will only display error messages?
-        # -Maybe it's to do with different streams for root and regular users
-        #self.sub_proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-
-        # Runs the command - will display on a console for the time being
-        self.sub_proc = subprocess.call(cmd)
+        # Calls the sub procedure
+        self.sub_proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         self.sub_outp = ""
 
-        #GObject.timeout_add(100, self.update_terminal)
+        # Non-Block updates the TextView
+        GObject.timeout_add(100, self.update_terminal)
 
     def validation(self, string, start, stop):
         """This function is used to validate the passed parameter values
@@ -113,6 +105,8 @@ class PacketCaptureGTK:
         # Grabs the buffer and finds the end
         buffer = self.textView_ConsoleOutput.get_buffer()
 
+        # Grabs the end and marks it for reference
+        # the mark will stay at the end of the TextView
         end = buffer.get_end_iter()
         mark = buffer.create_mark('', end, False)
 

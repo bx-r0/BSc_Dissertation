@@ -12,6 +12,9 @@ To restore full internet connection run:
 
         "sudo iptables -F"
 """
+def print_force(string):
+    print(string)
+    sys.stdout.flush()
 
 
 def affect_packet(packet):
@@ -42,7 +45,7 @@ def print_packet(packet):
     """This function just prints the packet"""
 
     if affect_packet(packet):
-        print("[!]", packet)
+        print_force("[!] " + str(packet))
 
     # Accepts and lets the packet leave the queue
     packet.accept()
@@ -68,10 +71,9 @@ def packet_latency(packet):
     """This function is used to incur latency on packets"""
 
     # TODO: Issues with ^c not working when latency is active
-
     if affect_packet(packet):
         # Shows the packet
-        print("[!]", packet)
+        print_force("[!]" + str(packet))
 
         # Issues latency of the entered value
         time.sleep(latency_value_second)
@@ -92,7 +94,7 @@ def packet_loss(packet):
         # If the generated value is smaller than the percentage discard
         if packet_loss_percentage > random_value:
             packet.drop()
-            print("[!] Packet dropped!")
+            print_force("[!] Packet dropped!")
         # Accept the packet
         else:
             packet.accept()
@@ -108,14 +110,18 @@ def run_packet_manipulation():
         # Runs the IPTABLES command
         os.system("iptables -A INPUT -j NFQUEUE")
 
-        print("[*] Mode is: " + mode.__name__)
+        print_force("[*] Mode is: " + mode.__name__)
 
         # Setup for the NQUEUE
         nfqueue = NetfilterQueue()
-        nfqueue.bind(0, mode)  # 0 is the default NFQUEUE
+
+        try:
+             nfqueue.bind(0, mode)  # 0 is the default NFQUEUE
+        except OSError:
+            print_force("[!] Queue already created")
 
         # Shows the start waiting message
-        print("[*] Waiting ")
+        print_force("[*] Waiting ")
         nfqueue.run()
 
     except (KeyboardInterrupt, SystemExit):
@@ -175,14 +181,14 @@ def parameters():
                 packet_loss_percentage = int(arg)
 
             elif opt == "-t":
-                print("[!] Only affecting", arg, "packets")
+                print_force("[!] Only affecting " + arg + " packets")
                 target_packet_type = arg
 
         # When all parameters are handled
         run_packet_manipulation()
 
     except getopt.GetoptError:
-        print("Error: incorrect parameters")
+        print_force("Error: incorrect parameters")
         usage()
         sys.exit(2)
 
