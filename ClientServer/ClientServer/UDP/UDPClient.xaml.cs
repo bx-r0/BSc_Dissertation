@@ -20,8 +20,7 @@ namespace ClientServer.UDP
     public partial class UDPClientWindow : Window
     {
         //# Client
-        UDPClient Client = new UDPClient("localhost", UDPServer.port);
-        //UDPClient Client = new UDPClient("192.168.1.9", UDPServer.port);
+        UDPClient Client;
 
         //# Constructor
         public UDPClientWindow()
@@ -31,7 +30,17 @@ namespace ClientServer.UDP
 
         //# Connection click
         private void Connect_Click(object sender, RoutedEventArgs e)
-        {
+        { 
+            //Default if no address is specified
+            string address = "localhost";
+            if (TextBox_Address.Text.Trim() != "")
+            {
+                address = TextBox_Address.Text;
+            }
+            
+            //Creates the client
+            Client = new UDPClient(address, UDPServer.port);
+
             //Shows the button has been clicked
             Button_Connect.IsEnabled = false;
             

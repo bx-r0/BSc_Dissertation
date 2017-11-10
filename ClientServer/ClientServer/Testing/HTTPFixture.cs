@@ -24,7 +24,7 @@ namespace ClientServer.Testing
             HTTPClient client = new HTTPClient(address);
 
             //# Sets of the GET thread
-            var t = Task.Run(() => client.GET());
+            var t = Task.Run(() => client.GET(""));
             t.Wait();
 
             //# Obtains the result
