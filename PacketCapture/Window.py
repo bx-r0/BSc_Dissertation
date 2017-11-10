@@ -6,6 +6,7 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 from gi.repository import GObject
 
+
 class PacketCaptureGTK:
     """A GUI for controlling the Packet.py script"""
 
@@ -28,14 +29,13 @@ class PacketCaptureGTK:
     # --------------------------Control Events------------------------------------- #
 
     def onStop_Clicked(self, button):
-        try:
-            self.sub_proc.kill()
-            print('SIGINT Send')
-        except:
-            print("Error: Cannot stop process")
+        """Runs when the stop button is clicked"""
+        self.clean_close()
 
     def onDeleteWindow(self, *args):
         """Event that runs when the window is closed"""
+
+        self.clean_close()
         Gtk.main_quit(*args)
 
     def latency_Clicked(self, button):
@@ -56,13 +56,15 @@ class PacketCaptureGTK:
 
         error_message = \
             "Packet loss value entered is incorrect, it needs to be in the range of 1-100!"
+
         value = self.textBox_PacketLoss.get_text()
 
         # Checks if it is a valid int and if its within a specified range
         if self.validation(value, 1, 100):
-            self.run_packet_capture("-pl " + str(value))
+            self.run_packet_capture("-z " + str(value))
         else:
             print(error_message)
+
     # ----------------------------------------------------------------------------- #
 
     def run_packet_capture(self, parameters):
@@ -76,13 +78,14 @@ class PacketCaptureGTK:
         cmd = ['pkexec', 'python', file_path, parameters]
 
         # Calls the sub procedure
-        self.sub_proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        self.sub_proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, preexec_fn=os.setsid)
         self.sub_outp = ""
 
         # Non-Block updates the TextView
         GObject.timeout_add(100, self.update_terminal)
 
-    def validation(self, string, start, stop):
+    @staticmethod
+    def validation(string, start, stop):
         """This function is used to validate the passed parameter values
             it checks if the value can be parsed as an int and a range is
             specified that is must be within"""
@@ -122,7 +125,8 @@ class PacketCaptureGTK:
 
         return self.sub_proc.poll() is None
 
-    def non_block_read(self, output):
+    @staticmethod
+    def non_block_read(output):
         """Code for this was taken from @torfbolt answer on:
         https://stackoverflow.com/questions/17038063/show-terminal-output-in-a-gui-window-using-python-gtk
         """
@@ -134,4 +138,11 @@ class PacketCaptureGTK:
         except:
             return ''
 
+    def clean_close(self):
+        """Function that is designed to stop the subprocess as cleanly as possible"""
+        try:
+            # Kill needs to be sudo because the sub process is launched from sudo
+            os.system('pkexec kill -SIGINT ' + str(self.sub_proc.pid))
+        except Exception as e:
+            print(e)
 

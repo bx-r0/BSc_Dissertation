@@ -73,7 +73,7 @@ def packet_latency(packet):
     # TODO: Issues with ^c not working when latency is active
     if affect_packet(packet):
         # Shows the packet
-        print_force("[!]" + str(packet))
+        print_force("[!] " + str(packet))
 
         # Issues latency of the entered value
         time.sleep(latency_value_second)
@@ -174,7 +174,7 @@ def parameters():
             # ---------- Arguments ---------- # - Parameters with values
             elif opt == "-l":
                 mode = packet_latency
-                latency_value_second = int(arg)
+                latency_value_second = int(arg) / 1000
 
             elif opt == "-z":
                 mode = packet_loss
