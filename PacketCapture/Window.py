@@ -25,11 +25,20 @@ class PacketCaptureGTK:
         self.textBox_PacketLoss = builder.get_object("TextBox_PacketLoss")
         self.textView_ConsoleOutput = builder.get_object("TextView_ConsoleOutput")
 
+        # Buttons
+        self.button_Latency = builder.get_object("Button_latency")
+        self.button_PacketLoss = builder.get_object("Button_packet_loss")
+
+        self.button_Stop = builder.get_object("Button_stop")
+        self.button_Stop.set_sensitive(False) # Stops the button from being clickable
+
         Gtk.main()
+
     # --------------------------Control Events------------------------------------- #
 
     def onStop_Clicked(self, button):
         """Runs when the stop button is clicked"""
+        self.progressRunning(False)
         self.clean_close()
 
     def onDeleteWindow(self, *args):
@@ -69,6 +78,9 @@ class PacketCaptureGTK:
 
     def run_packet_capture(self, parameters):
         """This method is used to run the Packet.py script"""
+
+        # Toggles the buttons
+        self.progressRunning(True)
 
         # The exact location of the file needs to specified
         file_name = "Packet.py"
@@ -145,4 +157,22 @@ class PacketCaptureGTK:
             os.system('pkexec kill -SIGINT ' + str(self.sub_proc.pid))
         except Exception as e:
             print(e)
+
+    def progressRunning(self, state):
+        """Used to toggle the button being enabled, so when a progress is running
+        the process buttons should be off and the cancel button enabled and visa versa"""
+
+        # Sets the latency and packet loss buttons sensitivity
+        self.button_Latency.set_sensitive(not state)
+        self.button_PacketLoss.set_sensitive(not state)
+
+        # Inverts the stop button
+        self.button_Stop.set_sensitive(state)
+
+        # Clears the textboxes (GtkEntry) if the stop button has been clicked
+        if state is False:
+            self.textBox_Latency.set_text("")
+            self.textBox_PacketLoss.set_text("")
+
+
 
