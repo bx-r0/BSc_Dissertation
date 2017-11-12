@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ClientServer"
         mc:Ignorable="d"
-        Title="MainWindow" Height="289.774" Width="361.505" ResizeMode="NoResize" WindowStartupLocation="CenterScreen">
+        Title="MainWindow" Height="333.422" Width="361.505" ResizeMode="NoResize" WindowStartupLocation="CenterScreen">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>
@@ -13,18 +13,25 @@
         <Grid.RowDefinitions>
             <RowDefinition/>
         </Grid.RowDefinitions>
-        <Button Content="GET" Margin="271,10,10,0" Click="GET_Click" Height="23" VerticalAlignment="Top"/>
-        <ListBox x:Name="WindowOutput" Height="182" Margin="10,0,96,10" VerticalAlignment="Bottom"/>
-        <Label Content="CLIENT&#xD;&#xA;" HorizontalAlignment="Left" Margin="10,37,0,0" VerticalAlignment="Top" Height="27"/>
-        <Button Content="AUTO" Margin="271,188,10,0" Click="AUTO_Click" Height="20" VerticalAlignment="Top"/>
-        <Button Content="SPAM" Margin="271,221,10,0" Click="SPAM_Click" Height="20" VerticalAlignment="Top"/>
-        <ComboBox x:Name="ComboBox_Operator" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="121">
+        <Button Content="GET" Margin="271,69,10,0" Click="GET_Click" Height="23" VerticalAlignment="Top"/>
+        <ListBox x:Name="WindowOutput" Height="182" Margin="10,0,111,10" VerticalAlignment="Bottom"/>
+        <Label Content="CLIENT&#xD;&#xA;" HorizontalAlignment="Left" Margin="154,10,0,0" VerticalAlignment="Top" Height="27" FontWeight="Bold"/>
+        <Button Content="AUTO" Margin="250,214,31,0" Click="AUTO_Click" Height="20" VerticalAlignment="Top" IsEnabled="False"/>
+        <Button Content="SPAM" Margin="250,247,31,0" Click="SPAM_Click" Height="20" VerticalAlignment="Top"/>
+        <ComboBox x:Name="ComboBox_Operator" HorizontalAlignment="Left" Margin="10,69,0,0" VerticalAlignment="Top" Width="121">
             <ComboBoxItem Content="Add" HorizontalAlignment="Left" Width="119"/>
             <ComboBoxItem Content="Sub" HorizontalAlignment="Left" Width="119"/>
             <ComboBoxItem Content="Mul" HorizontalAlignment="Left" Width="119"/>
             <ComboBoxItem Content="Div" HorizontalAlignment="Left" Width="119"/>
         </ComboBox>
-        <TextBox x:Name="TextBox_Value1" HorizontalAlignment="Left" Height="23" Margin="136,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="66"/>
-        <TextBox x:Name="TextBox_Value2" HorizontalAlignment="Left" Height="23" Margin="207,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="59"/>
+        <TextBox x:Name="TextBox_Value1" HorizontalAlignment="Left" Height="23" Margin="136,69,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="66"/>
+        <TextBox x:Name="TextBox_Value2" HorizontalAlignment="Left" Height="23" Margin="207,69,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="59"/>
+        <Label Content="Method" HorizontalAlignment="Left" Margin="10,43,0,0" VerticalAlignment="Top"/>
+        <Label Content="Value 1" HorizontalAlignment="Left" Margin="136,43,0,0" VerticalAlignment="Top"/>
+        <Label Content="Value 2" HorizontalAlignment="Left" Margin="207,43,0,0" VerticalAlignment="Top"/>
+        <Label Content="Stats" HorizontalAlignment="Left" Margin="250,112,0,0" VerticalAlignment="Top" FontWeight="Bold"/>
+        <Label Content="Latency:" HorizontalAlignment="Left" Margin="250,138,0,0" VerticalAlignment="Top"/>
+        <Label Content="0ms
+               " HorizontalAlignment="Left" Margin="298,138,0,0" VerticalAlignment="Top"/>
     </Grid>
 </Window>
