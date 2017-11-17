@@ -201,5 +201,9 @@ latency_value_second = 0
 mode = ignore_packet
 target_packet_type = "ALL"
 
+# Check if user is root
+if os.getuid() != 0:
+    exit("Error: User needs to be root to run this script")
+
 # Parameter handling
 parameters()
