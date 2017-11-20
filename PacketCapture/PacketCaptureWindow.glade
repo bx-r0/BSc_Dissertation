@@ -5,7 +5,7 @@
   <object class="GtkWindow" id="window1">
     <property name="name">window1</property>
     <property name="width_request">740</property>
-    <property name="height_request">500</property>
+    <property name="height_request">550</property>
     <property name="can_focus">False</property>
     <property name="hexpand">False</property>
     <property name="vexpand">False</property>
@@ -129,6 +129,37 @@
           <packing>
             <property name="x">29</property>
             <property name="y">168</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkButton" id="ARPSettings">
+            <property name="label" translatable="yes">ARP</property>
+            <property name="width_request">92</property>
+            <property name="height_request">36</property>
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="receives_default">True</property>
+            <signal name="clicked" handler="ARP_Clicked" swapped="no"/>
+          </object>
+          <packing>
+            <property name="x">567</property>
+            <property name="y">383</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkLabel" id="Label_ARP_active">
+            <property name="width_request">100</property>
+            <property name="height_request">40</property>
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="label" translatable="yes">ARP Not Active</property>
+            <attributes>
+              <attribute name="foreground" value="#ffffffffffff"/>
+            </attributes>
+          </object>
+          <packing>
+            <property name="x">461</property>
+            <property name="y">381</property>
           </packing>
         </child>
       </object>

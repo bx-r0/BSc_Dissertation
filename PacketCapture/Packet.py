@@ -3,16 +3,11 @@ import getopt
 from netfilterqueue import NetfilterQueue
 from scapy.all import *
 
-"""
-This iptables command needs to be run to push all packets into the NFQUEUE:
 
-        "sudo iptables -A INPUT -j NFQUEUE"
-
-To restore full internet connection run:
-
-        "sudo iptables -F"
-"""
 def print_force(string):
+    """This method is required because when this python file is called as a script
+    the prints don't appear and a flush is required """
+
     print(string)
     sys.stdout.flush()
 
@@ -70,7 +65,6 @@ def edit_packet(packet):
 def packet_latency(packet):
     """This function is used to incur latency on packets"""
 
-    # TODO: Issues with ^c not working when latency is active
     if affect_packet(packet):
         # Shows the packet
         print_force("[!] " + str(packet))
@@ -127,7 +121,7 @@ def run_packet_manipulation():
     except (KeyboardInterrupt, SystemExit):
         print("\n[!] Process aborted")
         print("[!] iptables reverted")
-        os.system("iptables -F")
+        os.system("iptables -F INPUT")
 
 
 def usage():

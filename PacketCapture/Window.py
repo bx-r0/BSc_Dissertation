@@ -12,6 +12,12 @@ class PacketCaptureGTK:
 
     # Loads and shows the window
     def __init__(self):
+        self.main_window_init()
+        self.arp_window_init()
+        Gtk.main()
+
+
+    def main_window_init(self):
         # Creates the builder and loads the UI from the glade file
         builder = Gtk.Builder()
         builder.add_from_file("PacketCaptureWindow.glade")
@@ -29,10 +35,29 @@ class PacketCaptureGTK:
         self.button_Latency = builder.get_object("Button_latency")
         self.button_PacketLoss = builder.get_object("Button_packet_loss")
 
-        self.button_Stop = builder.get_object("Button_stop")
-        self.button_Stop.set_sensitive(False) # Stops the button from being clickable
+        # Labels
+        self.label_ARP_active = builder.get_object("Label_ARP_active")
 
-        Gtk.main()
+        self.button_Stop = builder.get_object("Button_stop")
+        self.button_Stop.set_sensitive(False)  # Stops the button from being clickable
+
+    def arp_window_init(self):
+        builder = Gtk.Builder()
+        builder.add_from_file("ARP_Settings.glade")
+        builder.connect_signals(self)
+
+        # Grabs and saves the window for later
+        self.arp_window = builder.get_object("window1")
+
+        #Grabs objects
+        self.button_OK = builder.get_object("Button_OK")
+        self.button_Cancel = builder.get_object("Button_Cancel")
+
+        # Puts the textBoxes into a list for easy traversal later
+        self.ARP_TextBoxes = []
+        self.ARP_TextBoxes.append(builder.get_object("TextBox_Interface"))
+        self.ARP_TextBoxes.append(builder.get_object("TextBox_VictimIP"))
+        self.ARP_TextBoxes.append(builder.get_object("TextBox_RouterIP"))
 
     # --------------------------Control Events------------------------------------- #
 
@@ -73,6 +98,33 @@ class PacketCaptureGTK:
             self.run_packet_capture("-z " + str(value))
         else:
             print(error_message)
+
+    def ARP_Clicked(self, button):
+        self.arp_window.show_all()
+
+    def ARP_OK_Clicked(self, button):
+        # All the output from the TextBoxes are store in the list, the order is:
+        # [Interface, VictimIP, RouterIP]
+        self.arp_valuesList = []
+
+        # Sets the values and clears the boxes
+        for textBox in self.ARP_TextBoxes:
+            self.arp_valuesList.append(textBox.get_text())
+            textBox.set_text("")
+
+        # Changing ID
+        self.label_ARP_active.set_text("ARP Active!")
+    
+        # Bool to check later
+        self.arpValuesSet = True
+        self.arp_window.hide()
+
+    def ARP_Cancel_Clicked(self, button):
+        # Clears the TextBoxes
+        for textBox in self.ARP_TextBoxes:
+            textBox.set_text("")
+
+        self.arp_window.hide()
 
     # ----------------------------------------------------------------------------- #
 
@@ -173,6 +225,3 @@ class PacketCaptureGTK:
         if state is False:
             self.textBox_Latency.set_text("")
             self.textBox_PacketLoss.set_text("")
-
-
-
