@@ -1,7 +1,9 @@
 import getopt
-
+import signal
 from netfilterqueue import NetfilterQueue
 from scapy.all import *
+
+nfqueue = None
 
 
 def print_force(string):
@@ -106,11 +108,13 @@ def run_packet_manipulation():
 
         print_force("[*] Mode is: " + mode.__name__)
 
+        global nfqueue
+
         # Setup for the NQUEUE
         nfqueue = NetfilterQueue()
 
         try:
-             nfqueue.bind(0, mode)  # 0 is the default NFQUEUE
+            nfqueue.bind(0, mode)  # 0 is the default NFQUEUE
         except OSError:
             print_force("[!] Queue already created")
 
@@ -118,10 +122,8 @@ def run_packet_manipulation():
         print_force("[*] Waiting ")
         nfqueue.run()
 
-    except (KeyboardInterrupt, SystemExit):
-        print("\n[!] Process aborted")
-        print("[!] iptables reverted")
-        os.system("iptables -F INPUT")
+    except KeyboardInterrupt:
+        clean_close('', '')
 
 
 def usage():
@@ -186,8 +188,20 @@ def parameters():
         usage()
         sys.exit(2)
 
+
+def clean_close(signum, frame):
+    """Used to close the script cleanly"""
+
+    print("\n[!] Process aborted")
+    print("[!] iptables reverted")
+    os.system("iptables -F INPUT")
+
 # ------------------------DEFINITION END ------------------------------ #
 
+
+# Rebinds the all the close signals to clean_close the script
+signal.signal(signal.SIGTSTP, clean_close)  # Ctrl+Z
+signal.signal(signal.SIGQUIT, clean_close)  # Ctrl+\
 
 # Default value
 packet_loss_percentage = 0
@@ -199,5 +213,4 @@ target_packet_type = "ALL"
 if os.getuid() != 0:
     exit("Error: User needs to be root to run this script")
 
-# Parameter handling
 parameters()
