@@ -230,24 +230,31 @@ class PacketCaptureGTK:
         """Function that is designed to stop the subprocess as cleanly as possible"""
         try:
 
-            # Checks if the variables have been assigned
+            # Checks if the variables have been assigned and therefore if the process are running
             packet = False
             arp = False
             if hasattr(self, 'packet_proc'):
-                packet = True
+                if self.packet_proc is not None:
+                    packet = True
 
             if hasattr(self, 'arp_proc'):
-                arp = True
+                if self.arp_proc is not None:
+                    arp = True
 
             # Kill needs to be run from root because the sub process is launched from sudo
             # Runs the command together
             if packet and arp:
-                os.system('pkexec kill -SIGINT ' + str(self.packet_proc.pid) +
-                          '; kill -SIGINT ' + str(self.arp_proc.pid))
+                os.system('pkexec kill -SIGINT ' + str(self.packet_proc.pid) + ' ' + str(self.arp_proc.pid))
+                self.packet_proc = None
+                self.arp_proc = None
+            # Just kills the packet proc
             elif packet:
                 os.system('pkexec kill -SIGINT ' + str(self.packet_proc.pid))
+                self.packet_proc = None
+            # Just kill the arp proc
             elif arp:
                 os.system('pkexec kill -SIGINT ' + str(self.arp_proc.pid))
+                self.arp_proc = None
 
         except Exception as e:
             print(e)
