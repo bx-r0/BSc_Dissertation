@@ -171,5 +171,9 @@ def usage():
         """)
 
 
+# Check if user is root
+if os.getuid() != 0:
+    exit("Error: User needs to be root to run this script")
+
 parameters()
 run()

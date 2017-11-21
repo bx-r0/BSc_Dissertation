@@ -6,6 +6,9 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 from gi.repository import GObject
 
+# Add to this list to add or remove filters for the packet manipluation
+target_protcols = ['TCP', 'UDP', 'ICMP']
+
 
 class PacketCaptureGTK:
     """A GUI for controlling the Packet.py script"""
@@ -40,8 +43,17 @@ class PacketCaptureGTK:
         # Labels
         self.label_ARP_active = builder.get_object("Label_ARP_active")
 
+        # Combo Box
+        self.comboBox_packetFilter = builder.get_object("ComboBox_PacketFilter")
+        iface_list_store = Gtk.ListStore(GObject.TYPE_STRING)
+        for item in target_protcols:  # Creates the lists
+            iface_list_store.append([item])
+        self.comboBox_packetFilter.set_model(iface_list_store)
+        self.comboBox_packetFilter.set_active(0)
+
+        # Others
+        self.checkBox_packetFilter = builder.get_object("CheckBox_PacketFilter")
         self.button_Stop = builder.get_object("Button_stop")
-        self.button_Stop.set_sensitive(False)  # Stops the button from being clickable
 
     def arp_window_init(self):
         builder = Gtk.Builder()
@@ -134,6 +146,9 @@ class PacketCaptureGTK:
 
         self.arp_window.hide()
 
+    def onPacketFilter_Checked(self, checkBox):
+        self.comboBox_packetFilter.set_sensitive(checkBox.get_active())
+
     # ----------------------------------------------------------------------------- #
 
     def run_packet_capture(self, parameters):
@@ -142,12 +157,27 @@ class PacketCaptureGTK:
         # Toggles the buttons
         self.progressRunning(True)
 
+        parameter_list = [parameters]
+
+        # If the filter packet is toggled
+        if self.checkBox_packetFilter.get_active():
+            index = self.comboBox_packetFilter.get_active()
+            model = self.comboBox_packetFilter.get_model()
+
+            # Grab the selected item
+            item = model[index]
+
+            # Adds the selected item
+            parameter_list.append("-t " + item[0])
+
         # The exact location of the file needs to specified
         file_name = "Packet.py"
         file_path = "/home/user_1/PycharmProjects/Dissertation_Project/PacketCapture/" + file_name
 
         # Command parameters
-        cmd = ['pkexec', 'python', file_path, parameters]
+        cmd = ['pkexec', 'python', file_path]
+        cmd = cmd + parameter_list
+        print(cmd)
 
         # Calls the sub procedure
         self.packet_proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, preexec_fn=os.setsid)
