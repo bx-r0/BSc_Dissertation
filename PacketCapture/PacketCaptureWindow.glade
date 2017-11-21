@@ -5,7 +5,7 @@
   <object class="GtkWindow" id="window1">
     <property name="name">window1</property>
     <property name="width_request">740</property>
-    <property name="height_request">550</property>
+    <property name="height_request">620</property>
     <property name="can_focus">False</property>
     <property name="hexpand">False</property>
     <property name="vexpand">False</property>
@@ -107,7 +107,7 @@
           <object class="GtkScrolledWindow">
             <property name="name">ScrolledWindow_ConsoleWindow</property>
             <property name="width_request">628</property>
-            <property name="height_request">205</property>
+            <property name="height_request">134</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <property name="shadow_type">in</property>
@@ -116,13 +116,13 @@
                 <property name="width_request">1000</property>
                 <property name="height_request">1000</property>
                 <property name="visible">True</property>
-                <property name="sensitive">False</property>
                 <property name="can_focus">True</property>
                 <property name="halign">center</property>
                 <property name="hscroll_policy">natural</property>
                 <property name="vscroll_policy">natural</property>
                 <property name="editable">False</property>
                 <property name="wrap_mode">word</property>
+                <property name="cursor_visible">False</property>
               </object>
             </child>
           </object>
@@ -134,16 +134,16 @@
         <child>
           <object class="GtkButton" id="ARPSettings">
             <property name="label" translatable="yes">ARP</property>
-            <property name="width_request">92</property>
-            <property name="height_request">36</property>
+            <property name="width_request">120</property>
+            <property name="height_request">35</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <property name="receives_default">True</property>
             <signal name="clicked" handler="ARP_Clicked" swapped="no"/>
           </object>
           <packing>
-            <property name="x">567</property>
-            <property name="y">383</property>
+            <property name="x">537</property>
+            <property name="y">312</property>
           </packing>
         </child>
         <child>
@@ -158,8 +158,29 @@
             </attributes>
           </object>
           <packing>
-            <property name="x">461</property>
-            <property name="y">381</property>
+            <property name="x">432</property>
+            <property name="y">310</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkScrolledWindow">
+            <property name="width_request">629</property>
+            <property name="height_request">150</property>
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="shadow_type">in</property>
+            <child>
+              <object class="GtkTextView" id="TextView_ArpOutput">
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="editable">False</property>
+                <property name="cursor_visible">False</property>
+              </object>
+            </child>
+          </object>
+          <packing>
+            <property name="x">28</property>
+            <property name="y">357</property>
           </packing>
         </child>
       </object>

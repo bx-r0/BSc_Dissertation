@@ -1,5 +1,6 @@
 import getopt
 import signal
+import atexit
 from netfilterqueue import NetfilterQueue
 from scapy.all import *
 

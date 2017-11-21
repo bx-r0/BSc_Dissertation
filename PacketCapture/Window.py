@@ -12,10 +12,11 @@ class PacketCaptureGTK:
 
     # Loads and shows the window
     def __init__(self):
+        self.running = False
+
         self.main_window_init()
         self.arp_window_init()
         Gtk.main()
-
 
     def main_window_init(self):
         # Creates the builder and loads the UI from the glade file
@@ -30,6 +31,7 @@ class PacketCaptureGTK:
         self.textBox_Latency = builder.get_object("TextBox_Latency")
         self.textBox_PacketLoss = builder.get_object("TextBox_PacketLoss")
         self.textView_ConsoleOutput = builder.get_object("TextView_ConsoleOutput")
+        self.TextView_ArpOutput = builder.get_object("TextView_ArpOutput")
 
         # Buttons
         self.button_Latency = builder.get_object("Button_latency")
@@ -69,7 +71,9 @@ class PacketCaptureGTK:
     def onDeleteWindow(self, *args):
         """Event that runs when the window is closed"""
 
-        self.clean_close()
+        if self.running:
+            self.clean_close()
+
         Gtk.main_quit(*args)
 
     def latency_Clicked(self, button):
@@ -114,10 +118,14 @@ class PacketCaptureGTK:
 
         # Changing ID
         self.label_ARP_active.set_text("ARP Active!")
-    
-        # Bool to check later
-        self.arpValuesSet = True
         self.arp_window.hide()
+
+        # Sets the stop button to on
+        self.button_Stop.set_sensitive(True)
+
+        # Starts running the ARP Spoof
+        parameters = "-i {0} -v {1} -r {2}".format(self.arp_valuesList[0], self.arp_valuesList[1], self.arp_valuesList[2])
+        self.run_arp_spoof(parameters)
 
     def ARP_Cancel_Clicked(self, button):
         # Clears the TextBoxes
@@ -142,11 +150,28 @@ class PacketCaptureGTK:
         cmd = ['pkexec', 'python', file_path, parameters]
 
         # Calls the sub procedure
-        self.sub_proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, preexec_fn=os.setsid)
-        self.sub_outp = ""
+        self.packet_proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, preexec_fn=os.setsid)
+        self.packet_outp = ""
 
         # Non-Block updates the TextView
-        GObject.timeout_add(100, self.update_terminal)
+        GObject.timeout_add(100, self.update_terminal, self.textView_ConsoleOutput, self.packet_proc)
+
+    def run_arp_spoof(self, parameters):
+        """Runs the spoofing when called"""
+
+        # The exact location of the file needs to specified
+        file_name = "ArpSpoofing.py"
+        file_path = "/home/user_1/PycharmProjects/Dissertation_Project/PacketCapture/" + file_name
+
+        # Runs the arp spoofing
+        cmd = 'pkexec python ' + file_path + ' ' + parameters
+
+        # Calls the sub procedure
+        self.arp_proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, preexec_fn=os.setsid)
+        self.arp_outp = ""
+
+        # Non-Block updates the TextView
+        GObject.timeout_add(100, self.update_terminal, self.TextView_ArpOutput, self.arp_proc)
 
     @staticmethod
     def validation(string, start, stop):
@@ -166,11 +191,10 @@ class PacketCaptureGTK:
         except ValueError:
             return False
 
-    def update_terminal(self):
+    def update_terminal(self, TextView, sub_proc):
         """Used to pipe terminal output to a TextView"""
 
-        # Grabs the buffer and finds the end
-        buffer = self.textView_ConsoleOutput.get_buffer()
+        buffer = TextView.get_buffer()
 
         # Grabs the end and marks it for reference
         # the mark will stay at the end of the TextView
@@ -178,16 +202,16 @@ class PacketCaptureGTK:
         mark = buffer.create_mark('', end, False)
 
         # Grabs the console output
-        bytes = self.non_block_read(self.sub_proc.stdout)
+        bytes = self.non_block_read(sub_proc.stdout)
 
         if bytes is not None:
             # Display the output of the console
             buffer.insert(end, bytes.decode())
 
             # Keeps the most recent line on screen
-            self.textView_ConsoleOutput.scroll_mark_onscreen(mark)
+            TextView.scroll_mark_onscreen(mark)
 
-        return self.sub_proc.poll() is None
+        return sub_proc.poll() is None
 
     @staticmethod
     def non_block_read(output):
@@ -205,14 +229,35 @@ class PacketCaptureGTK:
     def clean_close(self):
         """Function that is designed to stop the subprocess as cleanly as possible"""
         try:
-            # Kill needs to be sudo because the sub process is launched from sudo
-            os.system('pkexec kill -SIGINT ' + str(self.sub_proc.pid))
+
+            # Checks if the variables have been assigned
+            packet = False
+            arp = False
+            if hasattr(self, 'packet_proc'):
+                packet = True
+
+            if hasattr(self, 'arp_proc'):
+                arp = True
+
+            # Kill needs to be run from root because the sub process is launched from sudo
+            # Runs the command together
+            if packet and arp:
+                os.system('pkexec kill -SIGINT ' + str(self.packet_proc.pid) +
+                          '; kill -SIGINT ' + str(self.arp_proc.pid))
+            elif packet:
+                os.system('pkexec kill -SIGINT ' + str(self.packet_proc.pid))
+            elif arp:
+                os.system('pkexec kill -SIGINT ' + str(self.arp_proc.pid))
+
         except Exception as e:
             print(e)
 
     def progressRunning(self, state):
         """Used to toggle the button being enabled, so when a progress is running
         the process buttons should be off and the cancel button enabled and visa versa"""
+
+        # Keeps track of value
+        self.running = state
 
         # Sets the latency and packet loss buttons sensitivity
         self.button_Latency.set_sensitive(not state)

