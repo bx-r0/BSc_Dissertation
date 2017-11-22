@@ -29,7 +29,7 @@ namespace ClientServer.HTTP
             //Added an event that triggers when the window is fully loaded
             Loaded += HTTPServerWindow_Loaded;
 
-            Clients = NumberOfClientsLabel;
+            
         }
 
         
@@ -39,11 +39,7 @@ namespace ClientServer.HTTP
             StartServer();
         }
 
-        public void Set_Label(int value)
-        {
-            NumberOfClientsLabel.Content = value.ToString();
-        }
-
+     
         private void StartServer()
         {
             //Creates a new server a starts it

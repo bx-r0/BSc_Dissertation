@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ClientServer.HTTP"
         mc:Ignorable="d"
-        Title="HTTPServer" Height="255.175" Width="390.311" ResizeMode="NoResize">
+        Title="HTTPServer" Height="255.175" Width="390.311" ResizeMode="NoResize" WindowStyle="ToolWindow">
     <Grid Margin="0,0,4,0">
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>
@@ -13,9 +13,8 @@
         <Grid.RowDefinitions>
             <RowDefinition/>
         </Grid.RowDefinitions>
-        <Label Content="SERVER" HorizontalAlignment="Left" Margin="161,10,0,0" VerticalAlignment="Top" FontWeight="Bold"/>
-        <ListBox x:Name="WindowOutput" Margin="10,83,32,10"/>
-        <Button x:Name="StopButton" Content="STOP" Margin="273,58,32,0" VerticalAlignment="Top" Click="StopButton_Click"/>
-        <Label x:Name="NumberOfClientsLabel" Content="0" Margin="354,190,10,10"/>
+        <ListBox x:Name="WindowOutput" Margin="10,10,85,10"/>
+        <Button x:Name="StopButton" Content="STOP" Margin="0,0,10,10" Click="StopButton_Click" HorizontalAlignment="Right" Width="70" Height="20" VerticalAlignment="Bottom"/>
+        <Label Content="Statistics" Margin="0,10,10,0" FontWeight="Bold" Height="26" VerticalAlignment="Top" HorizontalAlignment="Right" Width="73"/>
     </Grid>
 </Window>

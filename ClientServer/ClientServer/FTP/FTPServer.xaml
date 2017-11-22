@@ -5,12 +5,13 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ClientServer.FTP"
         mc:Ignorable="d"
-        Title="FTPServer" Height="280.5" Width="799.5" Background="{DynamicResource {x:Static SystemColors.ActiveCaptionBrushKey}}" Foreground="{x:Null}" WindowStyle="ToolWindow">
+        Title="FTPServer" Height="309.654" Width="344.245" Background="White" Foreground="{x:Null}" WindowStyle="ToolWindow">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition/>
         </Grid.RowDefinitions>
-        <ListBox x:Name="ListBox_ServerLog" Margin="10"/>
+        <ListBox x:Name="ListBox_ServerLog" Margin="10,10,88,10"/>
+        <Label Content="Statistics" Margin="0,10,10,244" FontWeight="Bold" HorizontalAlignment="Right" Width="73"/>
 
     </Grid>
 </Window>

@@ -22,7 +22,7 @@ namespace ClientServer.UDP
     public partial class UDPServerWindow : Window
     {
         //# Connection definition
-        UDPServer server = new UDPServer();
+        UDPServer server;
 
         //# Constructor
         public UDPServerWindow()
@@ -43,10 +43,18 @@ namespace ClientServer.UDP
         //# Buttons 
         private void Start_Click(object sender, RoutedEventArgs e)
         {
+            //Makes a new server and starts it
+            server = new UDPServer();
             StartServer();
-            Button_Start.Content = "STARTED";
-            Button_Start.IsEnabled = false;
+
+            CanRun(false);
         }
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            Reset_Grid();
+            CanRun(true);
+        }
+
 
         /// <summary>
         /// This function dynamically generates grid depending on the specified size
@@ -119,6 +127,22 @@ namespace ClientServer.UDP
             {
                 throw;
             }
+        }
+
+        private void Reset_Grid()
+        {
+            for (int i = 0; i < UDPServer.GRID_SIZE * UDPServer.GRID_SIZE; i++)
+            {
+                Canvas c = Pixels[i];
+
+                c.Background = Brushes.Beige;
+            }
+        }
+
+        private void CanRun(bool state)
+        {
+            Button_Start.IsEnabled = state;
+            Button_Restart.IsEnabled = !state;
         }
     }
 }
