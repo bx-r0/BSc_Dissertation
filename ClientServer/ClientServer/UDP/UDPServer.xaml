@@ -4,18 +4,35 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ClientServer.UDP"
-        mc:Ignorable="d"
-        Title="UDPServer" Height="477.466" Width="392.047" WindowStyle="ToolWindow">
+        mc:Ignorable="d" Height="442.434" Width="499.736" WindowStyle="ToolWindow">
     <Grid Margin="0,0,0,1">
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="9*"/>
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
-        <Button x:Name="Button_Start" Content="START" Margin="10,0,10,66" Click="Start_Click" Grid.ColumnSpan="2" Height="24" VerticalAlignment="Bottom"/>
+        <Button x:Name="Button_Start" Content="START" Margin="10,0,184,66" Click="Start_Click" Height="24" VerticalAlignment="Bottom"/>
 
-        <Border BorderBrush="Black" BorderThickness="1" Margin="10,10,10,95" Grid.ColumnSpan="2">
-            <Grid x:Name="grid" Margin="9" Grid.ColumnSpan="2"/>
+        <Border BorderBrush="Black" BorderThickness="1" Margin="10,52,184,95">
+            <Grid x:Name="grid" Margin="9" Grid.ColumnSpan="2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+            </Grid>
         </Border>
-        <Button x:Name="Button_Restart" Content="RESTART" Margin="10,0,10,35" Grid.ColumnSpan="2" Height="26" VerticalAlignment="Bottom" Click="Button_Click" IsEnabled="False"/>
+        <Button x:Name="Button_Restart" Content="RESTART" Margin="10,0,184,35" Height="26" VerticalAlignment="Bottom" Click="Button_Click" IsEnabled="False"/>
+        <Label Content="Statistics" Margin="0,52,106,0" FontWeight="Bold" HorizontalAlignment="Right" Width="73" Height="26" VerticalAlignment="Top"/>
+        <StackPanel Margin="0,83,63,10" HorizontalAlignment="Right" Width="116">
+            <Label Content="Total Packets Sent"/>
+            <Label Content="Packets Lost:"/>
+            <Label Content="Packets Lost %:"/>
+        </StackPanel>
+        <StackPanel Margin="0,83,10,10" HorizontalAlignment="Right" Width="53">
+            <Label x:Name="Data_TotalPackets" Content="-"/>
+            <Label x:Name="Data_PacketsLost" Content="-"/>
+            <Label x:Name="Data_LostPacketsPercent" Content="-" HorizontalAlignment="Left" Width="53"/>
+        </StackPanel>
+        <Label Content="UDP" Margin="10,0,0,0" FontWeight="Bold" Foreground="#FFF01010" Height="52" VerticalAlignment="Top" HorizontalAlignment="Left" Width="80" FontSize="24"/>
     </Grid>
 </Window>
