@@ -4,7 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ClientServer.HTTP"
-        mc:Ignorable="d" Height="320.845" Width="512.269" ResizeMode="NoResize" WindowStyle="ToolWindow">
+        mc:Ignorable="d" Height="328.35" Width="521.65" ResizeMode="NoResize" WindowStyle="ToolWindow">
     <Grid Margin="0,0,4,0">
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>

@@ -93,6 +93,7 @@
     <Compile Include="Program.xaml.cs">
       <DependentUpon>Program.xaml</DependentUpon>
     </Compile>
+    <Compile Include="StatsManager.cs" />
     <Compile Include="Testing\FTPFixture.cs" />
     <Compile Include="Testing\HTTPFixture.cs" />
     <Compile Include="UDP\UDPClient.cs" />

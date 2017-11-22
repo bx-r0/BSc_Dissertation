@@ -23,6 +23,7 @@ namespace ClientServer.UDP
     {
         //# Connection definition
         UDPServer server;
+        StatsManager stats;
 
         //# Constructor
         public UDPServerWindow()
@@ -51,7 +52,7 @@ namespace ClientServer.UDP
         }
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            Reset_Stats();
+            stats.ResetAllLabels();
             Reset_Grid();
             CanRun(true);
         }
@@ -146,56 +147,33 @@ namespace ClientServer.UDP
                 c.Background = Brushes.Beige;
             }
         }
-        private void Reset_Stats()
-        {
-            foreach (Label label in ActiveStats)
-            {
-                label.Content = "-";
-            }
-        }
 
         //# Stats
         //List of labels that have their values changed, this is to be used when resetting values
-        List<Label> ActiveStats = new List<Label>();
         int lostPackets;
-
         /// <summary>
         /// This method deals with calculating and updating the stats on the GUI
         /// </summary>
         private void Update_Stats()
         {
             //Reset
-            ActiveStats.Clear();
+            stats.ActiveLabels.Clear();
 
             //# Packet Loss value
             //Displays the lost packets
-            ChangeLabelText(Data_PacketsLost, lostPackets.ToString());
+            stats.ChangeLabelText(Data_PacketsLost, lostPackets.ToString());
 
             //# Packet Loss percentage
             //Displays the lost packets as a percentage
             int total_packets = UDPServer.GRID_SIZE * UDPServer.GRID_SIZE;
             int percent = lostPackets / total_packets * 100;
             string msg = percent + "%";
-            ChangeLabelText(Data_LostPacketsPercent, msg);
+            stats.ChangeLabelText(Data_LostPacketsPercent, msg);
 
             //# Displays how many packets should be sent
-            ChangeLabelText(Data_TotalPackets, total_packets.ToString());
+            stats.ChangeLabelText(Data_TotalPackets, total_packets.ToString());
         }
 
-        /// <summary>
-        /// This method deals with the dispatching and changing of labels text
-        /// It also saves the label to a list so it can be reset later, this is so the reset can be dynamic
-        /// </summary>
-        /// <param name="l"></param>
-        /// <param name="msg"></param>
-        private void ChangeLabelText(Label l, string msg)
-        {
-            l.Dispatcher.Invoke(() => l.Content = msg);
-
-            //Saves the label to reset later
-            ActiveStats.Add(l);
-        }
-      
         /// <summary>
         /// Method that changes the states of buttons, if the program cannot be run it flips the button states and visa versa
         /// </summary>
