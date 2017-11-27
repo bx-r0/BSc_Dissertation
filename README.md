@@ -12,5 +12,8 @@
   
 # Install for Python
 
-  ```pip install NetfilerQueue```
+  ```
+  sudo pip install NetfilerQueue
+  sudo pip install scapy
+  ```
 
