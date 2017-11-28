@@ -1,6 +1,5 @@
-import getopt
+import argparse
 import signal
-import atexit
 from netfilterqueue import NetfilterQueue
 from scapy.all import *
 
@@ -104,12 +103,13 @@ def run_packet_manipulation():
     """The main method here, will issue a iptables command and construct the NFQUEUE"""
 
     try:
+        global nfqueue
+        global arp_process
+
         # Runs the IPTABLES command
         os.system("iptables -A INPUT -j NFQUEUE")
 
         print_force("[*] Mode is: " + mode.__name__)
-
-        global nfqueue
 
         # Setup for the NQUEUE
         nfqueue = NetfilterQueue()
@@ -118,6 +118,11 @@ def run_packet_manipulation():
             nfqueue.bind(0, mode)  # 0 is the default NFQUEUE
         except OSError:
             print_force("[!] Queue already created")
+
+        # Runs the arp spoofing
+        if arp_active:
+            cmd = f'python ArpSpoofing.py -v {victim_ip} -r {router_ip} -i {interface}'
+            arp_process = subprocess.Popen(cmd, shell=True)
 
         # Shows the start waiting message
         print_force("[*] Waiting ")
@@ -138,6 +143,10 @@ def usage():
     |-l <latency_seconds>           - Latency         |
     |-z <loss_percentage>           - Packet loss     |
     |-t <target_packet_protocol>    - Target protocol |
+    |-a <v> <r> <i>                 - Arp Spoofing    |
+    |       <v> = Victim IP                           |
+    |       <r> = Router IP                           |
+    |       <i> = Interface name                      |
     |-h                             - Help            |
     #=================================================#
     """)
@@ -153,45 +162,52 @@ def parameters():
     global packet_loss_percentage
     global target_packet_type
 
-    try:
-        # The 2nd parameter for getopt() specifies the expected parameters
-        # "p"   = "-p"
-        # "t:"  = "-t <value>" Note: ":" is used to specify a value will preced
-        opts, args = getopt.getopt(sys.argv[1:], 'pel:z:ht:', '')
+    global victim_ip
+    global router_ip
+    global interface
+    global arp_active
 
-        for opt, arg in opts:
-            # ---------- Flags ---------- # - Parameters without values
-            if opt == "-h":
-                usage()
-                sys.exit(0)
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-p', action='store_true', help="Sets the mode to print_packet")
+    parser.add_argument('-l', action='store_true', help="Sets the mode to packet_latency")
+    parser.add_argument('-z', action='store_true', help="Sets the mode to packet_loss")
+    parser.add_argument('-t', action='store', help="Specifies a packet type to affect")
+    parser.add_argument('-a', action='store', nargs=3, help="Specifies values for arp spoofing mode")
+    args = parser.parse_args()
 
-            elif opt == "-p":
-                mode = print_packet
+    # ---------- Flags ---------- # - Parameters without values
+    if args.p:
+        mode = print_packet
 
-            # ---------- Arguments ---------- # - Parameters with values
-            elif opt == "-l":
-                mode = packet_latency
-                latency_value_second = int(arg) / 1000
+    # ---------- Arguments ---------- # - Parameters with values
+    elif args.l:
+        mode = packet_latency
+        latency_value_second = int(args.l) / 1000
 
-            elif opt == "-z":
-                mode = packet_loss
-                packet_loss_percentage = int(arg)
+    elif args.z:
+        mode = packet_loss
+        packet_loss_percentage = int(args.z)
 
-            elif opt == "-t":
-                print_force("[!] Only affecting " + arg + " packets")
-                target_packet_type = arg
+    elif args.t:
+        print_force("[!] Only affecting " + args + " packets")
+        target_packet_type = args.t
 
-        # When all parameters are handled
-        run_packet_manipulation()
+    elif args.a:
+        print_force("[!] Arp spoofing mode activated")
+        arp_active = True
+        victim_ip = args.a[0]
+        router_ip = args.a[1]
+        interface = args.a[2]
 
-    except getopt.GetoptError:
-        print_force("Error: incorrect parameters")
-        usage()
-        sys.exit(2)
+    # When all parameters are handled
+    run_packet_manipulation()
 
 
 def clean_close(signum, frame):
     """Used to close the script cleanly"""
+
+    if arp_active:
+        arp_process.send_signal(signal.SIGINT)
 
     print("\n[!] Process aborted")
     print("[!] iptables reverted")
@@ -209,6 +225,13 @@ packet_loss_percentage = 0
 latency_value_second = 0
 mode = ignore_packet
 target_packet_type = "ALL"
+
+# Arp spoofing
+victim_ip = None
+router_ip = None
+interface = None
+arp_process = None
+arp_active = False
 
 # Check if user is root
 if os.getuid() != 0:

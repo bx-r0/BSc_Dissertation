@@ -9,7 +9,6 @@ from gi.repository import GObject
 # Add to this list to add or remove filters for the packet manipluation
 target_protcols = ['TCP', 'UDP', 'ICMP']
 
-
 class PacketCaptureGTK:
     """A GUI for controlling the Packet.py script"""
 
@@ -191,6 +190,8 @@ class PacketCaptureGTK:
 
         # The exact location of the file needs to specified
         file_name = "ArpSpoofing.py"
+
+        # TODO: This needs to be fixed, why is the path required?
         file_path = "/home/user_1/PycharmProjects/Dissertation_Project/PacketCapture/" + file_name
 
         # Runs the arp spoofing
