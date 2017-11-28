@@ -4,8 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ClientServer.HTTP"
-        mc:Ignorable="d"
-        Title="HTTPServer" Height="255.175" Width="390.311" ResizeMode="NoResize">
+        mc:Ignorable="d" Height="328.35" Width="521.65" ResizeMode="NoResize" WindowStyle="ToolWindow">
     <Grid Margin="0,0,4,0">
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>
@@ -13,9 +12,15 @@
         <Grid.RowDefinitions>
             <RowDefinition/>
         </Grid.RowDefinitions>
-        <Label Content="SERVER" HorizontalAlignment="Left" Margin="161,10,0,0" VerticalAlignment="Top" FontWeight="Bold"/>
-        <ListBox x:Name="WindowOutput" Margin="10,83,32,10"/>
-        <Button x:Name="StopButton" Content="STOP" Margin="273,58,32,0" VerticalAlignment="Top" Click="StopButton_Click"/>
-        <Label x:Name="NumberOfClientsLabel" Content="0" Margin="354,190,10,10"/>
+        <ListBox x:Name="WindowOutput" Margin="10,54,181,34"/>
+        <Button x:Name="StopButton" Content="STOP" Margin="10,0,0,9" Click="StopButton_Click" Height="20" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="73"/>
+        <Label Content="Statistics" Margin="0,54,103,0" FontWeight="Bold" Height="26" VerticalAlignment="Top" HorizontalAlignment="Right" Width="73"/>
+        <StackPanel Margin="0,85,65,34" HorizontalAlignment="Right" Width="111">
+            <Label Content="&lt;Test stat&gt;"/>
+        </StackPanel>
+        <StackPanel Margin="0,85,10,34" HorizontalAlignment="Right" Width="55">
+            <Label Content="-"/>
+        </StackPanel>
+        <Label Content="HTTP" Margin="10,0,0,0" FontWeight="Bold" Foreground="#FF318D0E" Height="52" VerticalAlignment="Top" HorizontalAlignment="Left" Width="80" FontSize="24"/>
     </Grid>
 </Window>

@@ -21,29 +21,21 @@ namespace ClientServer.HTTP
     public partial class HTTPServerWindow : Window
     {
         HTTPServer server;
-        public static Label Clients;
+        static StatsManager stats;
+
         public HTTPServerWindow()
         {
             InitializeComponent();
             
             //Added an event that triggers when the window is fully loaded
             Loaded += HTTPServerWindow_Loaded;
-
-            Clients = NumberOfClientsLabel;
         }
-
-        
 
         private void HTTPServerWindow_Loaded(object sender, RoutedEventArgs e)
         {
             StartServer();
         }
-
-        public void Set_Label(int value)
-        {
-            NumberOfClientsLabel.Content = value.ToString();
-        }
-
+     
         private void StartServer()
         {
             //Creates a new server a starts it

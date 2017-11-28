@@ -22,7 +22,8 @@ namespace ClientServer.UDP
     public partial class UDPServerWindow : Window
     {
         //# Connection definition
-        UDPServer server = new UDPServer();
+        UDPServer server;
+        StatsManager stats;
 
         //# Constructor
         public UDPServerWindow()
@@ -43,9 +44,17 @@ namespace ClientServer.UDP
         //# Buttons 
         private void Start_Click(object sender, RoutedEventArgs e)
         {
+            //Makes a new server and starts it
+            server = new UDPServer();
             StartServer();
-            Button_Start.Content = "STARTED";
-            Button_Start.IsEnabled = false;
+
+            CanRun(false);
+        }
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            stats.ResetAllLabels();
+            Reset_Grid();
+            CanRun(true);
         }
 
         /// <summary>
@@ -93,6 +102,9 @@ namespace ClientServer.UDP
         {
             try
             {
+                //Reset
+                lostPackets = 0;
+
                 //Loops round the list of correctly received pixels
                 int count = 0;
                 foreach (bool pixel in server.GRID_Obtained)
@@ -107,6 +119,8 @@ namespace ClientServer.UDP
                     }
                     else
                     {
+                        lostPackets++;
+
                         //INCORRECT
                         c.Dispatcher.Invoke(() => c.Background = Brushes.Red);
                     }
@@ -114,11 +128,60 @@ namespace ClientServer.UDP
                     //Moves the index along
                     ++count;
                 }
+
+                Update_Stats();
             }
             catch (Exception e)
             {
                 throw;
             }
+        }
+
+        //# Resets
+        private void Reset_Grid()
+        {
+            for (int i = 0; i < UDPServer.GRID_SIZE * UDPServer.GRID_SIZE; i++)
+            {
+                Canvas c = Pixels[i];
+
+                c.Background = Brushes.Beige;
+            }
+        }
+
+        //# Stats
+        //List of labels that have their values changed, this is to be used when resetting values
+        int lostPackets;
+        /// <summary>
+        /// This method deals with calculating and updating the stats on the GUI
+        /// </summary>
+        private void Update_Stats()
+        {
+            //Reset
+            stats.ActiveLabels.Clear();
+
+            //# Packet Loss value
+            //Displays the lost packets
+            stats.ChangeLabelText(Data_PacketsLost, lostPackets.ToString());
+
+            //# Packet Loss percentage
+            //Displays the lost packets as a percentage
+            int total_packets = UDPServer.GRID_SIZE * UDPServer.GRID_SIZE;
+            int percent = lostPackets / total_packets * 100;
+            string msg = percent + "%";
+            stats.ChangeLabelText(Data_LostPacketsPercent, msg);
+
+            //# Displays how many packets should be sent
+            stats.ChangeLabelText(Data_TotalPackets, total_packets.ToString());
+        }
+
+        /// <summary>
+        /// Method that changes the states of buttons, if the program cannot be run it flips the button states and visa versa
+        /// </summary>
+        /// <param name="state"></param>
+        private void CanRun(bool state)
+        {
+            Button_Start.IsEnabled = state;
+            Button_Restart.IsEnabled = !state;
         }
     }
 }

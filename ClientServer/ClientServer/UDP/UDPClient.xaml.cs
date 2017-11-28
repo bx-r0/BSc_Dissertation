@@ -41,11 +41,20 @@ namespace ClientServer.UDP
             //Creates the client
             Client = new UDPClient(address, UDPServer.port);
 
-            //Shows the button has been clicked
-            Button_Connect.IsEnabled = false;
+            CanRun(false);
             
             //# Connects
             Client.Connect();
+        }
+        private void Button_Reset_Click(object sender, RoutedEventArgs e)
+        {
+            CanRun(true);
+        }
+
+        private void CanRun(bool state)
+        {
+            Button_Connect.IsEnabled = state;
+            Button_Reset.IsEnabled = !state;
         }
     }
 }
