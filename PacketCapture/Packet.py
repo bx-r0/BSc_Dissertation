@@ -119,10 +119,11 @@ def run_packet_manipulation():
 
         # Runs the arp spoofing
         if arp_active:
-            cmd = f'python ArpSpoofing.py -t {victim_ip} -r {router_ip} -i {interface}'
+            cmd = 'python ArpSpoofing.py -t {0} -r {1} -i {2}'.format(victim_ip, router_ip, interface)
             arp_process = subprocess.Popen(cmd, shell=True)
 
         # Shows the start waiting message
+        print_force("[*] Waiting ")
         print_force("[*] Waiting ")
         nfqueue.run()
 
