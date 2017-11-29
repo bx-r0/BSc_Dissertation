@@ -3,14 +3,12 @@ import signal
 from netfilterqueue import NetfilterQueue
 from scapy.all import *
 
-nfqueue = None
 
-
-def print_force(string):
+def print_force(str):
     """This method is required because when this python file is called as a script
     the prints don't appear and a flush is required """
 
-    print(string)
+    print(str)
     sys.stdout.flush()
 
 
@@ -121,7 +119,7 @@ def run_packet_manipulation():
 
         # Runs the arp spoofing
         if arp_active:
-            cmd = f'python ArpSpoofing.py -v {victim_ip} -r {router_ip} -i {interface}'
+            cmd = f'python ArpSpoofing.py -t {victim_ip} -r {router_ip} -i {interface}'
             arp_process = subprocess.Popen(cmd, shell=True)
 
         # Shows the start waiting message
@@ -130,26 +128,6 @@ def run_packet_manipulation():
 
     except KeyboardInterrupt:
         clean_close('', '')
-
-
-def usage():
-    """Issues a terminal help message"""
-
-    print("""
-    Options:
-    #=================================================#
-    |-p                             - Print packet    |
-    |-e                             - Packet edit     |
-    |-l <latency_seconds>           - Latency         |
-    |-z <loss_percentage>           - Packet loss     |
-    |-t <target_packet_protocol>    - Target protocol |
-    |-a <v> <r> <i>                 - Arp Spoofing    |
-    |       <v> = Victim IP                           |
-    |       <r> = Router IP                           |
-    |       <i> = Interface name                      |
-    |-h                             - Help            |
-    #=================================================#
-    """)
 
 
 def parameters():
@@ -167,32 +145,41 @@ def parameters():
     global interface
     global arp_active
 
-    parser = argparse.ArgumentParser()
+    # Defaults
+    mode = ignore_packet
+    target_packet_type = 'ALL'
+    arp_active = False
+
+    # Arguments
+    parser = argparse.ArgumentParser(prog="Packet.py", description="Run this script to cause network degradation")
     parser.add_argument('-p', action='store_true', help="Sets the mode to print_packet")
-    parser.add_argument('-l', action='store_true', help="Sets the mode to packet_latency")
-    parser.add_argument('-z', action='store_true', help="Sets the mode to packet_loss")
-    parser.add_argument('-t', action='store', help="Specifies a packet type to affect")
-    parser.add_argument('-a', action='store', nargs=3, help="Specifies values for arp spoofing mode")
+    parser.add_argument('-l', action='store', help="Sets the mode to packet_latency", metavar='time(ms)')
+    parser.add_argument('-z', action='store', help="Sets the mode to packet_loss", metavar='loss_percent')
+    parser.add_argument('-t', action='store', help="Specifies a packet type to affect", metavar='packet_name')
+    parser.add_argument('-a', action='store', nargs=3, help="Specifies values for arp spoofing mode",
+                        metavar=('victimIP', 'routerIP', 'interface'))
     args = parser.parse_args()
 
-    # ---------- Flags ---------- # - Parameters without values
+    # Modes
     if args.p:
         mode = print_packet
 
-    # ---------- Arguments ---------- # - Parameters with values
     elif args.l:
+        print_force('[*] Latency set to: ' + args.l + 'ms')
         mode = packet_latency
         latency_value_second = int(args.l) / 1000
 
     elif args.z:
+        print_force('[*] Packet loss set to: ' + args.z + '%')
         mode = packet_loss
         packet_loss_percentage = int(args.z)
 
-    elif args.t:
-        print_force("[!] Only affecting " + args + " packets")
+    # Extra settings
+    if args.t:
+        print_force("[!] Only affecting " + args.t + " packets")
         target_packet_type = args.t
 
-    elif args.a:
+    if args.a:
         print_force("[!] Arp spoofing mode activated")
         arp_active = True
         victim_ip = args.a[0]
@@ -213,25 +200,10 @@ def clean_close(signum, frame):
     print("[!] iptables reverted")
     os.system("iptables -F INPUT")
 
-# ------------------------DEFINITION END ------------------------------ #
-
 
 # Rebinds the all the close signals to clean_close the script
 signal.signal(signal.SIGTSTP, clean_close)  # Ctrl+Z
 signal.signal(signal.SIGQUIT, clean_close)  # Ctrl+\
-
-# Default value
-packet_loss_percentage = 0
-latency_value_second = 0
-mode = ignore_packet
-target_packet_type = "ALL"
-
-# Arp spoofing
-victim_ip = None
-router_ip = None
-interface = None
-arp_process = None
-arp_active = False
 
 # Check if user is root
 if os.getuid() != 0:
