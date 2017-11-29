@@ -9,6 +9,9 @@ from gi.repository import GObject
 # Add to this list to add or remove filters for the packet manipulation
 target_protcols = ['TCP', 'UDP', 'ICMP']
 
+# Gets the directory of the current file
+filepath = os.path.dirname(os.path.abspath(__file__))
+
 class PacketCaptureGTK:
     """A GUI for controlling the Packet.py script"""
 
@@ -135,7 +138,7 @@ class PacketCaptureGTK:
         self.button_Stop.set_sensitive(True)
 
         # Starts running the ARP Spoof
-        parameters = "-i {0} -v {1} -r {2}".format(self.arp_valuesList[0], self.arp_valuesList[1], self.arp_valuesList[2])
+        parameters = "-i {0} -t {1} -r {2} -v".format(self.arp_valuesList[0], self.arp_valuesList[1], self.arp_valuesList[2])
         self.run_arp_spoof(parameters)
 
     def ARP_Cancel_Clicked(self, button):
@@ -170,13 +173,10 @@ class PacketCaptureGTK:
             parameter_list.append("-t " + item[0])
 
         # The exact location of the file needs to specified
-        file_name = "Packet.py"
-        file_path = "/home/user_1/PycharmProjects/Dissertation_Project/PacketCapture/" + file_name
 
         # Command parameters
-        cmd = ['pkexec', 'python', file_path]
+        cmd = ['pkexec', 'python', filepath + '/Packet.py']
         cmd = cmd + parameter_list
-        print(cmd)
 
         # Calls the sub procedure
         self.packet_proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, preexec_fn=os.setsid)
@@ -188,17 +188,12 @@ class PacketCaptureGTK:
     def run_arp_spoof(self, parameters):
         """Runs the spoofing when called"""
 
-        # The exact location of the file needs to specified
-        file_name = "ArpSpoofing.py"
-
-        # TODO: This needs to be fixed, why is the path required?
-        file_path = "/home/user_1/PycharmProjects/Dissertation_Project/PacketCapture/" + file_name
-
         # Runs the arp spoofing
-        cmd = 'pkexec python ' + file_path + ' ' + parameters
+        cmd = ['pkexec', 'python', filepath + '/ArpSpoofing.py']
+        cmd = cmd + parameters.split()  # Splits the parameter string into a list
 
         # Calls the sub procedure
-        self.arp_proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, preexec_fn=os.setsid)
+        self.arp_proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, preexec_fn=os.setsid)
         self.arp_outp = ""
 
         # Non-Block updates the TextView
