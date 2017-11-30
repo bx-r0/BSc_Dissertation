@@ -271,16 +271,16 @@ class PacketCaptureGTK:
             # Runs the command together
             if packet and arp:
                 os.system('pkexec kill -SIGINT ' + str(self.packet_proc.pid) + ' ' + str(self.arp_proc.pid))
-                self.packet_proc = None
-                self.arp_proc = None
+                self.packet_proc.kill()
+                self.arp_proc.kill()
             # Just kills the packet proc
             elif packet:
                 os.system('pkexec kill -SIGINT ' + str(self.packet_proc.pid))
-                self.packet_proc = None
+                self.packet_proc.kill()
             # Just kill the arp proc
             elif arp:
                 os.system('pkexec kill -SIGINT ' + str(self.arp_proc.pid))
-                self.arp_proc = None
+                self.arp_proc.kill()
 
         except Exception as e:
             print(e)
@@ -297,7 +297,7 @@ class PacketCaptureGTK:
         self.button_PacketLoss.set_sensitive(not state)
 
         # Inverts the stop button
-        self.button_Stop.set_sensitive(state)
+        self.button_Stop.set_sensitive(True)
 
         # Clears the textboxes (GtkEntry) if the stop button has been clicked
         if state is False:

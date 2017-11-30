@@ -2,6 +2,7 @@ import argparse
 import signal
 from netfilterqueue import NetfilterQueue
 from scapy.all import *
+import _thread
 
 
 def print_force(str):
@@ -39,41 +40,64 @@ def ignore_packet(packet):
 def print_packet(packet):
     """This function just prints the packet"""
 
-    if affect_packet(packet):
-        print_force("[!] " + str(packet))
+    # Thread functionality
+    def _print_thread(packet):
+        """The functionality that will spawned in a thread from the Print_Packet mode"""
 
-    # Accepts and lets the packet leave the queue
-    packet.accept()
+        if affect_packet(packet):
+            print_force("[!] " + str(packet))
+
+        packet.accept()
+
+    try:
+        _thread.start_new_thread(_print_thread, (packet,))
+    except KeyboardInterrupt:
+        clean_close('', '')
 
 
 def edit_packet(packet):
     """This function will be used to edit sections of a packet, this is currently incomplete"""
 
-    if affect_packet(packet):
-        # Converts into Scapy compatible string
-        pkt = IP(packet.get_payload())
+    # Thread functionality
+    def _edit_thread(packet):
 
-        # TODO: Packet editing here
+        if affect_packet(packet):
+            # Converts into Scapy compatible string
+            pkt = IP(packet.get_payload())
 
-        # Sets the packet to the modified version
-        packet.set_payload(bytes(pkt))
+            # TODO: Packet editing here
 
-    # Accepts and lets the packet leave the queue
-    packet.accept()
+            # Sets the packet to the modified version
+            packet.set_payload(bytes(pkt))
+
+            # Accepts and lets the packet leave the queue
+        packet.accept()
+
+    try:
+        _thread.start_new_thread(_edit_thread, (packet,))
+    except KeyboardInterrupt:
+        clean_close('', '')
 
 
 def packet_latency(packet):
     """This function is used to incur latency on packets"""
 
-    if affect_packet(packet):
-        # Shows the packet
-        print_force("[!] " + str(packet))
+    # Thread functionality
+    def _latency_thread(packet):
 
-        # Issues latency of the entered value
-        time.sleep(latency_value_second)
+        if affect_packet(packet):
+            print_force("[!] " + str(packet))
 
-    # Accepts and lets the packet leave the queue
-    packet.accept()
+            # Issues latency of the entered value
+            time.sleep(latency_value_second)
+
+        # Accepts and lets the packet leave the queue
+        packet.accept()
+
+    try:
+        _thread.start_new_thread(_latency_thread, (packet,))
+    except KeyboardInterrupt:
+        clean_close('', '')
 
 
 def packet_loss(packet):
@@ -104,8 +128,11 @@ def run_packet_manipulation():
         global nfqueue
         global arp_process
 
-        # Runs the IPTABLES command
+        # Packets for this machine
         os.system("iptables -A INPUT -j NFQUEUE")
+
+        # Packets for forwarding or other routes
+        os.system("iptables -t nat -A PREROUTING -j NFQUEUE")
 
         print_force("[*] Mode is: " + mode.__name__)
 
@@ -123,7 +150,6 @@ def run_packet_manipulation():
             arp_process = subprocess.Popen(cmd, shell=True)
 
         # Shows the start waiting message
-        print_force("[*] Waiting ")
         print_force("[*] Waiting ")
         nfqueue.run()
 
@@ -197,9 +223,11 @@ def clean_close(signum, frame):
     if arp_active:
         arp_process.send_signal(signal.SIGINT)
 
-    print("\n[!] Process aborted")
-    print("[!] iptables reverted")
+    print_force("\n[!] Process aborted")
+    print_force("[!] iptables reverted")
     os.system("iptables -F INPUT")
+    print_force("[!] NFQUEUE unbinded")
+    nfqueue.unbind()
 
 
 # Rebinds the all the close signals to clean_close the script
