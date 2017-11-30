@@ -10,7 +10,7 @@ import socket
 # TODO: Separate script?
 def scan_for_active_hosts():
 
-    print_force('[!] Grabbing active hosts on your network')
+    print('[!] Grabbing active hosts on your network')
 
     def grab_internal_ip():
         """This works by connecting with Google's DNS and grabbing the connection IP"""
@@ -25,14 +25,22 @@ def scan_for_active_hosts():
 
         return ip
 
-    nm = nmap.PortScanner()
-    ip_range = grab_internal_ip() + '.1-255'
-    nm.scan(hosts=ip_range, arguments='-sP')
+    # TODO: Percentage bar for the scan?
+    try:
+        nm = nmap.PortScanner()
+        ip_range = grab_internal_ip() + '.1-255'
+        nm.scan(hosts=ip_range, arguments='-sP -v --stats-every 1s')
 
-    # Makes the program wait
-    nm.command_line()
+        total = nm.scanstats()['totalhosts']
+        up = nm.scanstats()['uphosts']
+        down = nm.scanstats()['downhosts']
 
-    # Adds all the active hosts to a list
+        print("[*] NMAP Result: [Total: {0} Up: {1} Down: {2}]".format(total, up, down))
+
+    except KeyboardInterrupt:
+        print('[!] Local scan canceled')
+
+    # Saves the active hosts
     for x in nm.all_hosts():
         active_hosts = []
 
@@ -267,7 +275,6 @@ signal.signal(signal.SIGQUIT, clean_close)  # Ctrl+\
 if os.getuid() != 0:
     exit("Error: User needs to be root to run this script")
 
-scan_for_active_hosts()
 parameters()
 
 
