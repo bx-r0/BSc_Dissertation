@@ -3,6 +3,42 @@ import signal
 from netfilterqueue import NetfilterQueue
 from scapy.all import *
 import _thread
+import nmap
+import socket
+
+
+# TODO: Separate script?
+def scan_for_active_hosts():
+
+    print_force('[!] Grabbing active hosts on your network')
+
+    def grab_internal_ip():
+        """This works by connecting with Google's DNS and grabbing the connection IP"""
+
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(("8.8.8.8", 80))
+        ip = s.getsockname()[0]
+        s.close()
+
+        # Takes of the last octive
+        ip = '.'.join(ip.split('.')[:3])
+
+        return ip
+
+    nm = nmap.PortScanner()
+    ip_range = grab_internal_ip() + '.1-255'
+    nm.scan(hosts=ip_range, arguments='-sP')
+
+    # Makes the program wait
+    nm.command_line()
+
+    # Adds all the active hosts to a list
+    for x in nm.all_hosts():
+        active_hosts = []
+
+        # Adds the active hosts to a list
+        if nm[x].state() == 'up':
+            active_hosts.append(x)
 
 
 def print_force(str):
@@ -162,15 +198,8 @@ def parameters():
     most of the handling is performed by the 'getopt' module"""
 
     # Defines globals to be used above
-    global mode
-    global latency_value_second
-    global packet_loss_percentage
-    global target_packet_type
-
-    global victim_ip
-    global router_ip
-    global interface
-    global arp_active
+    global mode, latency_value_second, packet_loss_percentage, target_packet_type
+    global victim_ip, router_ip, interface, arp_active
 
     # Defaults
     mode = ignore_packet
@@ -238,4 +267,8 @@ signal.signal(signal.SIGQUIT, clean_close)  # Ctrl+\
 if os.getuid() != 0:
     exit("Error: User needs to be root to run this script")
 
+scan_for_active_hosts()
 parameters()
+
+
+
