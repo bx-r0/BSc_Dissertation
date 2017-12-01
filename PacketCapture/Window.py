@@ -2,6 +2,10 @@ import fcntl
 import os
 import subprocess
 import gi
+import queue
+import _thread
+
+from LocalNetworkScan import *
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 from gi.repository import GObject
@@ -68,6 +72,9 @@ class PacketCaptureGTK:
         #Grabs objects
         self.button_OK = builder.get_object("Button_OK")
         self.button_Cancel = builder.get_object("Button_Cancel")
+        self.button_localHost = builder.get_object("Button_GetLocalHosts")
+
+        self.levelbar_localHost = builder.get_object("LevelBar_GetLocalHosts")
 
         # Puts the textBoxes into a list for easy traversal later
         self.ARP_TextBoxes = []
@@ -150,6 +157,10 @@ class PacketCaptureGTK:
 
     def onPacketFilter_Checked(self, checkBox):
         self.comboBox_packetFilter.set_sensitive(checkBox.get_active())
+
+    def getLocalHosts_Clicked(self, button):
+        active = scan_for_active_hosts()
+        self.levelbar_localHost.set_value(1)
 
     # ----------------------------------------------------------------------------- #
 

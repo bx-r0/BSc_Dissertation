@@ -3,50 +3,8 @@ import signal
 from netfilterqueue import NetfilterQueue
 from scapy.all import *
 import _thread
-import nmap
-import socket
-
-
-# TODO: Separate script?
-def scan_for_active_hosts():
-
-    print('[!] Grabbing active hosts on your network')
-
-    def grab_internal_ip():
-        """This works by connecting with Google's DNS and grabbing the connection IP"""
-
-        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        s.connect(("8.8.8.8", 80))
-        ip = s.getsockname()[0]
-        s.close()
-
-        # Takes of the last octive
-        ip = '.'.join(ip.split('.')[:3])
-
-        return ip
-
-    # TODO: Percentage bar for the scan?
-    try:
-        nm = nmap.PortScanner()
-        ip_range = grab_internal_ip() + '.1-255'
-        nm.scan(hosts=ip_range, arguments='-sP -v --stats-every 1s')
-
-        total = nm.scanstats()['totalhosts']
-        up = nm.scanstats()['uphosts']
-        down = nm.scanstats()['downhosts']
-
-        print("[*] NMAP Result: [Total: {0} Up: {1} Down: {2}]".format(total, up, down))
-
-    except KeyboardInterrupt:
-        print('[!] Local scan canceled')
-
-    # Saves the active hosts
-    for x in nm.all_hosts():
-        active_hosts = []
-
-        # Adds the active hosts to a list
-        if nm[x].state() == 'up':
-            active_hosts.append(x)
+import ArpSpoofing
+import LocalNetworkScan
 
 
 def print_force(str):
@@ -190,8 +148,7 @@ def run_packet_manipulation():
 
         # Runs the arp spoofing
         if arp_active:
-            cmd = 'python ArpSpoofing.py -t {0} -r {1} -i {2}'.format(victim_ip, router_ip, interface)
-            arp_process = subprocess.Popen(cmd, shell=True)
+            arp_spoof_external(interface, routerIP, victimIP)
 
         # Shows the start waiting message
         print_force("[*] Waiting ")

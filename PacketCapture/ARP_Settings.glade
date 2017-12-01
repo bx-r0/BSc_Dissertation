@@ -73,7 +73,7 @@
               </object>
               <packing>
                 <property name="left_attach">1</property>
-                <property name="top_attach">1</property>
+                <property name="top_attach">3</property>
               </packing>
             </child>
             <child>
@@ -84,7 +84,7 @@
               </object>
               <packing>
                 <property name="left_attach">2</property>
-                <property name="top_attach">1</property>
+                <property name="top_attach">3</property>
               </packing>
             </child>
             <child>
@@ -95,7 +95,7 @@
               </object>
               <packing>
                 <property name="left_attach">1</property>
-                <property name="top_attach">3</property>
+                <property name="top_attach">5</property>
               </packing>
             </child>
             <child>
@@ -105,7 +105,7 @@
               </object>
               <packing>
                 <property name="left_attach">2</property>
-                <property name="top_attach">3</property>
+                <property name="top_attach">5</property>
               </packing>
             </child>
             <child>
@@ -138,7 +138,7 @@
               </object>
               <packing>
                 <property name="left_attach">1</property>
-                <property name="top_attach">5</property>
+                <property name="top_attach">7</property>
               </packing>
             </child>
             <child>
@@ -148,7 +148,7 @@
               </object>
               <packing>
                 <property name="left_attach">2</property>
-                <property name="top_attach">5</property>
+                <property name="top_attach">7</property>
               </packing>
             </child>
             <child>
@@ -161,6 +161,53 @@
                 <property name="left_attach">0</property>
                 <property name="top_attach">0</property>
               </packing>
+            </child>
+            <child>
+              <object class="GtkSeparator">
+                <property name="height_request">5</property>
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+              </object>
+              <packing>
+                <property name="left_attach">0</property>
+                <property name="top_attach">6</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkButton" id="Button_GetLocalHosts">
+                <property name="label" translatable="yes">Search Network</property>
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">True</property>
+                <signal name="clicked" handler="getLocalHosts_Clicked" swapped="no"/>
+              </object>
+              <packing>
+                <property name="left_attach">1</property>
+                <property name="top_attach">1</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkLevelBar" id="LevelBar_GetLocalHosts">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="margin_left">4</property>
+                <property name="margin_right">2</property>
+                <property name="margin_top">2</property>
+                <property name="margin_bottom">2</property>
+              </object>
+              <packing>
+                <property name="left_attach">2</property>
+                <property name="top_attach">1</property>
+              </packing>
+            </child>
+            <child>
+              <placeholder/>
+            </child>
+            <child>
+              <placeholder/>
+            </child>
+            <child>
+              <placeholder/>
             </child>
             <child>
               <placeholder/>

