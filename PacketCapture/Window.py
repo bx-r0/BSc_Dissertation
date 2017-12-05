@@ -77,10 +77,9 @@ class PacketCaptureGTK:
         self.levelbar_localHost = builder.get_object("LevelBar_GetLocalHosts")
 
         # Puts the textBoxes into a list for easy traversal later
-        self.ARP_TextBoxes = []
-        self.ARP_TextBoxes.append(builder.get_object("TextBox_Interface"))
-        self.ARP_TextBoxes.append(builder.get_object("TextBox_VictimIP"))
-        self.ARP_TextBoxes.append(builder.get_object("TextBox_RouterIP"))
+        self.ARP_TextBox_Interface = builder.get_object("TextBox_Interface")
+        self.ARP_ComboBox_VictimIP = builder.get_object("Combo_Box_VictimIP")
+        self.ARP_ComboBox_RouterIP = builder.get_object("Combo_Box_RouterIP")
 
     # --------------------------Control Events------------------------------------- #
 
@@ -130,12 +129,15 @@ class PacketCaptureGTK:
     def ARP_OK_Clicked(self, button):
         # All the output from the TextBoxes are store in the list, the order is:
         # [Interface, VictimIP, RouterIP]
-        self.arp_valuesList = []
+        arp_valuesList = []
+        arp_valuesList.append(self.ARP_TextBox_Interface.get_text())
+        arp_valuesList.append(self.ARP_ComboBox_VictimIP.get_active_text())
+        arp_valuesList.append(self.ARP_ComboBox_RouterIP.get_active_text())
 
-        # Sets the values and clears the boxes
-        for textBox in self.ARP_TextBoxes:
-            self.arp_valuesList.append(textBox.get_text())
-            textBox.set_text("")
+        # Clears the boxes
+        self.ARP_TextBox_Interface.set_text("")
+
+        # TODO: Resets the comboBoxes
 
         # Changing ID
         self.label_ARP_active.set_text("ARP Active!")
@@ -145,24 +147,27 @@ class PacketCaptureGTK:
         self.button_Stop.set_sensitive(True)
 
         # Starts running the ARP Spoof
-        parameters = "-i {0} -t {1} -r {2} -v".format(self.arp_valuesList[0], self.arp_valuesList[1], self.arp_valuesList[2])
+        parameters = "-i {0} -t {1} -r {2} -v".format(arp_valuesList[0], arp_valuesList[1], arp_valuesList[2])
         self.run_arp_spoof(parameters)
 
     def ARP_Cancel_Clicked(self, button):
-        # Clears the TextBoxes
-        for textBox in self.ARP_TextBoxes:
-            textBox.set_text("")
-
+        # TODO: Reset textboxes and ComboBoxes
         self.arp_window.hide()
 
     def onPacketFilter_Checked(self, checkBox):
         self.comboBox_packetFilter.set_sensitive(checkBox.get_active())
 
     def getLocalHosts_Clicked(self, button):
+        #TODO: Callback for thread that changes the level bar????
         active = scan_for_active_hosts()
         self.levelbar_localHost.set_value(1)
 
-    # ----------------------------------------------------------------------------- #
+        # Sets the values for the comboboxes
+        for x in active:
+            self.ARP_ComboBox_RouterIP.append_text(x)
+            self.ARP_ComboBox_RouterIP.set_active(0)
+            self.ARP_ComboBox_VictimIP.append_text(x)
+            self.ARP_ComboBox_VictimIP.set_active(1)
 
     def run_packet_capture(self, parameters):
         """This method is used to run the Packet.py script"""

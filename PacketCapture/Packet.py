@@ -3,7 +3,6 @@ import signal
 from netfilterqueue import NetfilterQueue
 from scapy.all import *
 import _thread
-import ArpSpoofing
 import LocalNetworkScan
 
 

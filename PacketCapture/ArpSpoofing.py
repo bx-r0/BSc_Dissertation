@@ -43,8 +43,8 @@ def grab_MAC_Addresses():
     if victimMAC is not None and routerMAC is not None:
         loop = False
         print_force("[!] MAC Addresses obtain successfully!")
-        print("[*] Router mac: \'", routerMAC, '\'')
-        print("[*] Victim mac: \'", victimMAC, '\'')
+        print_force("[*] Router mac: \'", routerMAC, '\'')
+        print_force("[*] Victim mac: \'", victimMAC, '\'')
     else:
         exit("[!] Error obtaining MAC Addresses, Arp spoofing stopped!")
 
@@ -126,7 +126,7 @@ def valid_ip(ip_address):
 
     # Pattern match
     if not regex.match(pattern, ip_address):
-        print("[!] Error: Invalid IP please check your parameters!")
+        print_force("[!] Error: Invalid IP please check your parameters!")
         sys.exit(1)
 
 
@@ -167,5 +167,5 @@ if os.getuid() != 0:
     exit("Error: User needs to be root to run this script")
 
 
-if __name__ is "__main__":
+if __name__ == "__main__":
     parameters()
