@@ -2,16 +2,31 @@ import argparse
 import signal
 from netfilterqueue import NetfilterQueue
 from scapy.all import *
-import _thread
+from multiprocessing.dummy import Pool as ThreadPool
+import threading
 import LocalNetworkScan
+
+# Defines how many threads are in the pool
+# Does this need more?
+pool = ThreadPool(100)
+
+
+def map_thread(method, packet):
+    """Method that deals with the threading of the packet manipulation"""
+
+    # If this try is caught, it occurs for every thread active so anything in the
+    # except is triggered for all active threads
+    try:
+        pool.map(method, [packet])
+    except ValueError:
+        pass
 
 
 def print_force(str):
     """This method is required because when this python file is called as a script
     the prints don't appear and a flush is required """
 
-    print(str)
-    sys.stdout.flush()
+    print(str, flush=True)
 
 
 def affect_packet(packet):
@@ -51,7 +66,7 @@ def print_packet(packet):
         packet.accept()
 
     try:
-        _thread.start_new_thread(_print_thread, (packet,))
+        map_thread(_print_thread, packet)
     except KeyboardInterrupt:
         clean_close('', '')
 
@@ -75,7 +90,7 @@ def edit_packet(packet):
         packet.accept()
 
     try:
-        _thread.start_new_thread(_edit_thread, (packet,))
+        map_thread(_edit_thread, packet)
     except KeyboardInterrupt:
         clean_close('', '')
 
@@ -96,7 +111,7 @@ def packet_latency(packet):
         packet.accept()
 
     try:
-        _thread.start_new_thread(_latency_thread, (packet,))
+        map_thread(_latency_thread, packet)
     except KeyboardInterrupt:
         clean_close('', '')
 
@@ -210,18 +225,27 @@ def parameters():
     run_packet_manipulation()
 
 
+def kill_thread_pool():
+    # Death to the thread pool
+    pool.close()
+    print_force("\n[!] Thread pool killed")
+
+
 def clean_close(signum, frame):
     """Used to close the script cleanly"""
+
+    stoppool = threading.Thread(target=kill_thread_pool)
+    stoppool.start()
 
     if arp_active:
         arp_process.send_signal(signal.SIGINT)
 
-    print_force("\n[!] Process aborted")
     print_force("[!] iptables reverted")
     os.system("iptables -F INPUT")
+
     print_force("[!] NFQUEUE unbinded")
     nfqueue.unbind()
-
+    os._exit(0)
 
 # Rebinds the all the close signals to clean_close the script
 signal.signal(signal.SIGTSTP, clean_close)  # Ctrl+Z
