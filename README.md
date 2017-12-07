@@ -17,6 +17,7 @@ Note: Python 3.6 is required
   ```
   sudo pip install NetfilerQueue
   sudo pip install scapy
+  sudo pip install python-nmap
   ```
 
 # Configuring PI as a router
