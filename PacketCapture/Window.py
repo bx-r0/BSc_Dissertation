@@ -2,13 +2,19 @@ import fcntl
 import os
 import subprocess
 import gi
+import queue
+import _thread
+
+from LocalNetworkScan import *
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 from gi.repository import GObject
 
-# Add to this list to add or remove filters for the packet manipluation
+# Add to this list to add or remove filters for the packet manipulation
 target_protcols = ['TCP', 'UDP', 'ICMP']
 
+# Gets the directory of the current file
+filepath = os.path.dirname(os.path.abspath(__file__))
 
 class PacketCaptureGTK:
     """A GUI for controlling the Packet.py script"""
@@ -66,12 +72,14 @@ class PacketCaptureGTK:
         #Grabs objects
         self.button_OK = builder.get_object("Button_OK")
         self.button_Cancel = builder.get_object("Button_Cancel")
+        self.button_localHost = builder.get_object("Button_GetLocalHosts")
+
+        self.levelbar_localHost = builder.get_object("LevelBar_GetLocalHosts")
 
         # Puts the textBoxes into a list for easy traversal later
-        self.ARP_TextBoxes = []
-        self.ARP_TextBoxes.append(builder.get_object("TextBox_Interface"))
-        self.ARP_TextBoxes.append(builder.get_object("TextBox_VictimIP"))
-        self.ARP_TextBoxes.append(builder.get_object("TextBox_RouterIP"))
+        self.ARP_TextBox_Interface = builder.get_object("TextBox_Interface")
+        self.ARP_ComboBox_VictimIP = builder.get_object("Combo_Box_VictimIP")
+        self.ARP_ComboBox_RouterIP = builder.get_object("Combo_Box_RouterIP")
 
     # --------------------------Control Events------------------------------------- #
 
@@ -121,12 +129,15 @@ class PacketCaptureGTK:
     def ARP_OK_Clicked(self, button):
         # All the output from the TextBoxes are store in the list, the order is:
         # [Interface, VictimIP, RouterIP]
-        self.arp_valuesList = []
+        arp_valuesList = []
+        arp_valuesList.append(self.ARP_TextBox_Interface.get_text())
+        arp_valuesList.append(self.ARP_ComboBox_VictimIP.get_active_text())
+        arp_valuesList.append(self.ARP_ComboBox_RouterIP.get_active_text())
 
-        # Sets the values and clears the boxes
-        for textBox in self.ARP_TextBoxes:
-            self.arp_valuesList.append(textBox.get_text())
-            textBox.set_text("")
+        # Clears the boxes
+        self.ARP_TextBox_Interface.set_text("")
+
+        # TODO: Resets the comboBoxes
 
         # Changing ID
         self.label_ARP_active.set_text("ARP Active!")
@@ -136,20 +147,27 @@ class PacketCaptureGTK:
         self.button_Stop.set_sensitive(True)
 
         # Starts running the ARP Spoof
-        parameters = "-i {0} -v {1} -r {2}".format(self.arp_valuesList[0], self.arp_valuesList[1], self.arp_valuesList[2])
+        parameters = "-i {0} -t {1} -r {2} -v".format(arp_valuesList[0], arp_valuesList[1], arp_valuesList[2])
         self.run_arp_spoof(parameters)
 
     def ARP_Cancel_Clicked(self, button):
-        # Clears the TextBoxes
-        for textBox in self.ARP_TextBoxes:
-            textBox.set_text("")
-
+        # TODO: Reset textboxes and ComboBoxes
         self.arp_window.hide()
 
     def onPacketFilter_Checked(self, checkBox):
         self.comboBox_packetFilter.set_sensitive(checkBox.get_active())
 
-    # ----------------------------------------------------------------------------- #
+    def getLocalHosts_Clicked(self, button):
+        #TODO: Callback for thread that changes the level bar????
+        active = scan_for_active_hosts()
+        self.levelbar_localHost.set_value(1)
+
+        # Sets the values for the comboboxes
+        for x in active:
+            self.ARP_ComboBox_RouterIP.append_text(x)
+            self.ARP_ComboBox_RouterIP.set_active(0)
+            self.ARP_ComboBox_VictimIP.append_text(x)
+            self.ARP_ComboBox_VictimIP.set_active(1)
 
     def run_packet_capture(self, parameters):
         """This method is used to run the Packet.py script"""
@@ -171,13 +189,10 @@ class PacketCaptureGTK:
             parameter_list.append("-t " + item[0])
 
         # The exact location of the file needs to specified
-        file_name = "Packet.py"
-        file_path = "/home/user_1/PycharmProjects/Dissertation_Project/PacketCapture/" + file_name
 
         # Command parameters
-        cmd = ['pkexec', 'python', file_path]
+        cmd = ['pkexec', 'python', filepath + '/Packet.py']
         cmd = cmd + parameter_list
-        print(cmd)
 
         # Calls the sub procedure
         self.packet_proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, preexec_fn=os.setsid)
@@ -189,15 +204,12 @@ class PacketCaptureGTK:
     def run_arp_spoof(self, parameters):
         """Runs the spoofing when called"""
 
-        # The exact location of the file needs to specified
-        file_name = "ArpSpoofing.py"
-        file_path = "/home/user_1/PycharmProjects/Dissertation_Project/PacketCapture/" + file_name
-
         # Runs the arp spoofing
-        cmd = 'pkexec python ' + file_path + ' ' + parameters
+        cmd = ['pkexec', 'python', filepath + '/ArpSpoofing.py']
+        cmd = cmd + parameters.split()  # Splits the parameter string into a list
 
         # Calls the sub procedure
-        self.arp_proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, preexec_fn=os.setsid)
+        self.arp_proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, preexec_fn=os.setsid)
         self.arp_outp = ""
 
         # Non-Block updates the TextView
@@ -275,16 +287,16 @@ class PacketCaptureGTK:
             # Runs the command together
             if packet and arp:
                 os.system('pkexec kill -SIGINT ' + str(self.packet_proc.pid) + ' ' + str(self.arp_proc.pid))
-                self.packet_proc = None
-                self.arp_proc = None
+                self.packet_proc.kill()
+                self.arp_proc.kill()
             # Just kills the packet proc
             elif packet:
                 os.system('pkexec kill -SIGINT ' + str(self.packet_proc.pid))
-                self.packet_proc = None
+                self.packet_proc.kill()
             # Just kill the arp proc
             elif arp:
                 os.system('pkexec kill -SIGINT ' + str(self.arp_proc.pid))
-                self.arp_proc = None
+                self.arp_proc.kill()
 
         except Exception as e:
             print(e)
@@ -301,7 +313,7 @@ class PacketCaptureGTK:
         self.button_PacketLoss.set_sensitive(not state)
 
         # Inverts the stop button
-        self.button_Stop.set_sensitive(state)
+        self.button_Stop.set_sensitive(True)
 
         # Clears the textboxes (GtkEntry) if the stop button has been clicked
         if state is False:

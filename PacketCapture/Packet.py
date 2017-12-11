@@ -1,18 +1,32 @@
-import getopt
+import argparse
 import signal
-import atexit
 from netfilterqueue import NetfilterQueue
 from scapy.all import *
+from multiprocessing.dummy import Pool as ThreadPool
+import threading
+import LocalNetworkScan
 
-nfqueue = None
+# Defines how many threads are in the pool
+# Does this need more?
+pool = ThreadPool(100)
 
 
-def print_force(string):
+def map_thread(method, packet):
+    """Method that deals with the threading of the packet manipulation"""
+
+    # If this try is caught, it occurs for every thread active so anything in the
+    # except is triggered for all active threads
+    try:
+        pool.map(method, [packet])
+    except ValueError:
+        pass
+
+
+def print_force(str):
     """This method is required because when this python file is called as a script
     the prints don't appear and a flush is required """
 
-    print(string)
-    sys.stdout.flush()
+    print(str, flush=True)
 
 
 def affect_packet(packet):
@@ -42,41 +56,64 @@ def ignore_packet(packet):
 def print_packet(packet):
     """This function just prints the packet"""
 
-    if affect_packet(packet):
-        print_force("[!] " + str(packet))
+    # Thread functionality
+    def _print_thread(packet):
+        """The functionality that will spawned in a thread from the Print_Packet mode"""
 
-    # Accepts and lets the packet leave the queue
-    packet.accept()
+        if affect_packet(packet):
+            print_force("[!] " + str(packet))
+
+        packet.accept()
+
+    try:
+        map_thread(_print_thread, packet)
+    except KeyboardInterrupt:
+        clean_close('', '')
 
 
 def edit_packet(packet):
     """This function will be used to edit sections of a packet, this is currently incomplete"""
 
-    if affect_packet(packet):
-        # Converts into Scapy compatible string
-        pkt = IP(packet.get_payload())
+    # Thread functionality
+    def _edit_thread(packet):
 
-        # TODO: Packet editing here
+        if affect_packet(packet):
+            # Converts into Scapy compatible string
+            pkt = IP(packet.get_payload())
 
-        # Sets the packet to the modified version
-        packet.set_payload(bytes(pkt))
+            # TODO: Packet editing here
 
-    # Accepts and lets the packet leave the queue
-    packet.accept()
+            # Sets the packet to the modified version
+            packet.set_payload(bytes(pkt))
+
+            # Accepts and lets the packet leave the queue
+        packet.accept()
+
+    try:
+        map_thread(_edit_thread, packet)
+    except KeyboardInterrupt:
+        clean_close('', '')
 
 
 def packet_latency(packet):
     """This function is used to incur latency on packets"""
 
-    if affect_packet(packet):
-        # Shows the packet
-        print_force("[!] " + str(packet))
+    # Thread functionality
+    def _latency_thread(packet):
 
-        # Issues latency of the entered value
-        time.sleep(latency_value_second)
+        if affect_packet(packet):
+            print_force("[!] " + str(packet))
 
-    # Accepts and lets the packet leave the queue
-    packet.accept()
+            # Issues latency of the entered value
+            time.sleep(latency_value_second)
+
+        # Accepts and lets the packet leave the queue
+        packet.accept()
+
+    try:
+        map_thread(_latency_thread, packet)
+    except KeyboardInterrupt:
+        clean_close('', '')
 
 
 def packet_loss(packet):
@@ -104,12 +141,16 @@ def run_packet_manipulation():
     """The main method here, will issue a iptables command and construct the NFQUEUE"""
 
     try:
-        # Runs the IPTABLES command
+        global nfqueue
+        global arp_process
+
+        # Packets for this machine
         os.system("iptables -A INPUT -j NFQUEUE")
 
-        print_force("[*] Mode is: " + mode.__name__)
+        # Packets for forwarding or other routes
+        os.system("iptables -t nat -A PREROUTING -j NFQUEUE")
 
-        global nfqueue
+        print_force("[*] Mode is: " + mode.__name__)
 
         # Setup for the NQUEUE
         nfqueue = NetfilterQueue()
@@ -119,6 +160,10 @@ def run_packet_manipulation():
         except OSError:
             print_force("[!] Queue already created")
 
+        # Runs the arp spoofing
+        if arp_active:
+            arp_spoof_external(interface, routerIP, victimIP)
+
         # Shows the start waiting message
         print_force("[*] Waiting ")
         nfqueue.run()
@@ -127,91 +172,90 @@ def run_packet_manipulation():
         clean_close('', '')
 
 
-def usage():
-    """Issues a terminal help message"""
-
-    print("""
-    Options:
-    #=================================================#
-    |-p                             - Print packet    |
-    |-e                             - Packet edit     |
-    |-l <latency_seconds>           - Latency         |
-    |-z <loss_percentage>           - Packet loss     |
-    |-t <target_packet_protocol>    - Target protocol |
-    |-h                             - Help            |
-    #=================================================#
-    """)
-
-
 def parameters():
     """This function deals with parameters passed to the script
     most of the handling is performed by the 'getopt' module"""
 
     # Defines globals to be used above
-    global mode
-    global latency_value_second
-    global packet_loss_percentage
-    global target_packet_type
+    global mode, latency_value_second, packet_loss_percentage, target_packet_type
+    global victim_ip, router_ip, interface, arp_active
 
-    try:
-        # The 2nd parameter for getopt() specifies the expected parameters
-        # "p"   = "-p"
-        # "t:"  = "-t <value>" Note: ":" is used to specify a value will preced
-        opts, args = getopt.getopt(sys.argv[1:], 'pel:z:ht:', '')
+    # Defaults
+    mode = ignore_packet
+    target_packet_type = 'ALL'
+    arp_active = False
 
-        for opt, arg in opts:
-            # ---------- Flags ---------- # - Parameters without values
-            if opt == "-h":
-                usage()
-                sys.exit(0)
+    # Arguments
+    parser = argparse.ArgumentParser(prog="Packet.py", description="Run this script to cause network degradation")
+    parser.add_argument('-p', action='store_true', help="Sets the mode to print_packet")
+    parser.add_argument('-l', action='store', help="Sets the mode to packet_latency", metavar='time(ms)')
+    parser.add_argument('-z', action='store', help="Sets the mode to packet_loss", metavar='loss_percent')
+    parser.add_argument('-t', action='store', help="Specifies a packet type to affect", metavar='packet_name')
+    parser.add_argument('-a', action='store', nargs=3, help="Specifies values for arp spoofing mode",
+                        metavar=('victimIP', 'routerIP', 'interface'))
+    args = parser.parse_args()
 
-            elif opt == "-p":
-                mode = print_packet
+    # Modes
+    if args.p:
+        mode = print_packet
 
-            # ---------- Arguments ---------- # - Parameters with values
-            elif opt == "-l":
-                mode = packet_latency
-                latency_value_second = int(arg) / 1000
+    elif args.l:
+        print_force('[*] Latency set to: ' + args.l + 'ms')
+        mode = packet_latency
+        latency_value_second = int(args.l) / 1000
 
-            elif opt == "-z":
-                mode = packet_loss
-                packet_loss_percentage = int(arg)
+    elif args.z:
+        print_force('[*] Packet loss set to: ' + args.z + '%')
+        mode = packet_loss
+        packet_loss_percentage = int(args.z)
 
-            elif opt == "-t":
-                print_force("[!] Only affecting " + arg + " packets")
-                target_packet_type = arg
+    # Extra settings
+    if args.t:
+        print_force("[!] Only affecting " + args.t + " packets")
+        target_packet_type = args.t
 
-        # When all parameters are handled
-        run_packet_manipulation()
+    if args.a:
+        print_force("[!] Arp spoofing mode activated")
+        arp_active = True
+        victim_ip = args.a[0]
+        router_ip = args.a[1]
+        interface = args.a[2]
 
-    except getopt.GetoptError:
-        print_force("Error: incorrect parameters")
-        usage()
-        sys.exit(2)
+    # When all parameters are handled
+    run_packet_manipulation()
+
+
+def kill_thread_pool():
+    # Death to the thread pool
+    pool.close()
+    print_force("\n[!] Thread pool killed")
 
 
 def clean_close(signum, frame):
     """Used to close the script cleanly"""
 
-    print("\n[!] Process aborted")
-    print("[!] iptables reverted")
+    stoppool = threading.Thread(target=kill_thread_pool)
+    stoppool.start()
+
+    if arp_active:
+        arp_process.send_signal(signal.SIGINT)
+
+    print_force("[!] iptables reverted")
     os.system("iptables -F INPUT")
 
-# ------------------------DEFINITION END ------------------------------ #
-
+    print_force("[!] NFQUEUE unbinded")
+    nfqueue.unbind()
+    os._exit(0)
 
 # Rebinds the all the close signals to clean_close the script
 signal.signal(signal.SIGTSTP, clean_close)  # Ctrl+Z
 signal.signal(signal.SIGQUIT, clean_close)  # Ctrl+\
-
-# Default value
-packet_loss_percentage = 0
-latency_value_second = 0
-mode = ignore_packet
-target_packet_type = "ALL"
 
 # Check if user is root
 if os.getuid() != 0:
     exit("Error: User needs to be root to run this script")
 
 parameters()
+
+
+
