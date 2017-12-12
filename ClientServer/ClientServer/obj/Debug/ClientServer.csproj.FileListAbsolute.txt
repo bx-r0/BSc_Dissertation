@@ -1,7 +1,4 @@
 C:\Users\User\AppData\Local\Temporary Projects\ClientServer\bin\Debug\ClientServer.exe.config
-C:\Users\User\Documents\GitHub\Dissertation_Project\ClientServer\ClientServer\bin\Debug\ClientServer.exe.config
-C:\Users\User\Documents\GitHub\Dissertation_Project\ClientServer\ClientServer\obj\Debug\ClientServer.exe
-C:\Users\User\Documents\GitHub\Dissertation_Project\ClientServer\ClientServer\obj\Debug\ClientServer.pdb
 C:\Users\User\Documents\GitHub\Dissertation_Project\ClientServer\ClientServer\bin\Debug\NUnit3.TestAdapter.dll
 C:\Users\User\Documents\GitHub\Dissertation_Project\ClientServer\ClientServer\bin\Debug\nunit.engine.dll
 C:\Users\User\Documents\GitHub\Dissertation_Project\ClientServer\ClientServer\bin\Debug\nunit.engine.api.dll
@@ -9,6 +6,7 @@ C:\Users\User\Documents\GitHub\Dissertation_Project\ClientServer\ClientServer\bi
 C:\Users\User\Documents\GitHub\Dissertation_Project\ClientServer\ClientServer\bin\Debug\Mono.Cecil.Pdb.dll
 C:\Users\User\Documents\GitHub\Dissertation_Project\ClientServer\ClientServer\bin\Debug\Mono.Cecil.Mdb.dll
 C:\Users\User\Documents\GitHub\Dissertation_Project\ClientServer\ClientServer\bin\Debug\Mono.Cecil.Rocks.dll
+C:\Users\User\Documents\GitHub\Dissertation_Project\ClientServer\ClientServer\bin\Debug\ClientServer.exe.config
 C:\Users\User\Documents\GitHub\Dissertation_Project\ClientServer\ClientServer\bin\Debug\ClientServer.exe
 C:\Users\User\Documents\GitHub\Dissertation_Project\ClientServer\ClientServer\bin\Debug\ClientServer.pdb
 C:\Users\User\Documents\GitHub\Dissertation_Project\ClientServer\ClientServer\bin\Debug\FluentFTP.dll
@@ -21,6 +19,8 @@ C:\Users\User\Documents\GitHub\Dissertation_Project\ClientServer\ClientServer\ob
 C:\Users\User\Documents\GitHub\Dissertation_Project\ClientServer\ClientServer\obj\Debug\HTTP\HTTPClient.g.cs
 C:\Users\User\Documents\GitHub\Dissertation_Project\ClientServer\ClientServer\obj\Debug\HTTP\HTTPServer.g.cs
 C:\Users\User\Documents\GitHub\Dissertation_Project\ClientServer\ClientServer\obj\Debug\Program.g.cs
+C:\Users\User\Documents\GitHub\Dissertation_Project\ClientServer\ClientServer\obj\Debug\UDP\UDPClient.g.cs
+C:\Users\User\Documents\GitHub\Dissertation_Project\ClientServer\ClientServer\obj\Debug\UDP\UDPServer.g.cs
 C:\Users\User\Documents\GitHub\Dissertation_Project\ClientServer\ClientServer\obj\Debug\App.g.cs
 C:\Users\User\Documents\GitHub\Dissertation_Project\ClientServer\ClientServer\obj\Debug\ClientServer_Content.g.cs
 C:\Users\User\Documents\GitHub\Dissertation_Project\ClientServer\ClientServer\obj\Debug\ClientServer_MarkupCompile.cache
@@ -30,10 +30,10 @@ C:\Users\User\Documents\GitHub\Dissertation_Project\ClientServer\ClientServer\ob
 C:\Users\User\Documents\GitHub\Dissertation_Project\ClientServer\ClientServer\obj\Debug\HTTP\HTTPClient.baml
 C:\Users\User\Documents\GitHub\Dissertation_Project\ClientServer\ClientServer\obj\Debug\HTTP\HTTPServer.baml
 C:\Users\User\Documents\GitHub\Dissertation_Project\ClientServer\ClientServer\obj\Debug\Program.baml
+C:\Users\User\Documents\GitHub\Dissertation_Project\ClientServer\ClientServer\obj\Debug\UDP\UDPClient.baml
+C:\Users\User\Documents\GitHub\Dissertation_Project\ClientServer\ClientServer\obj\Debug\UDP\UDPServer.baml
 C:\Users\User\Documents\GitHub\Dissertation_Project\ClientServer\ClientServer\obj\Debug\ClientServer.g.resources
 C:\Users\User\Documents\GitHub\Dissertation_Project\ClientServer\ClientServer\obj\Debug\ClientServer.Properties.Resources.resources
 C:\Users\User\Documents\GitHub\Dissertation_Project\ClientServer\ClientServer\obj\Debug\ClientServer.csproj.GenerateResource.Cache
-C:\Users\User\Documents\GitHub\Dissertation_Project\ClientServer\ClientServer\obj\Debug\UDP\UDPClient.g.cs
-C:\Users\User\Documents\GitHub\Dissertation_Project\ClientServer\ClientServer\obj\Debug\UDP\UDPServer.g.cs
-C:\Users\User\Documents\GitHub\Dissertation_Project\ClientServer\ClientServer\obj\Debug\UDP\UDPClient.baml
-C:\Users\User\Documents\GitHub\Dissertation_Project\ClientServer\ClientServer\obj\Debug\UDP\UDPServer.baml
+C:\Users\User\Documents\GitHub\Dissertation_Project\ClientServer\ClientServer\obj\Debug\ClientServer.exe
+C:\Users\User\Documents\GitHub\Dissertation_Project\ClientServer\ClientServer\obj\Debug\ClientServer.pdb

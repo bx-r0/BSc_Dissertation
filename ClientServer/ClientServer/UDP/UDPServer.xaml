@@ -34,5 +34,6 @@
             <Label x:Name="Data_LostPacketsPercent" Content="-" HorizontalAlignment="Left" Width="53"/>
         </StackPanel>
         <Label Content="UDP" Margin="10,0,0,0" FontWeight="Bold" Foreground="#FFF01010" Height="52" VerticalAlignment="Top" HorizontalAlignment="Left" Width="80" FontSize="24"/>
+        <Button x:Name="Button_Random" Content="R" Margin="10,0,457,6" Height="24" VerticalAlignment="Bottom" Click="Button_Random_Click"/>
     </Grid>
 </Window>

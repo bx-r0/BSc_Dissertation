@@ -23,7 +23,9 @@ namespace ClientServer.UDP
     {
         //# Connection definition
         UDPServer server;
-        StatsManager stats;
+        StatsManager stats = new StatsManager();
+
+        Random r = new Random();
 
         //# Constructor
         public UDPServerWindow()
@@ -136,7 +138,7 @@ namespace ClientServer.UDP
                 throw;
             }
         }
-
+        
         //# Resets
         private void Reset_Grid()
         {
@@ -147,7 +149,6 @@ namespace ClientServer.UDP
                 c.Background = Brushes.Beige;
             }
         }
-
         //# Stats
         //List of labels that have their values changed, this is to be used when resetting values
         int lostPackets;
@@ -182,6 +183,32 @@ namespace ClientServer.UDP
         {
             Button_Start.IsEnabled = state;
             Button_Restart.IsEnabled = !state;
+        }
+
+        //Just used to test if colours are working
+        private void Button_Random_Click(object sender, RoutedEventArgs e)
+        {
+            CanRun(false);
+
+            Random_Color();
+        }
+        private void Random_Color()
+        {
+            // Change parameters
+            int percentage_correct = 90;
+
+            for (int i = 0; i < UDPServer.GRID_SIZE * UDPServer.GRID_SIZE; i++)
+            {
+                Canvas c = Pixels[i];
+
+                //Randomizes the colours
+                int value = r.Next(0, 100);
+
+                if (value >= (100 - percentage_correct))
+                    c.Background = Brushes.Green;
+                else
+                    c.Background = Brushes.Red;
+            }
         }
     }
 }
