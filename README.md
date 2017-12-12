@@ -1,4 +1,5 @@
 # Dissertation_Project
+[![asciicast](https://asciinema.org/a/KtyqI8rwuqKefuhRddmsshKOX.png)](https://asciinema.org/a/KtyqI8rwuqKefuhRddmsshKOX)
 
 # Required Packages
 
