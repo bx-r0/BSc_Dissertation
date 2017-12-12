@@ -2,7 +2,6 @@ import argparse
 import signal
 import threading
 import textwrap
-import time
 from netfilterqueue import NetfilterQueue
 from scapy.all import *
 from multiprocessing.dummy import Pool as ThreadPool
@@ -32,13 +31,13 @@ afray@hotmail.co.uk
 """
 
 
-def map_thread(method, packet):
+def map_thread(method, args):
     """Method that deals with the threading of the packet manipulation"""
 
     # If this try is caught, it occurs for every thread active so anything in the
     # except is triggered for all active threads
     try:
-        pool.map(method, [packet])
+        pool.map(method, args)
     except ValueError:
         # Stops the program from exploding when he pool is terminated
         pass
@@ -67,7 +66,7 @@ def affect_packet(packet):
             return False
 
 
-def print_packet(packet):
+def print_packet(packet, accept=True):
     """This function just prints the packet"""
 
     # Thread functionality
@@ -77,39 +76,45 @@ def print_packet(packet):
         if affect_packet(packet):
             print_force("[!] " + str(packet))
 
-        packet.accept()
+        if accept:
+            packet.accept()
 
     try:
-        map_thread(_print_thread, packet)
+        map_thread(_print_thread, [packet])
     except KeyboardInterrupt:
-        clean_close('', '')
+        clean_close()
 
 
-def edit_packet(packet):
+def edit_packet(packet, accept=True):
     """This function will be used to edit sections of a packet, this is currently incomplete"""
 
     # Thread functionality
     def _edit_thread(packet):
 
         if affect_packet(packet):
-            # Converts into Scapy compatible string
             pkt = IP(packet.get_payload())
 
-            # TODO: Packet editing here
+            # Changes the Time To Live of the packet
+            pkt.ttl = 150
+
+            # Recalculates the check sum
+            del pkt[IP].chksum
 
             # Sets the packet to the modified version
             packet.set_payload(bytes(pkt))
 
-            # Accepts and lets the packet leave the queue
-        packet.accept()
+            if accept:
+                packet.accept()
+        else:
+            packet.accept()
 
     try:
-        map_thread(_edit_thread, packet)
+        map_thread(_edit_thread, [packet])
     except KeyboardInterrupt:
-        clean_close('', '')
+        clean_close()
 
 
-def packet_latency(packet):
+def packet_latency(packet, accept=True):
     """This function is used to incur latency on packets"""
 
     # Thread functionality
@@ -121,16 +126,17 @@ def packet_latency(packet):
             # Issues latency of the entered value
             time.sleep(latency_value_second)
 
-        # Accepts and lets the packet leave the queue
-        packet.accept()
+            # Accepts and lets the packet leave the queue
+            if accept:
+                packet.accept()
 
     try:
-        map_thread(_latency_thread, packet)
+        map_thread(_latency_thread, [packet])
     except KeyboardInterrupt:
-        clean_close('', '')
+        clean_close()
 
 
-def packet_loss(packet):
+def packet_loss(packet, accept=True):
     """This function will issue a packet loss,
     a percentage is defined and anything
     lower is dropped and anything else is accepted"""
@@ -145,38 +151,33 @@ def packet_loss(packet):
             print_force("[!] Packet dropped!")
         # Accept the packet
         else:
-            packet.accept()
+            if accept:
+                packet.accept()
     # This else is needed because the packet would be blocked if it's not the target
     else:
         packet.accept()
 
-
 # ISSUES
 # - For some reason the value printed as 'sent' is always twice the number that actually have been sent??
 # - There needs to be a wait before the packet is added to the pool?? Maybe they're being added too quickly
+
 
 def throttle(packet):
     """Mode to throttle packets"""
 
     global throttle_pool
 
-    wait_t()
+    # TODO: Why is this needed?
+    try:
+        time.sleep(0.1)
+    except KeyboardInterrupt:
+        pass
 
     if affect_packet(packet):
         # Adds the packet to the pool
         throttle_pool.append(packet)
     else:
         packet.accept()
-
-
-# TODO: Why is this needed?
-def wait_t():
-    """HACK Method, for some reasons throttle needs to wait before appending to list in some cases"""
-
-    try:
-        time.sleep(0.1)
-    except KeyboardInterrupt:
-        pass
 
 
 def throttle_purge():
@@ -195,6 +196,19 @@ def throttle_purge():
 
     # Starts another thread
     t_job = threading.Timer(throttle_period, throttle_purge).start()
+
+
+def duplicate(packet, accept=True):
+    """Mode that takes a full duplication"""
+    global duplication_factor
+
+    if affect_packet(packet):
+
+        # TODO: BROKEN: Just sending the packet using scapy does not work
+
+        pass
+    else:
+        packet.accept()
 
 
 def run_packet_manipulation():
@@ -229,7 +243,7 @@ def run_packet_manipulation():
         nfqueue.run()
 
     except KeyboardInterrupt:
-        clean_close('', '')
+        clean_close()
 
 
 def parameters():
@@ -237,9 +251,8 @@ def parameters():
     most of the handling is performed by the 'getopt' module"""
 
     # Defines globals to be used above
-    global mode, latency_value_second, packet_loss_percentage, target_packet_type
+    global mode, latency_value_second, packet_loss_percentage, target_packet_type, duplication_factor
     global victim_ip, router_ip, interface, arp_active
-
     global throttle_period, throttle_pool, t_job
 
     # Defaults
@@ -261,32 +274,43 @@ def parameters():
                         action='store_true',
                         help='Sets the mode to print_packet')
 
-    effect.add_argument('-l', '--latency',
+    effect.add_argument('-l',
                         action='store',
-                        help='Sets the mode to packet_latency (ms)',
-                        metavar='delay')
+                        help='Latency - Sets the mode to packet_latency (ms)',
+                        metavar='<delay>')
 
-    effect.add_argument('-z', '--packet-loss',
+    effect.add_argument('-z',
                         action='store',
-                        help='Sets the mode to packet_loss (percentage)',
-                        metavar='loss_percent')
+                        help='Packet_Loss - Sets the mode to packet_loss (percentage)',
+                        metavar='<loss_percent>')
 
-    effect.add_argument('-d', '--throttle',
+    effect.add_argument('-d',
                         action='store',
-                        help='Specifies a length of time to hold all packets and release in one go (ms)',
-                        metavar='delay')
+                        help='Throttle - Specifies a length of time to hold all packets and release in one go (ms)',
+                        metavar='<delay>')
+
+    effect.add_argument('-m',
+                        action='store',
+                        help='Specifies the duplication factor',
+                        metavar='<factor>')
+
+    effect.add_argument('-c',
+                        action='store',
+                        nargs=2,
+                        help='Specifies to use Latency and Packet loss together',
+                        metavar=('<latency>', '<packet_loss>'))
 
     # Extra parameters
-    parser.add_argument('-t', '--target-packet',
+    parser.add_argument('-t',
                         action='store',
                         help="Specifies a packet type to affect",
-                        metavar='packet_name')
+                        metavar='<packet_protocol>')
 
-    parser.add_argument('-a', '--arp',
+    parser.add_argument('-a',
                         action='store',
                         nargs=3,
                         help="Specifies values for arp spoofing mode",
-                        metavar=('victimIP', 'routerIP', 'interface'))
+                        metavar=('<victimIP>', '<routerIP>', '<interface>'))
 
     args = parser.parse_args()
 
@@ -294,30 +318,45 @@ def parameters():
     if args.print:
         mode = print_packet
 
-    elif args.latency:
-        latency_value_second = int(args.latency) / 1000
+    elif args.l:
+        latency_value_second = int(args.l) / 1000
         print_force('[*] Latency set to: {}ms'.format(latency_value_second))
         mode = packet_latency
 
-    elif args.packet_loss:
-        packet_loss_percentage = int(args.target_packet)
+    elif args.z:
+        packet_loss_percentage = int(args.z)
         print_force('[*] Packet loss set to: {}%'.format(packet_loss_percentage))
         mode = packet_loss
 
-    elif args.throttle:
-        throttle_period = int(args.throttle) / 1000
+    elif args.d:
+        throttle_period = int(args.d) / 1000
         print_force('[*] Packet throttle delay set to {}ms'.format(throttle_period))
         mode = throttle
 
         # Starts throttle purge thread
         t_job = threading.Timer(throttle_period, throttle_purge).start()
 
+    elif args.m:
+        duplication_factor = int(args.m)
+        print_force('[*] Packet duplication set. Factor is: {}'.format(duplication_factor))
+        mode = duplicate
+
+    elif args.c:
+        latency_value_second = int(args.c[0])
+        packet_loss_percentage = int(args.c[1])
+
+        print_force('[*] Latency set to:        {} ms'.format(latency_value_second))
+        print_force('[*] Packet loss set to:    {} %'.format(packet_loss_percentage))
+
+        # TODO: Add a multi method? Maybe something that incorperates both effects
+        #mode = [packet_latency, packet_loss]
+
     # Extra settings
-    if args.target_packet:
-        target_packet_type = args.target_packet
+    if args.t:
+        target_packet_type = args.t
         print_force('[!] Only affecting {} packets'.format(target_packet_type))
 
-    if args.arp:
+    if args.a:
         print_force("[!] Arp spoofing mode activated")
         arp_active = True
         victim_ip = args.arp[0]
@@ -334,7 +373,7 @@ def kill_thread_pool():
     print_force("\n[!] Thread pool killed")
 
 
-def clean_close(signum, frame):
+def clean_close(signum='', frame=''):
     """Used to close the script cleanly"""
 
     global t_job
