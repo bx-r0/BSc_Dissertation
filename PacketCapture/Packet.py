@@ -1,14 +1,35 @@
 import argparse
 import signal
+import threading
+import textwrap
+import time
 from netfilterqueue import NetfilterQueue
 from scapy.all import *
 from multiprocessing.dummy import Pool as ThreadPool
-import threading
-import LocalNetworkScan
 
 # Defines how many threads are in the pool
-# Does this need more?
 pool = ThreadPool(100)
+
+# Formatting messages for the usage
+logo = """
+==============================================================
+Degraded Packet Simulation
+
+    ██████╗ ██████╗ ███████╗
+    ██╔══██╗██╔══██╗██╔════╝
+    ██║  ██║██████╔╝███████╗
+    ██║  ██║██╔═══╝ ╚════██║
+    ██████╔╝██║     ███████║
+    ╚═════╝ ╚═╝     ╚══════╝
+
+"""
+
+epilog = """
+Aidan Fray
+afray@hotmail.co.uk
+
+==============================================================
+"""
 
 
 def map_thread(method, packet):
@@ -19,13 +40,13 @@ def map_thread(method, packet):
     try:
         pool.map(method, [packet])
     except ValueError:
+        # Stops the program from exploding when he pool is terminated
         pass
 
 
 def print_force(str):
     """This method is required because when this python file is called as a script
     the prints don't appear and a flush is required """
-
     print(str, flush=True)
 
 
@@ -44,13 +65,6 @@ def affect_packet(packet):
             return True
         else:
             return False
-
-
-def ignore_packet(packet):
-    """This is just used a default 'do nothing' function """
-
-    # Accepts and lets the packet leave the queue
-    packet.accept()
 
 
 def print_packet(packet):
@@ -137,6 +151,52 @@ def packet_loss(packet):
         packet.accept()
 
 
+# ISSUES
+# - For some reason the value printed as 'sent' is always twice the number that actually have been sent??
+# - There needs to be a wait before the packet is added to the pool?? Maybe they're being added too quickly
+
+def throttle(packet):
+    """Mode to throttle packets"""
+
+    global throttle_pool
+
+    wait_t()
+
+    if affect_packet(packet):
+        # Adds the packet to the pool
+        throttle_pool.append(packet)
+    else:
+        packet.accept()
+
+
+# TODO: Why is this needed?
+def wait_t():
+    """HACK Method, for some reasons throttle needs to wait before appending to list in some cases"""
+
+    try:
+        time.sleep(0.1)
+    except KeyboardInterrupt:
+        pass
+
+
+def throttle_purge():
+    """Event that purges the packet pool"""
+
+    global throttle_pool, throttle_period, t_job
+
+    # Sends all packets!
+    for x in throttle_pool:
+        x.accept()
+
+    if len(throttle_pool) is not 0:
+        print_force("[!] Packets sent. Number: {}".format(len(throttle_pool)))
+
+    throttle_pool = []
+
+    # Starts another thread
+    t_job = threading.Timer(throttle_period, throttle_purge).start()
+
+
 def run_packet_manipulation():
     """The main method here, will issue a iptables command and construct the NFQUEUE"""
 
@@ -180,46 +240,89 @@ def parameters():
     global mode, latency_value_second, packet_loss_percentage, target_packet_type
     global victim_ip, router_ip, interface, arp_active
 
+    global throttle_period, throttle_pool, t_job
+
     # Defaults
-    mode = ignore_packet
+    mode = print_packet
     target_packet_type = 'ALL'
     arp_active = False
+    throttle_pool = []
+    t_job = None
 
     # Arguments
-    parser = argparse.ArgumentParser(prog="Packet.py", description="Run this script to cause network degradation")
-    parser.add_argument('-p', action='store_true', help="Sets the mode to print_packet")
-    parser.add_argument('-l', action='store', help="Sets the mode to packet_latency", metavar='time(ms)')
-    parser.add_argument('-z', action='store', help="Sets the mode to packet_loss", metavar='loss_percent')
-    parser.add_argument('-t', action='store', help="Specifies a packet type to affect", metavar='packet_name')
-    parser.add_argument('-a', action='store', nargs=3, help="Specifies values for arp spoofing mode",
+    parser = argparse.ArgumentParser(prog="Packet.py",
+                                     formatter_class=argparse.RawDescriptionHelpFormatter,
+                                     description=textwrap.dedent(logo),
+                                     epilog=textwrap.dedent(epilog))
+
+    # Mode parameters
+    effect = parser.add_mutually_exclusive_group(required=False)
+    effect.add_argument('-p', '--print',
+                        action='store_true',
+                        help='Sets the mode to print_packet')
+
+    effect.add_argument('-l', '--latency',
+                        action='store',
+                        help='Sets the mode to packet_latency (ms)',
+                        metavar='delay')
+
+    effect.add_argument('-z', '--packet-loss',
+                        action='store',
+                        help='Sets the mode to packet_loss (percentage)',
+                        metavar='loss_percent')
+
+    effect.add_argument('-d', '--throttle',
+                        action='store',
+                        help='Specifies a length of time to hold all packets and release in one go (ms)',
+                        metavar='delay')
+
+    # Extra parameters
+    parser.add_argument('-t', '--target-packet',
+                        action='store',
+                        help="Specifies a packet type to affect",
+                        metavar='packet_name')
+
+    parser.add_argument('-a', '--arp',
+                        action='store',
+                        nargs=3,
+                        help="Specifies values for arp spoofing mode",
                         metavar=('victimIP', 'routerIP', 'interface'))
+
     args = parser.parse_args()
 
     # Modes
-    if args.p:
+    if args.print:
         mode = print_packet
 
-    elif args.l:
-        print_force('[*] Latency set to: ' + args.l + 'ms')
+    elif args.latency:
+        latency_value_second = int(args.latency) / 1000
+        print_force('[*] Latency set to: {}ms'.format(latency_value_second))
         mode = packet_latency
-        latency_value_second = int(args.l) / 1000
 
-    elif args.z:
-        print_force('[*] Packet loss set to: ' + args.z + '%')
+    elif args.packet_loss:
+        packet_loss_percentage = int(args.target_packet)
+        print_force('[*] Packet loss set to: {}%'.format(packet_loss_percentage))
         mode = packet_loss
-        packet_loss_percentage = int(args.z)
+
+    elif args.throttle:
+        throttle_period = int(args.throttle) / 1000
+        print_force('[*] Packet throttle delay set to {}ms'.format(throttle_period))
+        mode = throttle
+
+        # Starts throttle purge thread
+        t_job = threading.Timer(throttle_period, throttle_purge).start()
 
     # Extra settings
-    if args.t:
-        print_force("[!] Only affecting " + args.t + " packets")
-        target_packet_type = args.t
+    if args.target_packet:
+        target_packet_type = args.target_packet
+        print_force('[!] Only affecting {} packets'.format(target_packet_type))
 
-    if args.a:
+    if args.arp:
         print_force("[!] Arp spoofing mode activated")
         arp_active = True
-        victim_ip = args.a[0]
-        router_ip = args.a[1]
-        interface = args.a[2]
+        victim_ip = args.arp[0]
+        router_ip = args.arp[1]
+        interface = args.arp[2]
 
     # When all parameters are handled
     run_packet_manipulation()
@@ -234,8 +337,13 @@ def kill_thread_pool():
 def clean_close(signum, frame):
     """Used to close the script cleanly"""
 
-    stoppool = threading.Thread(target=kill_thread_pool)
-    stoppool.start()
+    global t_job
+
+    if t_job is not None:
+        t_job.terminate()
+
+    stop_pool = threading.Thread(target=kill_thread_pool)
+    stop_pool.start()
 
     if arp_active:
         arp_process.send_signal(signal.SIGINT)
@@ -247,6 +355,7 @@ def clean_close(signum, frame):
     nfqueue.unbind()
     os._exit(0)
 
+
 # Rebinds the all the close signals to clean_close the script
 signal.signal(signal.SIGTSTP, clean_close)  # Ctrl+Z
 signal.signal(signal.SIGQUIT, clean_close)  # Ctrl+\
@@ -256,6 +365,3 @@ if os.getuid() != 0:
     exit("Error: User needs to be root to run this script")
 
 parameters()
-
-
-
