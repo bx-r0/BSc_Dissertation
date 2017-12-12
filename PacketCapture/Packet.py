@@ -50,7 +50,7 @@ def print_force(str):
 
 
 def affect_packet(packet):
-    """This function checks if the packet should be affected or not"""
+    """This function checks if the packet should be affected or not. This is part of the -t option"""
 
     if target_packet_type == "ALL":
         return True
@@ -70,7 +70,7 @@ def print_packet(packet, accept=True):
     """This function just prints the packet"""
 
     # Thread functionality
-    def _print_thread(packet):
+    def t_print(packet):
         """The functionality that will spawned in a thread from the Print_Packet mode"""
 
         if affect_packet(packet):
@@ -80,7 +80,7 @@ def print_packet(packet, accept=True):
             packet.accept()
 
     try:
-        map_thread(_print_thread, [packet])
+        map_thread(t_print, [packet])
     except KeyboardInterrupt:
         clean_close()
 
@@ -89,7 +89,8 @@ def edit_packet(packet, accept=True):
     """This function will be used to edit sections of a packet, this is currently incomplete"""
 
     # Thread functionality
-    def _edit_thread(packet):
+    def edit(packet):
+        """Thread functionality"""
 
         if affect_packet(packet):
             pkt = IP(packet.get_payload())
@@ -109,7 +110,7 @@ def edit_packet(packet, accept=True):
             packet.accept()
 
     try:
-        map_thread(_edit_thread, [packet])
+        map_thread(edit, [packet])
     except KeyboardInterrupt:
         clean_close()
 
@@ -117,8 +118,8 @@ def edit_packet(packet, accept=True):
 def packet_latency(packet, accept=True):
     """This function is used to incur latency on packets"""
 
-    # Thread functionality
-    def _latency_thread(packet):
+    def latency(packet):
+        """Thread functionality"""
 
         if affect_packet(packet):
             print_force("[!] " + str(packet))
@@ -131,43 +132,51 @@ def packet_latency(packet, accept=True):
                 packet.accept()
 
     try:
-        map_thread(_latency_thread, [packet])
+        map_thread(latency, [packet])
     except KeyboardInterrupt:
         clean_close()
 
 
-def packet_loss(packet, accept=True):
+def drop_packet():
+    """Used so the dual packetloss-latency can use the functionality of the packet loss code"""
+
+    # random value from 1 to 100
+    random_value = random.uniform(1, 100)
+
+    # If the generated value is smaller than the percentage discard
+    if packet_loss_percentage > random_value:
+        print_force("[!] Packet dropped!")
+
+        return True
+    # Accept the packet
+    else:
+        return False
+
+
+def packet_loss(packet):
     """This function will issue a packet loss,
     a percentage is defined and anything
     lower is dropped and anything else is accepted"""
 
     if affect_packet(packet):
-        # random value from 1 to 100
-        random_value = random.uniform(1, 100)
-
-        # If the generated value is smaller than the percentage discard
-        if packet_loss_percentage > random_value:
+        if drop_packet():
             packet.drop()
-            print_force("[!] Packet dropped!")
-        # Accept the packet
         else:
-            if accept:
-                packet.accept()
-    # This else is needed because the packet would be blocked if it's not the target
+            packet.accept()
     else:
         packet.accept()
+
 
 # ISSUES
 # - For some reason the value printed as 'sent' is always twice the number that actually have been sent??
 # - There needs to be a wait before the packet is added to the pool?? Maybe they're being added too quickly
-
-
 def throttle(packet):
     """Mode to throttle packets"""
 
     global throttle_pool
 
-    # TODO: Why is this needed?
+    # TODO: Why is this needed wait needed?
+    # If the wait isn't included it will freeze the program
     try:
         time.sleep(0.1)
     except KeyboardInterrupt:
@@ -181,7 +190,7 @@ def throttle(packet):
 
 
 def throttle_purge():
-    """Event that purges the packet pool"""
+    """Event that purges the packet pool when the time has elapsed"""
 
     global throttle_pool, throttle_period, t_job
 
@@ -198,7 +207,7 @@ def throttle_purge():
     t_job = threading.Timer(throttle_period, throttle_purge).start()
 
 
-def duplicate(packet, accept=True):
+def duplicate(packet):
     """Mode that takes a full duplication"""
     global duplication_factor
 
@@ -209,6 +218,15 @@ def duplicate(packet, accept=True):
         pass
     else:
         packet.accept()
+
+
+def packetloss_and_latency(packet):
+    """This performs two of the effects together"""
+
+    if drop_packet():
+        packet.drop()
+    else:
+        packet_latency(packet, True)
 
 
 def run_packet_manipulation():
@@ -330,7 +348,7 @@ def parameters():
 
     elif args.d:
         throttle_period = int(args.d) / 1000
-        print_force('[*] Packet throttle delay set to {}ms'.format(throttle_period))
+        print_force('[*] Packet throttle delay set to {} s'.format(throttle_period))
         mode = throttle
 
         # Starts throttle purge thread
@@ -342,14 +360,13 @@ def parameters():
         mode = duplicate
 
     elif args.c:
-        latency_value_second = int(args.c[0])
+        latency_value_second = int(args.c[0]) / 1000
         packet_loss_percentage = int(args.c[1])
 
-        print_force('[*] Latency set to:        {} ms'.format(latency_value_second))
+        print_force('[*] Latency set to:        {} s'.format(latency_value_second))
         print_force('[*] Packet loss set to:    {} %'.format(packet_loss_percentage))
 
-        # TODO: Add a multi method? Maybe something that incorperates both effects
-        #mode = [packet_latency, packet_loss]
+        mode = packetloss_and_latency
 
     # Extra settings
     if args.t:
