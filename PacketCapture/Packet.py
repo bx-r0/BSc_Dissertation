@@ -2,6 +2,7 @@ import argparse
 import signal
 import threading
 import textwrap
+import Common_Connections
 from netfilterqueue import NetfilterQueue
 from scapy.all import *
 from multiprocessing.dummy import Pool as ThreadPool
@@ -229,6 +230,17 @@ def packetloss_and_latency(packet):
         packet_latency(packet, True)
 
 
+def emulate_real_connection_speed(packet):
+    global connection
+    global latency_value_second, packet_loss_percentage
+
+    latency_value_second = (connection.rnd(connection.latency) / 1000)
+    packet_loss_percentage = connection.rnd(connection.packetloss)
+
+    # Calls mode
+    packetloss_and_latency(packet)
+
+
 def run_packet_manipulation():
     """The main method here, will issue a iptables command and construct the NFQUEUE"""
 
@@ -304,7 +316,8 @@ def parameters():
 
     effect.add_argument('-d',
                         action='store',
-                        help='Throttle - Specifies a length of time to hold all packets and release in one go (ms)',
+                        help='Throttle - Specifies a length of time to hold all' +
+                             ' packets and release in one go (ms)',
                         metavar='<delay>')
 
     effect.add_argument('-m',
@@ -317,6 +330,11 @@ def parameters():
                         nargs=2,
                         help='Specifies to use Latency and Packet loss together',
                         metavar=('<latency>', '<packet_loss>'))
+
+    effect.add_argument('-s',
+                        action='store',
+                        help='Specifies a real world connection to simulate',
+                        metavar='<connection_type>')
 
     # Extra parameters
     parser.add_argument('-t',
@@ -367,6 +385,23 @@ def parameters():
         print_force('[*] Packet loss set to:    {} %'.format(packet_loss_percentage))
 
         mode = packetloss_and_latency
+
+    elif args.s:
+        global connection
+
+        connection = None
+        for c in Common_Connections.connections:
+            if c.name == str(args.s):
+                connection = c
+
+        # Could not find connection type
+        if connection is None:
+            print('Error: Could no find the \'{}\' connection entered'.format(args.s))
+            sys.exit(0)
+
+        print_force('[*] Connection type is emulating: {}'.format(connection.name))
+
+        mode = emulate_real_connection_speed
 
     # Extra settings
     if args.t:

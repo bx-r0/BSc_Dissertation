@@ -16,6 +16,7 @@ target_protcols = ['TCP', 'UDP', 'ICMP']
 # Gets the directory of the current file
 filepath = os.path.dirname(os.path.abspath(__file__))
 
+
 class PacketCaptureGTK:
     """A GUI for controlling the Packet.py script"""
 
@@ -23,65 +24,63 @@ class PacketCaptureGTK:
     def __init__(self):
         self.running = False
 
-        self.main_window_init()
-        self.arp_window_init()
+        def main_window_init(self):
+            # Creates the builder and loads the UI from the glade file
+            builder = Gtk.Builder()
+            builder.add_from_file("GUI/PacketCaptureWindow.glade")
+            builder.connect_signals(self)
+
+            win = builder.get_object("window1")
+            win.show_all()
+
+            # Grabs and saves objects
+            self.textBox_Latency = builder.get_object("TextBox_Latency")
+            self.textBox_PacketLoss = builder.get_object("TextBox_PacketLoss")
+            self.textView_ConsoleOutput = builder.get_object("TextView_ConsoleOutput")
+            self.TextView_ArpOutput = builder.get_object("TextView_ArpOutput")
+
+            # Buttons
+            self.button_Latency = builder.get_object("Button_latency")
+            self.button_PacketLoss = builder.get_object("Button_packet_loss")
+
+            # Labels
+            self.label_ARP_active = builder.get_object("Label_ARP_active")
+
+            # Combo Box
+            self.comboBox_packetFilter = builder.get_object("ComboBox_PacketFilter")
+            iface_list_store = Gtk.ListStore(GObject.TYPE_STRING)
+            for item in target_protcols:  # Creates the lists
+                iface_list_store.append([item])
+            self.comboBox_packetFilter.set_model(iface_list_store)
+            self.comboBox_packetFilter.set_active(0)
+
+            # Others
+            self.checkBox_packetFilter = builder.get_object("CheckBox_PacketFilter")
+            self.button_Stop = builder.get_object("Button_stop")
+
+        def arp_window_init(self):
+            builder = Gtk.Builder()
+            builder.add_from_file("GUI/ARP_Settings.glade")
+            builder.connect_signals(self)
+
+            # Grabs and saves the window for later
+            self.arp_window = builder.get_object("window1")
+
+            # Grabs objects
+            self.button_OK = builder.get_object("Button_OK")
+            self.button_Cancel = builder.get_object("Button_Cancel")
+            self.button_localHost = builder.get_object("Button_GetLocalHosts")
+
+            self.levelbar_localHost = builder.get_object("LevelBar_GetLocalHosts")
+
+            # Puts the textBoxes into a list for easy traversal later
+            self.ARP_TextBox_Interface = builder.get_object("TextBox_Interface")
+            self.ARP_ComboBox_VictimIP = builder.get_object("Combo_Box_VictimIP")
+            self.ARP_ComboBox_RouterIP = builder.get_object("Combo_Box_RouterIP")
+
+        main_window_init(self)
+        arp_window_init(self)
         Gtk.main()
-
-    def main_window_init(self):
-        # Creates the builder and loads the UI from the glade file
-        builder = Gtk.Builder()
-        builder.add_from_file("PacketCaptureWindow.glade")
-        builder.connect_signals(self)
-
-        win = builder.get_object("window1")
-        win.show_all()
-
-        # Grabs and saves objects
-        self.textBox_Latency = builder.get_object("TextBox_Latency")
-        self.textBox_PacketLoss = builder.get_object("TextBox_PacketLoss")
-        self.textView_ConsoleOutput = builder.get_object("TextView_ConsoleOutput")
-        self.TextView_ArpOutput = builder.get_object("TextView_ArpOutput")
-
-        # Buttons
-        self.button_Latency = builder.get_object("Button_latency")
-        self.button_PacketLoss = builder.get_object("Button_packet_loss")
-
-        # Labels
-        self.label_ARP_active = builder.get_object("Label_ARP_active")
-
-        # Combo Box
-        self.comboBox_packetFilter = builder.get_object("ComboBox_PacketFilter")
-        iface_list_store = Gtk.ListStore(GObject.TYPE_STRING)
-        for item in target_protcols:  # Creates the lists
-            iface_list_store.append([item])
-        self.comboBox_packetFilter.set_model(iface_list_store)
-        self.comboBox_packetFilter.set_active(0)
-
-        # Others
-        self.checkBox_packetFilter = builder.get_object("CheckBox_PacketFilter")
-        self.button_Stop = builder.get_object("Button_stop")
-
-    def arp_window_init(self):
-        builder = Gtk.Builder()
-        builder.add_from_file("ARP_Settings.glade")
-        builder.connect_signals(self)
-
-        # Grabs and saves the window for later
-        self.arp_window = builder.get_object("window1")
-
-        #Grabs objects
-        self.button_OK = builder.get_object("Button_OK")
-        self.button_Cancel = builder.get_object("Button_Cancel")
-        self.button_localHost = builder.get_object("Button_GetLocalHosts")
-
-        self.levelbar_localHost = builder.get_object("LevelBar_GetLocalHosts")
-
-        # Puts the textBoxes into a list for easy traversal later
-        self.ARP_TextBox_Interface = builder.get_object("TextBox_Interface")
-        self.ARP_ComboBox_VictimIP = builder.get_object("Combo_Box_VictimIP")
-        self.ARP_ComboBox_RouterIP = builder.get_object("Combo_Box_RouterIP")
-
-    # --------------------------Control Events------------------------------------- #
 
     def onStop_Clicked(self, button):
         """Runs when the stop button is clicked"""
@@ -158,7 +157,6 @@ class PacketCaptureGTK:
         self.comboBox_packetFilter.set_sensitive(checkBox.get_active())
 
     def getLocalHosts_Clicked(self, button):
-        #TODO: Callback for thread that changes the level bar????
         active = scan_for_active_hosts()
         self.levelbar_localHost.set_value(1)
 
