@@ -1,0 +1,3 @@
+class Latency:
+    pass
+

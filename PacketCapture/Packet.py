@@ -8,6 +8,10 @@ from netfilterqueue import NetfilterQueue
 from scapy.all import *
 from multiprocessing.dummy import Pool as ThreadPool
 
+# Effect imports
+from Effects.LimitBandwidth import Bandwidth
+from Effects.Latency import Latency
+
 # Defines how many threads are in the pool
 pool = ThreadPool(100)
 
@@ -245,44 +249,9 @@ def emulate_real_connection_speed(packet):
 def track_bandwidth(packet):
     """This mode allows for the tracking of rate of packets recieved"""
 
-    # Defines the potential units the rate could be measured in
-    units = ['B/s', 'KB/s', 'MB/s', 'GB/s']
-
-    global total, previous
-
-    # Packet format
-    #   '<Name> packet <Size> Bytes'
-    parts = str(packet).split(' ')
-    packetsize = parts[2]
-
-    total += int(packetsize)
-
-    # Works out rate
-    now = time.time()
-    elapsed = now - previous
-    rate = (total / elapsed)
-
-    # Dynamic altering of rates unit
-    unit = units[0]   # Starts at 'B/s'
-    times_reduced = 0
-
-    # Increase
-    while rate > 1000 and times_reduced < 3:
-        rate = rate / 1000
-        times_reduced += 1
-        unit = units[times_reduced]
-
-    # Decrease
-    while rate < 0.1 and times_reduced > 0:
-        rate = rate * 1000
-        times_reduced -= 1
-        unit = units[times_reduced]
-
-    print('[*] Total: {} bytes - Rate: {:.2f} {} - Elapsed {:.2f} seconds'.format(total, rate, unit, elapsed), end='\r')
+    global bandwidth_obj
+    bandwidth_obj.display(packet)
     packet.accept()
-
-def rate_limit(packet):
-    pass
 
 
 def run_packet_manipulation():
@@ -321,13 +290,20 @@ def run_packet_manipulation():
 
 
 def parameters():
-    """This function deals with parameters passed to the script
-    most of the handling is performed by the 'getopt' module"""
+    """This function deals with parameters passed to the script"""
 
     # Defines globals to be used above
     global mode, latency_value_second, packet_loss_percentage, target_packet_type, duplication_factor
+
+    # Arp
     global victim_ip, router_ip, interface, arp_active
+
+    # Throttling
     global throttle_period, throttle_pool, t_job
+
+    # Bandwidth
+    global bandwidth_obj
+    bandwidth_obj = Bandwidth()
 
     # Defaults
     mode = print_packet
@@ -335,6 +311,7 @@ def parameters():
     arp_active = False
     throttle_pool = []
     t_job = None
+    packet_total = 0
 
     # Arguments
     parser = argparse.ArgumentParser(prog="Packet.py",
@@ -343,8 +320,7 @@ def parameters():
                                      epilog=textwrap.dedent(epilog),
                                      allow_abbrev=False)
 
-    parser.add_argument_group('Arguments',
-                              description=help.Usage())
+    parser.add_argument_group('Arguments', description=help.Usage())
 
     # Mode parameters
     effect = parser.add_mutually_exclusive_group(required=True,)
@@ -389,6 +365,7 @@ def parameters():
 
     effect.add_argument('--rate-limit', '-rl',
                         action='store',
+                        dest='rate_limit',
                         help=argparse.SUPPRESS,
                         type=int)
 
@@ -470,10 +447,19 @@ def parameters():
         mode = emulate_real_connection_speed
 
     elif args.display_bandwidth:
-        global total, previous
-        total = 0
-        previous = time.time()
         mode = track_bandwidth
+
+    elif args.rate_limit:
+        global bandwidth, packet_pool, rate_limit_startTime
+
+        rate_limit_startTime = time.time()
+
+        previous = time.time()
+        bandwidth = int(args.rate_limit)
+        print_force('[*] Bandwidth set to {}B/s'.format(bandwidth))
+
+        mode = bandwidth_limit
+        packet_pool = []
 
     # Extra settings
     if args.target_packet:
