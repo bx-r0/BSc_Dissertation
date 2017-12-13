@@ -3,6 +3,7 @@ import signal
 import threading
 import textwrap
 import Common_Connections
+import help
 from netfilterqueue import NetfilterQueue
 from scapy.all import *
 from multiprocessing.dummy import Pool as ThreadPool
@@ -280,6 +281,9 @@ def track_bandwidth(packet):
     print('[*] Total: {} bytes - Rate: {:.2f} {} - Elapsed {:.2f} seconds'.format(total, rate, unit, elapsed), end='\r')
     packet.accept()
 
+def rate_limit(packet):
+    pass
+
 
 def run_packet_manipulation():
     """The main method here, will issue a iptables command and construct the NFQUEUE"""
@@ -336,61 +340,67 @@ def parameters():
     parser = argparse.ArgumentParser(prog="Packet.py",
                                      formatter_class=argparse.RawDescriptionHelpFormatter,
                                      description=textwrap.dedent(logo),
-                                     epilog=textwrap.dedent(epilog))
+                                     epilog=textwrap.dedent(epilog),
+                                     allow_abbrev=False)
+
+    parser.add_argument_group('Arguments',
+                              description=help.Usage())
 
     # Mode parameters
-    effect = parser.add_mutually_exclusive_group(required=False)
+    effect = parser.add_mutually_exclusive_group(required=True,)
+
     effect.add_argument('--print',
                         action='store_true',
-                        help='Sets the mode to print_packet')
+                        help=argparse.SUPPRESS)
 
     effect.add_argument('--latency', '-l',
                         action='store',
-                        help='Latency - Sets the mode to packet_latency (ms)',
-                        metavar='<delay>')
+                        help=argparse.SUPPRESS,
+                        type=int)
 
     effect.add_argument('--packet-loss', '-pl',
                         action='store',
-                        help='Packet_Loss - Sets the mode to packet_loss (percentage)',
-                        metavar='<loss_percent>')
+                        help=argparse.SUPPRESS,
+                        type=int)
 
     effect.add_argument('--throttle', '-t',
                         action='store',
-                        help='Throttle - Specifies a length of time to hold all' +
-                             ' packets and release in one go (ms)',
-                        metavar='<delay>')
+                        help=argparse.SUPPRESS,
+                        type=int)
 
     effect.add_argument('--duplicate', '-d',
                         action='store',
-                        help='Specifies the duplication factor',
-                        metavar='<factor>')
+                        help=argparse.SUPPRESS,
+                        type=int)
 
-    effect.add_argument('--combination-effect', '-c',
+    effect.add_argument('--combination', '-c',
                         action='store',
                         nargs=2,
-                        help='Specifies to use Latency and Packet loss together',
-                        metavar=('<latency>', '<packet_loss>'))
+                        help=argparse.SUPPRESS,
+                        type=int)
 
-    effect.add_argument('--simulate-real-speed', '-s',
+    effect.add_argument('--simulate', '-s',
                         action='store',
-                        help='Specifies a real world connection to simulate',
-                        metavar='<connection_type>')
+                        help=argparse.SUPPRESS)
 
     effect.add_argument('--display-bandwidth', '-b',
                         action='store_true',
-                        help='Sets the mode to display the current bandwidth')
+                        help=argparse.SUPPRESS)
+
+    effect.add_argument('--rate-limit', '-rl',
+                        action='store',
+                        help=argparse.SUPPRESS,
+                        type=int)
 
     # Extra parameters
     parser.add_argument('--target-packet', '-tp',
                         action='store',
-                        help="Specifies a packet type to affect",
-                        metavar='<packet_protocol>')
+                        help=argparse.SUPPRESS)
 
     parser.add_argument('--arp', '-a',
                         action='store',
                         nargs=3,
-                        help="Specifies values for arp spoofing mode",
-                        metavar=('<victimIP>', '<routerIP>', '<interface>'))
+                        help=argparse.SUPPRESS)
 
     args = parser.parse_args()
 
@@ -429,8 +439,8 @@ def parameters():
         print_force('[*] Packet duplication set. Factor is: {}'.format(duplication_factor))
         mode = duplicate
 
-    elif args.combination_effect:
-        local_args = args.combination_effect
+    elif args.combination:
+        local_args = args.combination
 
         latency_value_second = int(local_args[0]) / 1000
         packet_loss_percentage = int(local_args[1])
@@ -440,8 +450,8 @@ def parameters():
 
         mode = packetloss_and_latency
 
-    elif args.simulate_real_speed:
-        local_args = args.simulate_simulte_real_speed
+    elif args.simulate:
+        local_args = args.simulate
 
         global connection
 
