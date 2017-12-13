@@ -26,8 +26,10 @@ class Connection:
 # TODO: Add accurate values
 # Hard coded real-world values
 #   The values are specified as lists representing ranges
-_3G = Connection([10, 20], [2, 5], '3G')
-_4G = Connection([0, 5], [1, 10], '4G')
+v_3G = Connection([10, 20], [2, 5], '3G')
+v_4G = Connection([0, 5], [1, 10], '4G')
 
 # List of connection types
-connections = [_3G, _4G]
+# Dynamically grabs the list of variables from the local list
+# 'v_' Is used to identify connection variables in the local list
+connections = [item for item in locals() if item.startswith("v_")]

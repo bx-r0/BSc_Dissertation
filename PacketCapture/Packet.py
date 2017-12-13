@@ -241,6 +241,46 @@ def emulate_real_connection_speed(packet):
     packetloss_and_latency(packet)
 
 
+def track_bandwidth(packet):
+    """This mode allows for the tracking of rate of packets recieved"""
+
+    # Defines the potential units the rate could be measured in
+    units = ['B/s', 'KB/s', 'MB/s', 'GB/s']
+
+    global total, previous
+
+    # Packet format
+    #   '<Name> packet <Size> Bytes'
+    parts = str(packet).split(' ')
+    packetsize = parts[2]
+
+    total += int(packetsize)
+
+    # Works out rate
+    now = time.time()
+    elapsed = now - previous
+    rate = (total / elapsed)
+
+    # Dynamic altering of rates unit
+    unit = units[0]   # Starts at 'B/s'
+    times_reduced = 0
+
+    # Increase
+    while rate > 1000 and times_reduced < 3:
+        rate = rate / 1000
+        times_reduced += 1
+        unit = units[times_reduced]
+
+    # Decrease
+    while rate < 0.1 and times_reduced > 0:
+        rate = rate * 1000
+        times_reduced -= 1
+        unit = units[times_reduced]
+
+    print('[*] Total: {} bytes - Rate: {:.2f} {} - Elapsed {:.2f} seconds'.format(total, rate, unit, elapsed), end='\r')
+    packet.accept()
+
+
 def run_packet_manipulation():
     """The main method here, will issue a iptables command and construct the NFQUEUE"""
 
@@ -300,49 +340,53 @@ def parameters():
 
     # Mode parameters
     effect = parser.add_mutually_exclusive_group(required=False)
-    effect.add_argument('-p', '--print',
+    effect.add_argument('--print',
                         action='store_true',
                         help='Sets the mode to print_packet')
 
-    effect.add_argument('-l',
+    effect.add_argument('--latency', '-l',
                         action='store',
                         help='Latency - Sets the mode to packet_latency (ms)',
                         metavar='<delay>')
 
-    effect.add_argument('-z',
+    effect.add_argument('--packet-loss', '-pl',
                         action='store',
                         help='Packet_Loss - Sets the mode to packet_loss (percentage)',
                         metavar='<loss_percent>')
 
-    effect.add_argument('-d',
+    effect.add_argument('--throttle', '-t',
                         action='store',
                         help='Throttle - Specifies a length of time to hold all' +
                              ' packets and release in one go (ms)',
                         metavar='<delay>')
 
-    effect.add_argument('-m',
+    effect.add_argument('--duplicate', '-d',
                         action='store',
                         help='Specifies the duplication factor',
                         metavar='<factor>')
 
-    effect.add_argument('-c',
+    effect.add_argument('--combination-effect', '-c',
                         action='store',
                         nargs=2,
                         help='Specifies to use Latency and Packet loss together',
                         metavar=('<latency>', '<packet_loss>'))
 
-    effect.add_argument('-s',
+    effect.add_argument('--simulate-real-speed', '-s',
                         action='store',
                         help='Specifies a real world connection to simulate',
                         metavar='<connection_type>')
 
+    effect.add_argument('--display-bandwidth', '-b',
+                        action='store_true',
+                        help='Sets the mode to display the current bandwidth')
+
     # Extra parameters
-    parser.add_argument('-t',
+    parser.add_argument('--target-packet', '-tp',
                         action='store',
                         help="Specifies a packet type to affect",
                         metavar='<packet_protocol>')
 
-    parser.add_argument('-a',
+    parser.add_argument('--arp', '-a',
                         action='store',
                         nargs=3,
                         help="Specifies values for arp spoofing mode",
@@ -354,66 +398,88 @@ def parameters():
     if args.print:
         mode = print_packet
 
-    elif args.l:
-        latency_value_second = int(args.l) / 1000
-        print_force('[*] Latency set to: {}ms'.format(latency_value_second))
+    elif args.latency:
+        local_args = args.latency
+
+        latency_value_second = int(local_args) / 1000
+        print_force('[*] Latency set to: {}s'.format(latency_value_second))
         mode = packet_latency
 
-    elif args.z:
-        packet_loss_percentage = int(args.z)
+    elif args.packet_loss:
+        local_args = args.packet_loss
+
+        packet_loss_percentage = int(local_args)
         print_force('[*] Packet loss set to: {}%'.format(packet_loss_percentage))
         mode = packet_loss
 
-    elif args.d:
-        throttle_period = int(args.d) / 1000
-        print_force('[*] Packet throttle delay set to {} s'.format(throttle_period))
+    elif args.throttle:
+        local_args = args.throttle
+
+        throttle_period = int(local_args) / 1000
+        print_force('[*] Packet throttle delay set to {}s'.format(throttle_period))
         mode = throttle
 
         # Starts throttle purge thread
         t_job = threading.Timer(throttle_period, throttle_purge).start()
 
-    elif args.m:
-        duplication_factor = int(args.m)
+    elif args.duplicate:
+        local_args = args.duplicate
+
+        duplication_factor = int(local_args)
         print_force('[*] Packet duplication set. Factor is: {}'.format(duplication_factor))
         mode = duplicate
 
-    elif args.c:
-        latency_value_second = int(args.c[0]) / 1000
-        packet_loss_percentage = int(args.c[1])
+    elif args.combination_effect:
+        local_args = args.combination_effect
+
+        latency_value_second = int(local_args[0]) / 1000
+        packet_loss_percentage = int(local_args[1])
 
         print_force('[*] Latency set to:        {} s'.format(latency_value_second))
         print_force('[*] Packet loss set to:    {} %'.format(packet_loss_percentage))
 
         mode = packetloss_and_latency
 
-    elif args.s:
+    elif args.simulate_real_speed:
+        local_args = args.simulate_simulte_real_speed
+
         global connection
 
         connection = None
         for c in Common_Connections.connections:
-            if c.name == str(args.s):
+            if c.name == str(local_args):
                 connection = c
 
         # Could not find connection type
         if connection is None:
-            print('Error: Could no find the \'{}\' connection entered'.format(args.s))
+            print('Error: Could no find the \'{}\' connection entered'.format(local_args))
             sys.exit(0)
 
         print_force('[*] Connection type is emulating: {}'.format(connection.name))
 
         mode = emulate_real_connection_speed
 
+    elif args.display_bandwidth:
+        global total, previous
+        total = 0
+        previous = time.time()
+        mode = track_bandwidth
+
     # Extra settings
-    if args.t:
-        target_packet_type = args.t
+    if args.target_packet:
+        local_args = args.target_packet
+
+        target_packet_type = local_args
         print_force('[!] Only affecting {} packets'.format(target_packet_type))
 
-    if args.a:
+    if args.arp:
+        local_args = args.arp
+
         print_force("[!] Arp spoofing mode activated")
         arp_active = True
-        victim_ip = args.arp[0]
-        router_ip = args.arp[1]
-        interface = args.arp[2]
+        victim_ip = local_args[0]
+        router_ip = local_args[1]
+        interface = local_args[2]
 
     # When all parameters are handled
     run_packet_manipulation()
