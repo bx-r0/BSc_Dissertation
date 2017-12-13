@@ -3,21 +3,24 @@ import time
 
 class Bandwidth:
     """Class that deals with bandwidth functionality"""
-    def __init__(self):
+    def __init__(self, bandwidth=0):
         self.units = ['B/s', 'KB/s', 'MB/s', 'GB/s']
         self.total = 0
         self.rate = 0
         self.unit = self.units[0]
         self.startTime = time.time()
+        self.packet_backlog = []
 
-    @staticmethod
-    def calculate_rate(total, previous):
+        self.bandwidth = bandwidth
+        if bandwidth is not 0:
+            print('[*] Bandwidth set to: {} B/s'.format(bandwidth))
+
+    def calculate_rate(self):
         """Calculates the rate of throughput"""
 
         # Works out rate
         now = time.time()
-        rate = (total / (now - previous))
-        return rate
+        self.rate = (self.total / (now - self.startTime))
 
     @staticmethod
     def calculate_packet_size(packet_name):
@@ -52,6 +55,9 @@ class Bandwidth:
 
         return rate
 
+    def print_stats(self):
+        print('[*] Total: {} bytes - Rate: {:.2f} {} '.format(self.total, self.rate, self.unit), end='\r')
+
     def display(self, packet):
         """Used to display the bandwidth"""
 
@@ -59,12 +65,36 @@ class Bandwidth:
         self.total += self.calculate_packet_size(packet)
 
         # Deals with the rate calculation
-        rate = self.calculate_rate(self.total, self.startTime)
-        rate = self.recalculate_units(rate)
+        self.calculate_rate()
 
-        print('[*] Total: {} bytes - Rate: {:.2f} {} '.format(self.total, rate, self.unit), end='\r')
+        self.rate = self.recalculate_units(self.rate)
+
+        self.print_stats()
+
+    def send_packet(self, packet):
+        """Sends a packet and increases the total"""
+
+        self.total += self.calculate_packet_size(packet)
+        packet.accept()
+        self.calculate_rate()
 
     def limit(self, packet):
-        # TODO
-        pass
+        """Used to limit the bandwidth of the channel"""
 
+        # Refresh
+        self.print_stats()
+        self.calculate_rate()
+
+        # Check if rate is over
+        if self.rate > self.bandwidth:
+            self.packet_backlog.append(packet)
+
+        # If it's not over, send packets until it is over
+        else:
+            self.send_packet(packet)
+
+            while self.rate < self.bandwidth and len(self.packet_backlog) > 0:
+                self.send_packet(self.packet_backlog[0])
+
+                # Packet is removed from the list
+                del self.packet_backlog[0]

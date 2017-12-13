@@ -4,18 +4,20 @@ import threading
 import textwrap
 import Common_Connections
 import help
+import ArpSpoofing
 from netfilterqueue import NetfilterQueue
 from scapy.all import *
 from multiprocessing.dummy import Pool as ThreadPool
 
 # Effect imports
-from Effects.LimitBandwidth import Bandwidth
 from Effects.Latency import Latency
+from Effects.LimitBandwidth import Bandwidth
+from Effects.PacketLoss import PacketLoss
+from Effects.Throttle import Throttle
 
 # Defines how many threads are in the pool
 pool = ThreadPool(100)
 
-# Formatting messages for the usage
 logo = """
 ==============================================================
 Degraded Packet Simulation
@@ -49,10 +51,10 @@ def map_thread(method, args):
         pass
 
 
-def print_force(str):
+def print_force(message):
     """This method is required because when this python file is called as a script
     the prints don't appear and a flush is required """
-    print(str, flush=True)
+    print(message, flush=True)
 
 
 def affect_packet(packet):
@@ -76,30 +78,27 @@ def print_packet(packet, accept=True):
     """This function just prints the packet"""
 
     # Thread functionality
-    def t_print(packet):
+    def t_print(t_packet):
         """The functionality that will spawned in a thread from the Print_Packet mode"""
 
-        if affect_packet(packet):
-            print_force("[!] " + str(packet))
+        if affect_packet(t_packet):
+            print_force("[!] " + str(t_packet))
 
         if accept:
-            packet.accept()
+            t_packet.accept()
 
-    try:
-        map_thread(t_print, [packet])
-    except KeyboardInterrupt:
-        clean_close()
+    map_thread(t_print, [packet])
 
 
 def edit_packet(packet, accept=True):
     """This function will be used to edit sections of a packet, this is currently incomplete"""
 
     # Thread functionality
-    def edit(packet):
+    def edit(t_packet):
         """Thread functionality"""
 
-        if affect_packet(packet):
-            pkt = IP(packet.get_payload())
+        if affect_packet(t_packet):
+            pkt = IP(t_packet.get_payload())
 
             # Changes the Time To Live of the packet
             pkt.ttl = 150
@@ -108,12 +107,12 @@ def edit_packet(packet, accept=True):
             del pkt[IP].chksum
 
             # Sets the packet to the modified version
-            packet.set_payload(bytes(pkt))
+            t_packet.set_payload(bytes(pkt))
 
             if accept:
-                packet.accept()
+                t_packet.accept()
         else:
-            packet.accept()
+            t_packet.accept()
 
     try:
         map_thread(edit, [packet])
@@ -121,96 +120,38 @@ def edit_packet(packet, accept=True):
         clean_close()
 
 
-def packet_latency(packet, accept=True):
+def packet_loss_and_latency(packet):
+    """This performs two of the effects together"""
+
+    latency_obj.effect(packet)
+    packet_loss_obj.effect(packet)
+
+
+def packet_latency(packet):
     """This function is used to incur latency on packets"""
 
-    def latency(packet):
-        """Thread functionality"""
-
-        if affect_packet(packet):
-            print_force("[!] " + str(packet))
-
-            # Issues latency of the entered value
-            time.sleep(latency_value_second)
-
-            # Accepts and lets the packet leave the queue
-            if accept:
-                packet.accept()
-
-    try:
-        map_thread(latency, [packet])
-    except KeyboardInterrupt:
-        clean_close()
-
-
-def drop_packet():
-    """Used so the dual packetloss-latency can use the functionality of the packet loss code"""
-
-    # random value from 1 to 100
-    random_value = random.uniform(1, 100)
-
-    # If the generated value is smaller than the percentage discard
-    if packet_loss_percentage > random_value:
-        print_force("[!] Packet dropped!")
-
-        return True
-    # Accept the packet
+    if affect_packet(packet):
+        map_thread(latency_obj.effect, [packet])
     else:
-        return False
+        packet.accept()
 
 
 def packet_loss(packet):
-    """This function will issue a packet loss,
-    a percentage is defined and anything
-    lower is dropped and anything else is accepted"""
+    """Function that performs packet loss on all packets"""
 
     if affect_packet(packet):
-        if drop_packet():
-            packet.drop()
-        else:
-            packet.accept()
+        map_thread(packet_loss_obj.effect, [packet])
     else:
         packet.accept()
 
 
-# ISSUES
-# - For some reason the value printed as 'sent' is always twice the number that actually have been sent??
-# - There needs to be a wait before the packet is added to the pool?? Maybe they're being added too quickly
 def throttle(packet):
-    """Mode to throttle packets"""
-
-    global throttle_pool
-
-    # TODO: Why is this needed wait needed?
-    # If the wait isn't included it will freeze the program
-    try:
-        time.sleep(0.1)
-    except KeyboardInterrupt:
-        pass
+    """Mode assigned to throttle packets"""
 
     if affect_packet(packet):
-        # Adds the packet to the pool
-        throttle_pool.append(packet)
+        throttle_obj.effect(packet)
     else:
         packet.accept()
-
-
-def throttle_purge():
-    """Event that purges the packet pool when the time has elapsed"""
-
-    global throttle_pool, throttle_period, t_job
-
-    # Sends all packets!
-    for x in throttle_pool:
-        x.accept()
-
-    if len(throttle_pool) is not 0:
-        print_force("[!] Packets sent. Number: {}".format(len(throttle_pool)))
-
-    throttle_pool = []
-
-    # Starts another thread
-    t_job = threading.Timer(throttle_period, throttle_purge).start()
 
 
 def duplicate(packet):
@@ -218,40 +159,34 @@ def duplicate(packet):
     global duplication_factor
 
     if affect_packet(packet):
-
         # TODO: BROKEN: Just sending the packet using scapy does not work
-
         pass
     else:
         packet.accept()
 
 
-def packetloss_and_latency(packet):
-    """This performs two of the effects together"""
-
-    if drop_packet():
-        packet.drop()
-    else:
-        packet_latency(packet, True)
-
-
 def emulate_real_connection_speed(packet):
     global connection
-    global latency_value_second, packet_loss_percentage
 
-    latency_value_second = (connection.rnd(connection.latency) / 1000)
-    packet_loss_percentage = connection.rnd(connection.packetloss)
+    # Adjusts the values
+    latency_obj.alter_latency_value(connection.rnd_latency())
+    packet_loss_obj.alter_percentage(connection.rnd_packet_loss())
 
     # Calls mode
-    packetloss_and_latency(packet)
+    packet_loss_and_latency(packet)
 
 
 def track_bandwidth(packet):
     """This mode allows for the tracking of rate of packets recieved"""
 
-    global bandwidth_obj
     bandwidth_obj.display(packet)
     packet.accept()
+
+
+def limit_bandwidth(packet):
+    """This is mode for limiting the rate of transfer"""
+
+    bandwidth_obj.limit(packet)
 
 
 def run_packet_manipulation():
@@ -277,10 +212,6 @@ def run_packet_manipulation():
         except OSError:
             print_force("[!] Queue already created")
 
-        # Runs the arp spoofing
-        if arp_active:
-            arp_spoof_external(interface, routerIP, victimIP)
-
         # Shows the start waiting message
         print_force("[*] Waiting ")
         nfqueue.run()
@@ -293,25 +224,14 @@ def parameters():
     """This function deals with parameters passed to the script"""
 
     # Defines globals to be used above
-    global mode, latency_value_second, packet_loss_percentage, target_packet_type, duplication_factor
+    global mode, target_packet_type, duplication_factor, arp_active
 
-    # Arp
-    global victim_ip, router_ip, interface, arp_active
-
-    # Throttling
-    global throttle_period, throttle_pool, t_job
-
-    # Bandwidth
-    global bandwidth_obj
-    bandwidth_obj = Bandwidth()
+    global latency_obj, throttle_obj, packet_loss_obj, bandwidth_obj
 
     # Defaults
     mode = print_packet
     target_packet_type = 'ALL'
     arp_active = False
-    throttle_pool = []
-    t_job = None
-    packet_total = 0
 
     # Arguments
     parser = argparse.ArgumentParser(prog="Packet.py",
@@ -325,7 +245,7 @@ def parameters():
     # Mode parameters
     effect = parser.add_mutually_exclusive_group(required=True,)
 
-    effect.add_argument('--print',
+    effect.add_argument('--print', '-p',
                         action='store_true',
                         help=argparse.SUPPRESS)
 
@@ -386,28 +306,17 @@ def parameters():
         mode = print_packet
 
     elif args.latency:
-        local_args = args.latency
-
-        latency_value_second = int(local_args) / 1000
-        print_force('[*] Latency set to: {}s'.format(latency_value_second))
+        latency_obj = Latency(latency_value=args.latency, accept=True)
         mode = packet_latency
 
     elif args.packet_loss:
-        local_args = args.packet_loss
-
-        packet_loss_percentage = int(local_args)
-        print_force('[*] Packet loss set to: {}%'.format(packet_loss_percentage))
+        packet_loss_obj = PacketLoss(percentage=args.packet_loss, accept=True)
         mode = packet_loss
 
     elif args.throttle:
-        local_args = args.throttle
-
-        throttle_period = int(local_args) / 1000
-        print_force('[*] Packet throttle delay set to {}s'.format(throttle_period))
+        throttle_obj = Throttle(period=args.throttle)
+        throttle_obj.start_purge_monitor()
         mode = throttle
-
-        # Starts throttle purge thread
-        t_job = threading.Timer(throttle_period, throttle_purge).start()
 
     elif args.duplicate:
         local_args = args.duplicate
@@ -417,49 +326,37 @@ def parameters():
         mode = duplicate
 
     elif args.combination:
-        local_args = args.combination
-
-        latency_value_second = int(local_args[0]) / 1000
-        packet_loss_percentage = int(local_args[1])
-
-        print_force('[*] Latency set to:        {} s'.format(latency_value_second))
-        print_force('[*] Packet loss set to:    {} %'.format(packet_loss_percentage))
-
-        mode = packetloss_and_latency
+        latency_obj = Latency(latency_value=0, accept=False)
+        packet_loss_obj = PacketLoss(percentage=0, accept=True)
+        mode = packet_loss_and_latency
 
     elif args.simulate:
-        local_args = args.simulate
-
         global connection
 
+        # Checks if the parameter is a valid connection
         connection = None
         for c in Common_Connections.connections:
-            if c.name == str(local_args):
+            if c.name == str(args.simulate):
                 connection = c
-
         # Could not find connection type
         if connection is None:
-            print('Error: Could no find the \'{}\' connection entered'.format(local_args))
+            print('Error: Could no find the \'{}\' connection entered'.format(args.simulate))
             sys.exit(0)
 
         print_force('[*] Connection type is emulating: {}'.format(connection.name))
 
+        latency_obj = Latency(latency_value=0, accept=False)
+        packet_loss_obj = PacketLoss(percentage=0, accept=True)
         mode = emulate_real_connection_speed
 
     elif args.display_bandwidth:
+        bandwidth_obj = Bandwidth()
         mode = track_bandwidth
 
     elif args.rate_limit:
-        global bandwidth, packet_pool, rate_limit_startTime
-
-        rate_limit_startTime = time.time()
-
-        previous = time.time()
-        bandwidth = int(args.rate_limit)
-        print_force('[*] Bandwidth set to {}B/s'.format(bandwidth))
-
-        mode = bandwidth_limit
-        packet_pool = []
+        # Sets the bandwidth object with the specified bandwidth limit
+        bandwidth_obj = Bandwidth(args.rate_limit)
+        mode = limit_bandwidth
 
     # Extra settings
     if args.target_packet:
@@ -473,9 +370,12 @@ def parameters():
 
         print_force("[!] Arp spoofing mode activated")
         arp_active = True
-        victim_ip = local_args[0]
-        router_ip = local_args[1]
+
+        victim = local_args[0]
+        router = local_args[1]
         interface = local_args[2]
+
+        ArpSpoofing.arp_spoof_external(interface, router, victim)
 
     # When all parameters are handled
     run_packet_manipulation()
@@ -490,10 +390,11 @@ def kill_thread_pool():
 def clean_close(signum='', frame=''):
     """Used to close the script cleanly"""
 
-    global t_job
-
-    if t_job is not None:
-        t_job.terminate()
+    # TODO: Better way to do this
+    try:
+        throttle_obj.stop_purge_monitor()
+    except NameError:
+        pass
 
     stop_pool = threading.Thread(target=kill_thread_pool)
     stop_pool.start()

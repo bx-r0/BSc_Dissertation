@@ -42,9 +42,9 @@ def grab_MAC_Addresses():
 
     if victimMAC is not None and routerMAC is not None:
         loop = False
-        print_force("[!] MAC Addresses obtain successfully!")
-        print_force("[*] Router mac: \'", routerMAC, '\'')
-        print_force("[*] Victim mac: \'", victimMAC, '\'')
+        print("[!] MAC Addresses obtain successfully!", flush=True)
+        print("[*] Router mac: \'", routerMAC, '\'', flush=True)
+        print("[*] Victim mac: \'", victimMAC, '\'', flush=True)
     else:
         exit("[!] Error obtaining MAC Addresses, Arp spoofing stopped!")
 

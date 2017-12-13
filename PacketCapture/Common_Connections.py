@@ -13,6 +13,12 @@ class Connection:
             self.packetloss = pl
             self.name = name
 
+    def rnd_latency(self):
+        return self.rnd(self.latency) / 1000
+
+    def rnd_packet_loss(self):
+        return int(self.rnd(self.packetloss))
+
     @staticmethod
     def rnd(p_list):
         """Returns a random value in the given range"""
@@ -30,6 +36,4 @@ v_3G = Connection([10, 20], [2, 5], '3G')
 v_4G = Connection([0, 5], [1, 10], '4G')
 
 # List of connection types
-# Dynamically grabs the list of variables from the local list
-# 'v_' Is used to identify connection variables in the local list
-connections = [item for item in locals() if item.startswith("v_")]
+connections = [v_3G, v_4G]
