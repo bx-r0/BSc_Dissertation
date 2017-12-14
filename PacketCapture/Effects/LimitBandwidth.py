@@ -1,5 +1,9 @@
 import time
 import threading
+import os
+
+# Grabs terminals size
+height, width = os.popen('stty size').read().split(' ')
 
 
 class Bandwidth:
@@ -17,7 +21,7 @@ class Bandwidth:
         self.packet_backlog = []
 
         # Variable that defines how often the stats are updated
-        self.rate_update_period = 0.1  # In seconds
+        self.rate_update_period = 1 # In seconds
 
         self.bandwidth = bandwidth
         if bandwidth is not 0:
@@ -30,21 +34,18 @@ class Bandwidth:
 
         # Const variable that is the period of time the rate is calculated over
         # Measured in seconds
-        AVERAGE_INTERVAL = 5
+
         now = time.time()
         elapsed = (now - self.previous)
 
-        self.rate = (self.transferred_since_check / elapsed)
-
         # Refresh rate
-        if elapsed > AVERAGE_INTERVAL:
+        if elapsed > self.rate_update_period:
+            self.rate = (self.transferred_since_check / elapsed)
+            self.print_stats()
+
+            # Reset
             self.transferred_since_check = 0
             self.previous = now
-
-            # Gets the overall average
-            self.rate = self.total / (now - self.start)
-        else:
-            self.print_stats()
 
         self.start_rate_update()
 
@@ -85,8 +86,9 @@ class Bandwidth:
         print_rate, unit_rate = self.recalculate_units(self.rate)
         print_total, unit_total = self.recalculate_units(self.total)
 
+        # This line justs makes sure there is sections of previous lines present
+        print(' ' * int(width), end='\r')
         print('[*] Total: {:.1f} {} - Rate: {:.1f} {}/s '.format(print_total, unit_total, print_rate, unit_rate), end='\r')
-        # print('[*] Total: {} - Rate: {}'.format(self.total, self.rate), end='\r')
 
     def display(self, packet):
         """Used to display the bandwidth"""
