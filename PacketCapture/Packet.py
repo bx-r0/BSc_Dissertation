@@ -1,10 +1,14 @@
+import logging
+logging.getLogger("scapy.runtime").setLevel(logging.ERROR) # Suppresses the WARNING Message
+
 import argparse
 import signal
 import threading
 import textwrap
 import Common_Connections
 import help
-import ArpSpoofing
+
+# From Imports
 from netfilterqueue import NetfilterQueue
 from scapy.all import *
 from multiprocessing.dummy import Pool as ThreadPool
@@ -28,7 +32,6 @@ Degraded Packet Simulation
     ██║  ██║██╔═══╝ ╚════██║
     ██████╔╝██║     ███████║
     ╚═════╝ ╚═╝     ╚══════╝
-
 """
 
 epilog = """
@@ -45,7 +48,7 @@ def map_thread(method, args):
     # If this try is caught, it occurs for every thread active so anything in the
     # except is triggered for all active threads
     try:
-        pool.map(method, args)
+        pool.map_async(method, args)
     except ValueError:
         # Stops the program from exploding when he pool is terminated
         pass
@@ -199,7 +202,6 @@ def run_packet_manipulation():
 
     try:
         global nfqueue
-        global arp_process
 
         # Packets for this machine
         os.system("iptables -A INPUT -j NFQUEUE")
@@ -373,16 +375,23 @@ def parameters():
         print_force('[!] Only affecting {} packets'.format(target_packet_type))
 
     if args.arp:
+        global arp_process
+
         local_args = args.arp
 
-        print_force("[!] Arp spoofing mode activated")
-        arp_active = True
+        print_force("[*] ## ARP spoofing mode activated ## ")
 
         victim = local_args[0]
         router = local_args[1]
         interface = local_args[2]
 
-        ArpSpoofing.arp_spoof_external(interface, router, victim)
+        filepath = os.path.dirname(os.path.abspath(__file__))
+
+        # Runs the arp spoofing
+        arp_active = True
+        cmd = ['pkexec', 'python', filepath + '/ArpSpoofing.py']
+        cmd = cmd + ['-t', victim, '-r', router, '-i', interface]
+        arp_process = subprocess.Popen(cmd)
 
     # When all parameters are handled
     run_packet_manipulation()
@@ -391,7 +400,7 @@ def parameters():
 def kill_thread_pool():
     # Death to the thread pool
     pool.close()
-    print_force("\n[!] Thread pool killed")
+    print_force("[!] Thread pool killed\n")
 
 
 def clean_close(signum='', frame=''):
@@ -403,17 +412,23 @@ def clean_close(signum='', frame=''):
     except NameError:
         pass
 
-    stop_pool = threading.Thread(target=kill_thread_pool)
-    stop_pool.start()
+    print_force("\n[*] ## Close signal recieved ##")
 
-    if arp_active:
-        arp_process.send_signal(signal.SIGINT)
-
+    # Resets
     print_force("[!] iptables reverted")
     os.system("iptables -F INPUT")
 
     print_force("[!] NFQUEUE unbinded")
     nfqueue.unbind()
+
+    if arp_active:
+        print_force('[!] Arp Spoofing stopped!')
+        arp_process.terminate()
+
+    # Kills thread pool
+    stop_pool = threading.Thread(target=kill_thread_pool)
+    stop_pool.start()
+
     os._exit(0)
 
 
