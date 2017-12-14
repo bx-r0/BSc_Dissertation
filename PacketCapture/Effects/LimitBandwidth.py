@@ -8,8 +8,12 @@ height, width = os.popen('stty size').read().split(' ')
 
 class Bandwidth:
     """Class that deals with bandwidth functionality"""
-    def __init__(self, bandwidth=0):
+    def __init__(self, bandwidth=0, accept=True, print_f=True):
         self.units = ['B', 'KB', 'MB', 'GB']
+
+        # Flags
+        self.accept = accept
+        self.print_f = print_f
 
         self.total = 0
         self.transferred_since_check = 0
@@ -21,7 +25,7 @@ class Bandwidth:
         self.packet_backlog = []
 
         # Variable that defines how often the stats are updated
-        self.rate_update_period = 1 # In seconds
+        self.rate_update_period = 1  # In seconds
 
         self.bandwidth = bandwidth
         if bandwidth is not 0:
@@ -41,7 +45,9 @@ class Bandwidth:
         # Refresh rate
         if elapsed > self.rate_update_period:
             self.rate = (self.transferred_since_check / elapsed)
-            self.print_stats()
+
+            if self.print_f:
+                self.print_stats()
 
             # Reset
             self.transferred_since_check = 0
@@ -93,11 +99,7 @@ class Bandwidth:
     def display(self, packet):
         """Used to display the bandwidth"""
 
-        packet_size = self.calculate_packet_size(packet)
-
-        # Updates the total
-        self.total += packet_size
-        self.transferred_since_check += packet_size
+        self.send_packet(packet)
 
     def send_packet(self, packet):
         """Sends a packet and increases the total"""
@@ -106,7 +108,8 @@ class Bandwidth:
         self.total += packet_size
         self.transferred_since_check += packet_size
 
-        packet.accept()
+        if self.accept:
+            packet.accept()
 
     def limit(self, packet):
         """Used to limit the bandwidth of the channel"""
@@ -127,3 +130,6 @@ class Bandwidth:
 
     def start_rate_update(self):
         threading.Timer(self.rate_update_period, self.calculate_rate).start()
+
+    def alter_bandwidth(self, new_value):
+        self.bandwidth = new_value

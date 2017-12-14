@@ -16,7 +16,7 @@ from Effects.PacketLoss import PacketLoss
 from Effects.Throttle import Throttle
 
 # Defines how many threads are in the pool
-pool = ThreadPool(100)
+pool = ThreadPool(2000)
 
 logo = """
 ==============================================================
@@ -120,16 +120,8 @@ def edit_packet(packet, accept=True):
         clean_close()
 
 
-def packet_loss_and_latency(packet):
-    """This performs two of the effects together"""
-
-    latency_obj.effect(packet)
-    packet_loss_obj.effect(packet)
-
-
 def packet_latency(packet):
     """This function is used to incur latency on packets"""
-
     if affect_packet(packet):
         map_thread(latency_obj.effect, [packet])
     else:
@@ -138,7 +130,6 @@ def packet_latency(packet):
 
 def packet_loss(packet):
     """Function that performs packet loss on all packets"""
-
     if affect_packet(packet):
         map_thread(packet_loss_obj.effect, [packet])
     else:
@@ -147,7 +138,6 @@ def packet_loss(packet):
 
 def throttle(packet):
     """Mode assigned to throttle packets"""
-
     if affect_packet(packet):
         throttle_obj.effect(packet)
     else:
@@ -157,7 +147,6 @@ def throttle(packet):
 def duplicate(packet):
     """Mode that takes a full duplication"""
     global duplication_factor
-
     if affect_packet(packet):
         # TODO: BROKEN: Just sending the packet using scapy does not work
         pass
@@ -165,28 +154,44 @@ def duplicate(packet):
         packet.accept()
 
 
+def combination(packet):
+    """This performs two of the effects together"""
+    packet_loss_obj.effect(packet)
+    latency_obj.effect(packet)
+    bandwidth_obj.limit(packet)
+
+
 def emulate_real_connection_speed(packet):
+    """Used to emulate real world connections speeds"""
     global connection
 
-    # Adjusts the values
-    latency_obj.alter_latency_value(connection.rnd_latency())
-    packet_loss_obj.alter_percentage(connection.rnd_packet_loss())
+    if affect_packet(packet):
 
-    # Calls mode
-    packet_loss_and_latency(packet)
+        # Adjusts the values
+        latency_obj.alter_latency_value(connection.rnd_latency())
+        packet_loss_obj.alter_percentage(connection.rnd_packet_loss())
+        bandwidth_obj.alter_bandwith(connection.rnd_bandwidth())
+
+        # Calls mode
+        combination(packet)
+    else:
+        packet.accept()
 
 
 def track_bandwidth(packet):
     """This mode allows for the tracking of rate of packets recieved"""
-
-    bandwidth_obj.display(packet)
-    packet.accept()
+    if affect_packet(packet):
+        bandwidth_obj.display(packet)
+    else:
+        packet.accept()
 
 
 def limit_bandwidth(packet):
     """This is mode for limiting the rate of transfer"""
-
-    bandwidth_obj.limit(packet)
+    if affect_packet(packet):
+        bandwidth_obj.limit(packet)
+    else:
+        packet.accept()
 
 
 def run_packet_manipulation():
@@ -271,7 +276,7 @@ def parameters():
 
     effect.add_argument('--combination', '-c',
                         action='store',
-                        nargs=2,
+                        nargs=3,
                         help=argparse.SUPPRESS,
                         type=int)
 
@@ -326,9 +331,10 @@ def parameters():
         mode = duplicate
 
     elif args.combination:
-        latency_obj = Latency(latency_value=0, accept=False)
-        packet_loss_obj = PacketLoss(percentage=0, accept=True)
-        mode = packet_loss_and_latency
+        latency_obj = Latency(latency_value=args.combination[0], accept=False)
+        bandwidth_obj = Bandwidth(bandwidth=args.combination[2], accept=False, print_f=False)
+        packet_loss_obj = PacketLoss(percentage=args.combination[1], accept=True)
+        mode = combination
 
     elif args.simulate:
         global connection
@@ -346,7 +352,8 @@ def parameters():
         print_force('[*] Connection type is emulating: {}'.format(connection.name))
 
         latency_obj = Latency(latency_value=0, accept=False)
-        packet_loss_obj = PacketLoss(percentage=0, accept=True)
+        packet_loss_obj = PacketLoss(percentage=0, accept=False)
+        bandwidth_obj = Bandwidth(bandwidth=0, accept=True)
         mode = emulate_real_connection_speed
 
     elif args.display_bandwidth:
@@ -411,8 +418,9 @@ def clean_close(signum='', frame=''):
 
 
 # Rebinds the all the close signals to clean_close the script
-signal.signal(signal.SIGTSTP, clean_close)  # Ctrl+Z
-signal.signal(signal.SIGQUIT, clean_close)  # Ctrl+\
+signal.signal(signal.SIGINT, clean_close)   # Ctrl + C
+signal.signal(signal.SIGTSTP, clean_close)  # Ctrl + Z
+signal.signal(signal.SIGQUIT, clean_close)  # Ctrl + \
 
 # Check if user is root
 if os.getuid() != 0:

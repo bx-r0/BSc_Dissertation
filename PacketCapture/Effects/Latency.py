@@ -8,10 +8,17 @@ class Latency:
         self.latency_value = latency_value / 1000
         print('[*] Latency set to: {}s'.format(self.latency_value), flush=True)
 
+        # Stats
+        self.total_packets = 0
+
+    def print_stats(self):
+        print('[*] Total Packets effected: {}'.format(self.total_packets), end='\r', flush=True)
+
     def effect(self, packet):
         """Thread functionality"""
 
-        print("[!]", str(packet), flush=True)
+        self.print_stats()
+        self.total_packets += 1
 
         # Issues latency of the entered value
         time.sleep(self.latency_value)
