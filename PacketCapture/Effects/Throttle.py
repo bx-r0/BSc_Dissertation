@@ -37,6 +37,5 @@ class Throttle:
         self.throttle_job = threading.Timer(self.throttle_period, self.throttle_purge).start()
 
     def stop_purge_monitor(self):
-        if self.throttle_job is not None:
-            self.throttle_job.terminate()
-            print('[!] Throttle purge job stopped!', flush=True)
+        self.throttle_job.cancel()
+        print('[!] Throttle purge job stopped!', flush=True)

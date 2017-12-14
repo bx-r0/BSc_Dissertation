@@ -1,26 +1,52 @@
 import time
+import threading
 
 
 class Bandwidth:
     """Class that deals with bandwidth functionality"""
     def __init__(self, bandwidth=0):
-        self.units = ['B/s', 'KB/s', 'MB/s', 'GB/s']
+        self.units = ['B', 'KB', 'MB', 'GB']
+
         self.total = 0
+        self.transferred_since_check = 0
         self.rate = 0
-        self.unit = self.units[0]
-        self.startTime = time.time()
+
+        self.previous = time.time()
+        self.start = time.time()
+
         self.packet_backlog = []
+
+        # Variable that defines how often the stats are updated
+        self.rate_update_period = 0.1  # In seconds
 
         self.bandwidth = bandwidth
         if bandwidth is not 0:
             print('[*] Bandwidth set to: {} B/s'.format(bandwidth))
 
+        self.start_rate_update()
+
     def calculate_rate(self):
         """Calculates the rate of throughput"""
 
-        # Works out rate
+        # Const variable that is the period of time the rate is calculated over
+        # Measured in seconds
+        AVERAGE_INTERVAL = 5
         now = time.time()
-        self.rate = (self.total / (now - self.startTime))
+        elapsed = (now - self.previous)
+
+        self.rate = (self.transferred_since_check / elapsed)
+
+        # Refresh rate
+        if elapsed > AVERAGE_INTERVAL:
+            self.transferred_since_check = 0
+            self.previous = now
+
+            # Gets the overall average
+            self.rate = self.total / (now - self.start)
+        else:
+            self.print_stats()
+
+        self.start_rate_update()
 
     @staticmethod
     def calculate_packet_size(packet_name):
@@ -29,61 +55,59 @@ class Bandwidth:
         # Packet format
         #   '<Name> packet <Size> Bytes'
         parts = str(packet_name).split(' ')
-        packet_size = parts[2]
+        packet_size = parts[-2]
         return int(packet_size)
 
-    def recalculate_units(self, rate):
+    def recalculate_units(self, value):
         """Recalculates the units when they flow over.
         For example KBs -> MBs """
 
         times_reduced = 0
-
-        # Dynamic altering of rates unit
-        self.unit = self.units[0]  # Starts at 'B/s'
+        unit = self.units[times_reduced]
 
         # Increase
-        while rate > 1000 and times_reduced < 3:
-            rate = rate / 1000
+        while value > 1000 and times_reduced < 3:
+            value = value / 1000
             times_reduced += 1
-            self.unit = self.units[times_reduced]
+            unit = self.units[times_reduced]
 
         # Decrease
-        while rate < 0.1 and times_reduced > 0:
-            rate = rate * 1000
+        while value < 0.1 and times_reduced > 0:
+            value = value * 1000
             times_reduced -= 1
-            self.unit = self.units[times_reduced]
+            unit = self.units[times_reduced]
 
-        return rate
+        return value, unit
 
     def print_stats(self):
-        print('[*] Total: {} bytes - Rate: {:.2f} {} '.format(self.total, self.rate, self.unit), end='\r')
+
+        # Displays totals and rate in more relevant units
+        print_rate, unit_rate = self.recalculate_units(self.rate)
+        print_total, unit_total = self.recalculate_units(self.total)
+
+        print('[*] Total: {:.1f} {} - Rate: {:.1f} {}/s '.format(print_total, unit_total, print_rate, unit_rate), end='\r')
+        # print('[*] Total: {} - Rate: {}'.format(self.total, self.rate), end='\r')
 
     def display(self, packet):
         """Used to display the bandwidth"""
 
+        packet_size = self.calculate_packet_size(packet)
+
         # Updates the total
-        self.total += self.calculate_packet_size(packet)
-
-        # Deals with the rate calculation
-        self.calculate_rate()
-
-        self.rate = self.recalculate_units(self.rate)
-
-        self.print_stats()
+        self.total += packet_size
+        self.transferred_since_check += packet_size
 
     def send_packet(self, packet):
         """Sends a packet and increases the total"""
+        packet_size = self.calculate_packet_size(packet)
 
-        self.total += self.calculate_packet_size(packet)
+        self.total += packet_size
+        self.transferred_since_check += packet_size
+
         packet.accept()
-        self.calculate_rate()
 
     def limit(self, packet):
         """Used to limit the bandwidth of the channel"""
-
-        # Refresh
-        self.print_stats()
-        self.calculate_rate()
 
         # Check if rate is over
         if self.rate > self.bandwidth:
@@ -98,3 +122,6 @@ class Bandwidth:
 
                 # Packet is removed from the list
                 del self.packet_backlog[0]
+
+    def start_rate_update(self):
+        threading.Timer(self.rate_update_period, self.calculate_rate).start()
