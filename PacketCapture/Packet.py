@@ -1,5 +1,5 @@
 import logging
-logging.getLogger("scapy.runtime").setLevel(logging.ERROR) # Suppresses the WARNING Message
+logging.getLogger("scapy.runtime").setLevel(logging.ERROR)  # Suppresses the Scapy WARNING Message
 
 import argparse
 import signal
@@ -18,6 +18,7 @@ from Effects.Latency import Latency
 from Effects.LimitBandwidth import Bandwidth
 from Effects.PacketLoss import PacketLoss
 from Effects.Throttle import Throttle
+from Effects.OutOfOrder import Order
 
 # Defines how many threads are in the pool
 pool = ThreadPool(2000)
@@ -197,6 +198,14 @@ def limit_bandwidth(packet):
         packet.accept()
 
 
+def out_of_order(packet):
+    """Mode that alters the order of packets"""
+    if affect_packet(packet):
+        order_obj.effect(packet)
+    else:
+        packet.accept()
+
+
 def run_packet_manipulation():
     """The main method here, will issue a iptables command and construct the NFQUEUE"""
 
@@ -233,7 +242,12 @@ def parameters():
     # Defines globals to be used above
     global mode, target_packet_type, duplication_factor, arp_active
 
-    global latency_obj, throttle_obj, packet_loss_obj, bandwidth_obj
+    global latency_obj, throttle_obj, packet_loss_obj, bandwidth_obj, order_obj
+    latency_obj = None
+    throttle_obj = None
+    packet_loss_obj = None
+    bandwidth_obj = None
+    order_obj = None
 
     # Defaults
     mode = print_packet
@@ -295,6 +309,11 @@ def parameters():
                         dest='rate_limit',
                         help=argparse.SUPPRESS,
                         type=int)
+
+    effect.add_argument('--out-of-order', '-o',
+                        action='store_true',
+                        dest='order',
+                        help=argparse.SUPPRESS)
 
     # Extra parameters
     parser.add_argument('--target-packet', '-tp',
@@ -367,6 +386,10 @@ def parameters():
         bandwidth_obj = Bandwidth(args.rate_limit)
         mode = limit_bandwidth
 
+    elif args.order:
+        order_obj = Order()
+        mode = out_of_order
+
     # Extra settings
     if args.target_packet:
         local_args = args.target_packet
@@ -403,14 +426,19 @@ def kill_thread_pool():
     print_force("[!] Thread pool killed\n")
 
 
+def stop_object(object):
+    try:
+        object.stop()
+    except NameError:
+        pass
+
+
 def clean_close(signum='', frame=''):
     """Used to close the script cleanly"""
 
-    # TODO: Better way to do this
-    try:
-        throttle_obj.stop_purge_monitor()
-    except NameError:
-        pass
+    # Kills any threads running in objects
+    stop_object(throttle_obj)
+    stop_object(order_obj)
 
     print_force("\n[*] ## Close signal recieved ##")
 

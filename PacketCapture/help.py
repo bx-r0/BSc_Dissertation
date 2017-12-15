@@ -28,6 +28,9 @@ Effects:
                                 
 --combination, -c   <latency_ms> <packet-loss> <bandwidth_bytes>
     * Performs latency and packet loss at the same time
+    
+--out-of-order, -o 
+    * Sets the mode to out of order that alters the order of incoming packets
                                 
 Extra Optionals:
 
