@@ -10,10 +10,11 @@
     <property name="can_focus">False</property>
     <property name="resizable">False</property>
     <property name="window_position">center</property>
-    <property name="default_width">260</property>
+    <property name="default_width">261</property>
     <property name="default_height">100</property>
     <property name="destroy_with_parent">True</property>
     <property name="type_hint">normal</property>
+    <property name="deletable">False</property>
     <child internal-child="vbox">
       <object class="GtkBox">
         <property name="width_request">0</property>
@@ -81,6 +82,7 @@
                 <property name="height_request">20</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
+                <property name="overwrite_mode">True</property>
               </object>
               <packing>
                 <property name="left_attach">2</property>
@@ -184,10 +186,15 @@
               <object class="GtkComboBoxText" id="Combo_Box_VictimIP">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
+                <property name="button_sensitivity">on</property>
                 <property name="has_entry">True</property>
                 <child internal-child="entry">
                   <object class="GtkEntry">
                     <property name="can_focus">False</property>
+                    <property name="width_chars">0</property>
+                    <property name="max_width_chars">16</property>
+                    <property name="caps_lock_warning">False</property>
+                    <property name="placeholder_text" translatable="yes">192.168.1.1</property>
                   </object>
                 </child>
               </object>
@@ -200,10 +207,14 @@
               <object class="GtkComboBoxText" id="Combo_Box_RouterIP">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
+                <property name="button_sensitivity">on</property>
                 <property name="has_entry">True</property>
                 <child internal-child="entry">
                   <object class="GtkEntry">
                     <property name="can_focus">False</property>
+                    <property name="max_width_chars">16</property>
+                    <property name="overwrite_mode">True</property>
+                    <property name="placeholder_text" translatable="yes">192.168.1.1</property>
                   </object>
                 </child>
               </object>
