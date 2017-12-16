@@ -19,7 +19,6 @@ class PacketLoss:
             dropped_percentage = 0
 
         # TODO: Dynamic terminal width
-        print(' ' * 20, end='\r')
         print("[*] Total Packets: {} - Average Loss {:.2f}%".format(self.total_packets, dropped_percentage),
               end='\r', flush=True)
 
@@ -30,8 +29,6 @@ class PacketLoss:
 
         # random value from 0 to 100
         random_value = random.uniform(0, 100)
-
-        self.print_stats()
 
         self.total_packets += 1
 
@@ -44,6 +41,8 @@ class PacketLoss:
         else:
             if self.accept:
                 packet.accept()
+
+        self.print_stats()
 
     def alter_percentage(self, new_value):
         print('Packet loss: {}% -- '.format(new_value), flush=True, end='')

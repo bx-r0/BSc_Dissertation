@@ -13,6 +13,10 @@ from gi.repository import GObject
 # Add to this list to add or remove filters for the packet manipulation
 target_protcols = ['TCP', 'UDP', 'ICMP']
 
+# Command Line Constants
+cmd_latency = '-l '
+cmd_packetloss = '-pl '
+
 # Gets the directory of the current file
 filepath = os.path.dirname(os.path.abspath(__file__))
 
@@ -38,6 +42,8 @@ class PacketCaptureGTK:
             self.textBox_PacketLoss = builder.get_object("TextBox_PacketLoss")
             self.textView_ConsoleOutput = builder.get_object("TextView_ConsoleOutput")
             self.TextView_ArpOutput = builder.get_object("TextView_ArpOutput")
+
+            buffer = self.textView_ConsoleOutput.get_buffer()
 
             # Buttons
             self.button_Latency = builder.get_object("Button_latency")
@@ -104,7 +110,7 @@ class PacketCaptureGTK:
 
         # Checks if the value is a valid int a checks for it's range
         if self.validation(value, 1, 1000):
-            self.run_packet_capture("-l " + str(value))
+            self.run_packet_capture(cmd_latency + str(value))
         else:
             print(error_message)
 
@@ -118,7 +124,7 @@ class PacketCaptureGTK:
 
         # Checks if it is a valid int and if its within a specified range
         if self.validation(value, 1, 100):
-            self.run_packet_capture("-z " + str(value))
+            self.run_packet_capture(cmd_packetloss + str(value))
         else:
             print(error_message)
 
@@ -173,7 +179,7 @@ class PacketCaptureGTK:
         # Toggles the buttons
         self.progressRunning(True)
 
-        parameter_list = [parameters]
+        parameter_list = parameters.split(' ')
 
         # If the filter packet is toggled
         if self.checkBox_packetFilter.get_active():
@@ -195,6 +201,9 @@ class PacketCaptureGTK:
         # Calls the sub procedure
         self.packet_proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, preexec_fn=os.setsid)
         self.packet_outp = ""
+
+        buffer = self.textView_ConsoleOutput.get_buffer()
+        self.mark = buffer.create_mark('', buffer.get_end_iter(), True)
 
         # Non-Block updates the TextView
         GObject.timeout_add(100, self.update_terminal, self.textView_ConsoleOutput, self.packet_proc)
@@ -231,25 +240,40 @@ class PacketCaptureGTK:
         except ValueError:
             return False
 
+    @staticmethod
+    def overwrite_line(buffer, text, mark):
+        start = buffer.get_iter_at_mark(mark)
+        buffer.insert(start, text)
+        end = buffer.get_end_iter()
+        buffer.delete(start, end)
+
     def update_terminal(self, TextView, sub_proc):
         """Used to pipe terminal output to a TextView"""
 
         buffer = TextView.get_buffer()
 
-        # Grabs the end and marks it for reference
-        # the mark will stay at the end of the TextView
-        end = buffer.get_end_iter()
-        mark = buffer.create_mark('', end, False)
-
         # Grabs the console output
         bytes = self.non_block_read(sub_proc.stdout)
 
         if bytes is not None:
-            # Display the output of the console
-            buffer.insert(end, bytes.decode())
+            value = bytes.decode()
 
-            # Keeps the most recent line on screen
-            TextView.scroll_mark_onscreen(mark)
+            if b"\r" in bytes:
+                # Grabs the most recent value with a \r
+                parts = bytes.split(b'\r')
+                value = parts[len(parts) - 2].decode()
+
+                # Performs the action a \r would perform
+                self.overwrite_line(buffer, value, self.mark)
+            else:
+                end = buffer.get_end_iter()
+                # Display the output of the console
+                buffer.insert(end, value)
+
+                self.mark = buffer.create_mark('', end, True)
+
+                # Keeps the most recent line on screen
+                TextView.scroll_mark_onscreen(self.mark)
 
         return sub_proc.poll() is None
 

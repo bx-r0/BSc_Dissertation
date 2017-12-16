@@ -429,7 +429,7 @@ def kill_thread_pool():
 def stop_object(object):
     try:
         object.stop()
-    except NameError:
+    except AttributeError:
         pass
 
 
