@@ -41,3 +41,16 @@ Extra Optionals:
     * Performs arp spoofing with the passed parameters
     """
 
+
+# Command Line Constants
+cmd_latency = '-l'
+cmd_packetloss = '-pl'
+cmd_target_packet = '-tp'
+cmd_print = '-p'
+cmd_bandwidth = '-b'
+cmd_throttle = '-t'
+cmd_duplicate = '-d'
+cmd_simulate = '-s'
+cmd_ratelimit = '-rl'
+cmd_combination = '-c'
+cmd_outoforder = '-o'

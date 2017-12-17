@@ -1,4 +1,5 @@
 # Main Window
+
 buttons_values = \
     [
         'Button_Latency',
@@ -7,11 +8,16 @@ buttons_values = \
         'Button_Bandwidth',
         'Button_OutOfOrder',
         'Button_Print',
-        'Button_Simulate',
-        'Button_Combination',
-        'Button_Duplicate',
         'Button_RateLimit',
         'Button_stop'
+    ]
+
+#TODO: Move buttons out of here when they're functional
+non_func_buttons = \
+    [
+        'Button_Combination',
+        'Button_Duplicate',
+        'Button_Simulate',
     ]
 
 textbox_values = \

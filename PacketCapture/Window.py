@@ -12,14 +12,10 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 from gi.repository import GObject
 import GUI.Controls as Control
+import parameters as Parameter
 
 # Add to this list to add or remove filters for the packet manipulation
 target_protcols = ['TCP', 'UDP', 'ICMP']
-
-# Command Line Constants
-cmd_latency = '-l '
-cmd_packetloss = '-pl '
-cmd_target_packet = '-tp '
 
 # Gets the directory of the current file
 filepath = os.path.dirname(os.path.abspath(__file__))
@@ -116,29 +112,58 @@ class PacketCaptureGTK:
     def latency_Clicked(self, button):
         """Event that runs when the latency button is clicked"""
 
-        error_message = \
-            "Latency value entered is incorrect, it needs to be in the range of 1-1000ms"
         value = self.textBoxes['TextBox_Latency'].get_text()
 
         # Checks if the value is a valid int a checks for it's range
         if self.validation(value, 1, 1000):
-            self.run_packet_capture(cmd_latency + str(value))
-        else:
-            print(error_message)
+            self.run_packet_capture('{} {}'.format(Parameter.cmd_latency, str(value)))
 
     def packet_loss_Clicked(self, button):
         """Event that runs when the packet loss button is clicked"""
-
-        error_message = \
-            "Packet loss value entered is incorrect, it needs to be in the range of 1-100!"
 
         value = self.textBoxes['TextBox_PacketLoss'].get_text()
 
         # Checks if it is a valid int and if its within a specified range
         if self.validation(value, 1, 100):
-            self.run_packet_capture(cmd_packetloss + str(value))
-        else:
-            print(error_message)
+            self.run_packet_capture('{} {}'.format(Parameter.cmd_packetloss, str(value)))
+
+    def throttle_Clicked(self, button):
+
+        value = self.textBoxes['TextBox_Throttle'].get_text()
+
+        if self.validation(value, 1, 10000):
+            self.run_packet_capture('{} {}'.format(Parameter.cmd_throttle, str(value)))
+
+    def ratelimit_Clicked(self, button):
+        value = self.textBoxes['TextBox_RateLimit'].get_text()
+
+        if self.validation(value, 1, 10000):
+            self.run_packet_capture('{} {}'.format(Parameter.cmd_ratelimit, str(value)))
+
+    def duplicate_Clicked(self, button):
+        value = self.textBoxes['TextBox_Duplicate'].get_text()
+
+        if self.validation(value, 1, 100):
+            self.run_packet_capture('{} {}'.format(Parameter.cmd_duplicate, str(value)))
+
+    def simulate_Clicked(self, button):
+        # TODO: Add when packet.py has simulation implemented
+        print('sim')
+
+    def combination_Clicked(self, button):
+        # TODO: Add functionality
+        print('Combination!')
+
+    def bandwidth_Clicked(self, button):
+        self.run_packet_capture(Parameter.cmd_bandwidth)
+
+    def outoforder_Clicked(self, button):
+        self.run_packet_capture(Parameter.cmd_outoforder)
+
+    def print_Clicked(self, button):
+        self.run_packet_capture(Parameter.cmd_print)
+
+    # NEW BUTTONS HERE <-------------------------------------
 
     def ARP_Clicked(self, button):
         self.arp_window.show_all()
@@ -198,7 +223,7 @@ class PacketCaptureGTK:
             item = model[index]
 
             # Adds the selected item
-            parameter_list.append(cmd_target_packet + item[0])
+            parameter_list.append(Parameter.cmd_target_packet + item[0])
 
         # The exact location of the file needs to specified
 
@@ -244,8 +269,10 @@ class PacketCaptureGTK:
             if start <= integer <= stop:
                 return True
             else:
+                print('Error: Value needs to be between {} and {}'.format(start, stop))
                 return False
         except ValueError:
+            print('Error: Entered value is not an integer!')
             return False
 
     @staticmethod

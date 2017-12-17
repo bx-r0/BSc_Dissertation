@@ -1,19 +1,15 @@
 import logging
+import logging
 logging.getLogger("scapy.runtime").setLevel(logging.ERROR)  # Suppresses the Scapy WARNING Message
-
 import argparse
 import signal
 import threading
 import textwrap
 import Common_Connections
-import help
-
-# From Imports
+import parameters as Parameter
 from netfilterqueue import NetfilterQueue
 from scapy.all import *
 from multiprocessing.dummy import Pool as ThreadPool
-
-# Effect imports
 from Effects.Latency import Latency
 from Effects.LimitBandwidth import Bandwidth
 from Effects.PacketLoss import PacketLoss
@@ -21,7 +17,7 @@ from Effects.Throttle import Throttle
 from Effects.OutOfOrder import Order
 
 # Defines how many threads are in the pool
-pool = ThreadPool(2000)
+pool = ThreadPool(100)
 
 logo = """
 ==============================================================
@@ -261,7 +257,7 @@ def parameters():
                                      epilog=textwrap.dedent(epilog),
                                      allow_abbrev=False)
 
-    parser.add_argument_group('Arguments', description=help.Usage())
+    parser.add_argument_group('Arguments', description=Parameter.Usage())
 
     # Mode parameters
     effect = parser.add_mutually_exclusive_group(required=True,)
@@ -421,7 +417,7 @@ def parameters():
 
 
 def kill_thread_pool():
-    # Death to the thread pool
+    """Method used to kill the thredpool"""
     pool.close()
     print_force("[!] Thread pool killed\n")
 

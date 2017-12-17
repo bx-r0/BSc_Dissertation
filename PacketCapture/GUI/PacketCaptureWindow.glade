@@ -25,10 +25,8 @@
   <object class="GtkWindow" id="window1">
     <property name="name">window1</property>
     <property name="width_request">740</property>
-    <property name="height_request">620</property>
+    <property name="height_request">502</property>
     <property name="can_focus">False</property>
-    <property name="hexpand">False</property>
-    <property name="vexpand">False</property>
     <property name="resizable">False</property>
     <property name="window_position">center</property>
     <property name="urgency_hint">True</property>
@@ -59,7 +57,7 @@
           <object class="GtkScrolledWindow">
             <property name="name">ScrolledWindow_ConsoleWindow</property>
             <property name="width_request">352</property>
-            <property name="height_request">130</property>
+            <property name="height_request">150</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <property name="shadow_type">in</property>
@@ -95,13 +93,13 @@
           </object>
           <packing>
             <property name="x">327</property>
-            <property name="y">192</property>
+            <property name="y">211</property>
           </packing>
         </child>
         <child>
           <object class="GtkScrolledWindow">
             <property name="width_request">352</property>
-            <property name="height_request">130</property>
+            <property name="height_request">150</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <property name="shadow_type">in</property>
@@ -116,7 +114,7 @@
           </object>
           <packing>
             <property name="x">327</property>
-            <property name="y">235</property>
+            <property name="y">255</property>
           </packing>
         </child>
         <child>
@@ -221,11 +219,11 @@
               <object class="GtkButton" id="Button_Throttle">
                 <property name="label" translatable="yes">Throttle</property>
                 <property name="visible">True</property>
-                <property name="sensitive">False</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
                 <property name="relief">half</property>
                 <property name="always_show_image">True</property>
+                <signal name="clicked" handler="throttle_Clicked" swapped="no"/>
               </object>
               <packing>
                 <property name="left_attach">0</property>
@@ -236,9 +234,9 @@
               <object class="GtkButton" id="Button_Bandwidth">
                 <property name="label" translatable="yes">Bandwidth</property>
                 <property name="visible">True</property>
-                <property name="sensitive">False</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
+                <signal name="clicked" handler="bandwidth_Clicked" swapped="no"/>
               </object>
               <packing>
                 <property name="left_attach">0</property>
@@ -249,9 +247,9 @@
               <object class="GtkButton" id="Button_OutOfOrder">
                 <property name="label" translatable="yes">Out of Order</property>
                 <property name="visible">True</property>
-                <property name="sensitive">False</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
+                <signal name="clicked" handler="outoforder_Clicked" swapped="no"/>
               </object>
               <packing>
                 <property name="left_attach">0</property>
@@ -262,9 +260,9 @@
               <object class="GtkButton" id="Button_Print">
                 <property name="label" translatable="yes">Print</property>
                 <property name="visible">True</property>
-                <property name="sensitive">False</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
+                <signal name="clicked" handler="print_Clicked" swapped="no"/>
               </object>
               <packing>
                 <property name="left_attach">0</property>
@@ -278,6 +276,7 @@
                 <property name="sensitive">False</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
+                <signal name="clicked" handler="simulate_Clicked" swapped="no"/>
               </object>
               <packing>
                 <property name="left_attach">0</property>
@@ -291,6 +290,7 @@
                 <property name="sensitive">False</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
+                <signal name="clicked" handler="combination_Clicked" swapped="no"/>
               </object>
               <packing>
                 <property name="left_attach">0</property>
@@ -304,6 +304,7 @@
                 <property name="sensitive">False</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
+                <signal name="clicked" handler="duplicate_Clicked" swapped="no"/>
               </object>
               <packing>
                 <property name="left_attach">0</property>
@@ -314,9 +315,9 @@
               <object class="GtkButton" id="Button_RateLimit">
                 <property name="label" translatable="yes">Rate Limit</property>
                 <property name="visible">True</property>
-                <property name="sensitive">False</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
+                <signal name="clicked" handler="ratelimit_Clicked" swapped="no"/>
               </object>
               <packing>
                 <property name="left_attach">0</property>

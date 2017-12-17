@@ -29,7 +29,7 @@ class Bandwidth:
 
         self.bandwidth = bandwidth
         if bandwidth is not 0:
-            print('[*] Bandwidth set to: {} B/s'.format(bandwidth))
+            print('[*] Bandwidth set to: {} B/s'.format(bandwidth), flush=True)
 
         self.start_rate_update()
 
@@ -93,8 +93,10 @@ class Bandwidth:
         print_total, unit_total = self.recalculate_units(self.total)
 
         # This line justs makes sure there is sections of previous lines present
-        print(' ' * int(width), end='\r')
-        print('[*] Total: {:.1f} {} - Rate: {:.1f} {}/s '.format(print_total, unit_total, print_rate, unit_rate), end='\r')
+        print('[*] Total: {:.1f} {} - Rate: {:.1f} {}/s '.
+              format(print_total, unit_total, print_rate, unit_rate),
+              end='\r',
+              flush=True)
 
     def display(self, packet):
         """Used to display the bandwidth"""
