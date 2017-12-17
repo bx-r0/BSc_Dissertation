@@ -2,8 +2,10 @@ import fcntl
 import os
 import subprocess
 import gi
+import signal
 import queue
 import _thread
+
 
 from LocalNetworkScan import *
 gi.require_version('Gtk', '3.0')
@@ -21,6 +23,17 @@ cmd_target_packet = '-tp '
 
 # Gets the directory of the current file
 filepath = os.path.dirname(os.path.abspath(__file__))
+
+
+def ignore(signum, frame):
+    """Method used to rebind close signals when performed on the terminal"""
+    print('Signal: {} Ignored!'.format(signum))
+
+
+# Rebinds the all the close signals to clean_close the script
+signal.signal(signal.SIGINT, ignore)  # Ctrl + C
+signal.signal(signal.SIGTSTP, ignore)  # Ctrl + Z
+signal.signal(signal.SIGQUIT, ignore)  # Ctrl + \
 
 class PacketCaptureGTK:
     """A GUI for controlling the Packet.py script"""
