@@ -8,12 +8,12 @@ height, width = os.popen('stty size').read().split(' ')
 
 class Bandwidth:
     """Class that deals with bandwidth functionality"""
-    def __init__(self, bandwidth=0, accept=True, print_f=True):
+    def __init__(self, bandwidth=0, accept=True, method_print=True):
         self.units = ['B', 'KB', 'MB', 'GB']
 
         # Flags
         self.accept = accept
-        self.print_f = print_f
+        self.method_print = method_print
 
         self.total = 0
         self.transferred_since_check = 0
@@ -29,9 +29,23 @@ class Bandwidth:
 
         self.bandwidth = bandwidth
         if bandwidth is not 0:
-            print('[*] Bandwidth set to: {} B/s'.format(bandwidth), flush=True)
+            self._print('[*] Bandwidth set to: {} B/s'.format(bandwidth), force=True)
 
         self.start_rate_update()
+
+    def _print(self, message, end='\n', force=False):
+        if self.method_print or force:
+            print(message, end=end, flush=True)
+
+    def print_stats(self):
+
+        # Displays totals and rate in more relevant units
+        print_rate, unit_rate = self.recalculate_units(self.rate)
+        print_total, unit_total = self.recalculate_units(self.total)
+
+        # This line justs makes sure there is sections of previous lines present
+        self._print('[*] Total: {:.1f} {} - Rate: {:.1f} {}/s '.
+              format(print_total, unit_total, print_rate, unit_rate), end='\r')
 
     def calculate_rate(self):
         """Calculates the rate of throughput"""
@@ -46,8 +60,7 @@ class Bandwidth:
         if elapsed > self.rate_update_period:
             self.rate = (self.transferred_since_check / elapsed)
 
-            if self.print_f:
-                self.print_stats()
+            self.print_stats()
 
             # Reset
             self.transferred_since_check = 0
@@ -85,18 +98,6 @@ class Bandwidth:
             unit = self.units[times_reduced]
 
         return value, unit
-
-    def print_stats(self):
-
-        # Displays totals and rate in more relevant units
-        print_rate, unit_rate = self.recalculate_units(self.rate)
-        print_total, unit_total = self.recalculate_units(self.total)
-
-        # This line justs makes sure there is sections of previous lines present
-        print('[*] Total: {:.1f} {} - Rate: {:.1f} {}/s '.
-              format(print_total, unit_total, print_rate, unit_rate),
-              end='\r',
-              flush=True)
 
     def display(self, packet):
         """Used to display the bandwidth"""

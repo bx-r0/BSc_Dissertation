@@ -5,7 +5,7 @@ import gi
 import signal
 import queue
 import _thread
-
+import Common_Connections as Connection
 
 from LocalNetworkScan import *
 gi.require_version('Gtk', '3.0')
@@ -147,8 +147,13 @@ class PacketCaptureGTK:
             self.run_packet_capture('{} {}'.format(Parameter.cmd_duplicate, str(value)))
 
     def simulate_Clicked(self, button):
-        # TODO: Add when packet.py has simulation implemented
-        print('sim')
+        value = self.textBoxes['TextBox_Simulate'].get_text()
+
+        print(value)
+        if self.validation_str(Connection.connections, str(value)):
+            self.run_packet_capture('{} {}'.format(Parameter.cmd_simulate, str(value)))
+        else:
+            print('Error: Cannot find simulation profile \'{}\''.format(value))
 
     def combination_Clicked(self, button):
         # TODO: Add functionality
@@ -274,6 +279,19 @@ class PacketCaptureGTK:
         except ValueError:
             print('Error: Entered value is not an integer!')
             return False
+
+    @staticmethod
+    def validation_str(list, value):
+        """Checks if the value is in the valid set"""
+
+        for connection_type in Connection.connections:
+
+            # If the value is in the list
+            if value == connection_type.name:
+                return True
+
+        # Can't find value in lis
+        return False
 
     @staticmethod
     def overwrite_line(buffer, text, mark):

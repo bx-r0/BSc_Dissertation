@@ -17,7 +17,7 @@ from Effects.Throttle import Throttle
 from Effects.OutOfOrder import Order
 
 # Defines how many threads are in the pool
-pool = ThreadPool(100)
+pool = ThreadPool(1000)
 
 logo = """
 ==============================================================
@@ -155,10 +155,18 @@ def duplicate(packet):
 
 
 def combination(packet):
-    """This performs two of the effects together"""
+    """This performs effects together"""
     packet_loss_obj.effect(packet)
     latency_obj.effect(packet)
     bandwidth_obj.limit(packet)
+
+
+def combination_effect(packet):
+    """The effect of having multiple effects on a """
+    if affect_packet(packet):
+        map_thread(combination, [packet])
+    else:
+        packet.accept()
 
 
 def emulate_real_connection_speed(packet):
@@ -170,10 +178,10 @@ def emulate_real_connection_speed(packet):
         # Adjusts the values
         latency_obj.alter_latency_value(connection.rnd_latency())
         packet_loss_obj.alter_percentage(connection.rnd_packet_loss())
-        bandwidth_obj.alter_bandwith(connection.rnd_bandwidth())
+        bandwidth_obj.alter_bandwidth(connection.rnd_bandwidth())
 
         # Calls mode
-        combination(packet)
+        map_thread(combination, [packet])
     else:
         packet.accept()
 
@@ -262,61 +270,61 @@ def parameters():
     # Mode parameters
     effect = parser.add_mutually_exclusive_group(required=True,)
 
-    effect.add_argument('--print', '-p',
+    effect.add_argument('--print', Parameter.cmd_print,
                         action='store_true',
                         help=argparse.SUPPRESS)
 
-    effect.add_argument('--latency', '-l',
+    effect.add_argument('--latency', Parameter.cmd_latency,
                         action='store',
                         help=argparse.SUPPRESS,
                         type=int)
 
-    effect.add_argument('--packet-loss', '-pl',
+    effect.add_argument('--packet-loss', Parameter.cmd_packetloss,
                         action='store',
                         help=argparse.SUPPRESS,
                         type=int)
 
-    effect.add_argument('--throttle', '-t',
+    effect.add_argument('--throttle', Parameter.cmd_throttle,
                         action='store',
                         help=argparse.SUPPRESS,
                         type=int)
 
-    effect.add_argument('--duplicate', '-d',
+    effect.add_argument('--duplicate', Parameter.cmd_duplicate,
                         action='store',
                         help=argparse.SUPPRESS,
                         type=int)
 
-    effect.add_argument('--combination', '-c',
+    effect.add_argument('--combination', Parameter.cmd_combination,
                         action='store',
                         nargs=3,
                         help=argparse.SUPPRESS,
                         type=int)
 
-    effect.add_argument('--simulate', '-s',
+    effect.add_argument('--simulate', Parameter.cmd_simulate,
                         action='store',
                         help=argparse.SUPPRESS)
 
-    effect.add_argument('--display-bandwidth', '-b',
+    effect.add_argument('--display-bandwidth', Parameter.cmd_bandwidth,
                         action='store_true',
                         help=argparse.SUPPRESS)
 
-    effect.add_argument('--rate-limit', '-rl',
+    effect.add_argument('--rate-limit', Parameter.cmd_ratelimit,
                         action='store',
                         dest='rate_limit',
                         help=argparse.SUPPRESS,
                         type=int)
 
-    effect.add_argument('--out-of-order', '-o',
+    effect.add_argument('--out-of-order', Parameter.cmd_outoforder,
                         action='store_true',
                         dest='order',
                         help=argparse.SUPPRESS)
 
     # Extra parameters
-    parser.add_argument('--target-packet', '-tp',
+    parser.add_argument('--target-packet', Parameter.cmd_target_packet,
                         action='store',
                         help=argparse.SUPPRESS)
 
-    parser.add_argument('--arp', '-a',
+    parser.add_argument('--arp', Parameter.cmd_arp,
                         action='store',
                         nargs=3,
                         help=argparse.SUPPRESS)
@@ -328,7 +336,7 @@ def parameters():
         mode = print_packet
 
     elif args.latency:
-        latency_obj = Latency(latency_value=args.latency, accept=True)
+        latency_obj = Latency(latency_value=args.latency, accept=True, method_print=True)
         mode = packet_latency
 
     elif args.packet_loss:
@@ -348,19 +356,20 @@ def parameters():
         mode = duplicate
 
     elif args.combination:
-        latency_obj = Latency(latency_value=args.combination[0], accept=False)
-        bandwidth_obj = Bandwidth(bandwidth=args.combination[2], accept=False, print_f=False)
+        latency_obj = Latency(latency_value=args.combination[0], accept=False, method_print=False)
+        bandwidth_obj = Bandwidth(bandwidth=args.combination[2], accept=False, method_print=False)
         packet_loss_obj = PacketLoss(percentage=args.combination[1], accept=True)
-        mode = combination
+        mode = combination_effect
 
     elif args.simulate:
         global connection
 
         # Checks if the parameter is a valid connection
-        connection = None
+        connection = Nones
         for c in Common_Connections.connections:
             if c.name == str(args.simulate):
                 connection = c
+
         # Could not find connection type
         if connection is None:
             print('Error: Could no find the \'{}\' connection entered'.format(args.simulate))
@@ -368,9 +377,9 @@ def parameters():
 
         print_force('[*] Connection type is emulating: {}'.format(connection.name))
 
-        latency_obj = Latency(latency_value=0, accept=False)
-        packet_loss_obj = PacketLoss(percentage=0, accept=False)
-        bandwidth_obj = Bandwidth(bandwidth=0, accept=True)
+        latency_obj = Latency(latency_value=0, accept=False, method_print=False)
+        bandwidth_obj = Bandwidth(bandwidth=0, accept=False, method_print=False)
+        packet_loss_obj = PacketLoss(percentage=0, accept=True, method_print=False)
         mode = emulate_real_connection_speed
 
     elif args.display_bandwidth:
@@ -422,6 +431,7 @@ def kill_thread_pool():
     print_force("[!] Thread pool killed\n")
 
 
+# TODO: Refactor this?
 def stop_object(object):
     try:
         object.stop()
