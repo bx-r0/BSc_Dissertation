@@ -1,2 +1,5 @@
-class EditPacket:
+from Effects.Effect import Effect
+
+
+class EditPacket(Effect):
     pass

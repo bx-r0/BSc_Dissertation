@@ -1,58 +1,61 @@
+from Effects.Effect import Effect
 import time
 import threading
 import os
 
-# Grabs terminals size
-height, width = os.popen('stty size').read().split(' ')
 
+class Bandwidth(Effect):
+    """
+    Class that deals with bandwidth functionality
+    - Bandwidth (rate limiting)
+    - Displaying Bandwidth
+    """
 
-class Bandwidth:
-    """Class that deals with bandwidth functionality"""
-    def __init__(self, bandwidth=0, accept=True, method_print=True):
+    def __init__(self, bandwidth=0, accept_packets=True, show_output=True):
+        super().__init__(accept_packets, show_output)
+
+        # Constants
         self.units = ['B', 'KB', 'MB', 'GB']
 
-        # Flags
-        self.accept = accept
-        self.method_print = method_print
-
+        # General variables
         self.total = 0
         self.transferred_since_check = 0
         self.rate = 0
+        self.packet_backlog = []
 
+        # Time variables
         self.previous = time.time()
         self.start = time.time()
 
-        self.packet_backlog = []
-
-        # Variable that defines how often the stats are updated
+        # # CHARACTERISTICS # #
+        # Can be changed
         self.rate_update_period = 1  # In seconds
 
         self.bandwidth = bandwidth
         if bandwidth is not 0:
-            self._print('[*] Bandwidth set to: {} B/s'.format(bandwidth), force=True)
+            self.print('[*] Bandwidth set to: {} B/s'.format(bandwidth), force=True)
 
         self.start_rate_update()
 
-    def _print(self, message, end='\n', force=False):
-        if self.method_print or force:
-            print(message, end=end, flush=True)
-
     def print_stats(self):
+        """Stat output"""
 
         # Displays totals and rate in more relevant units
         print_rate, unit_rate = self.recalculate_units(self.rate)
         print_total, unit_total = self.recalculate_units(self.total)
 
         # This line justs makes sure there is sections of previous lines present
-        self._print('[*] Total: {:.1f} {} - Rate: {:.1f} {}/s '.
-              format(print_total, unit_total, print_rate, unit_rate), end='\r')
+        self.print('[*] Total: {:.1f} {} - Rate: {:.1f} {}/s '.format(
+            print_total, unit_total, print_rate, unit_rate), end='\r')
+
+    def calculate_rate_job(self):
+        """Calculates the rate of throughput"""
+        self.calculate_rate()
+        self.start_rate_update()
 
     def calculate_rate(self):
-        """Calculates the rate of throughput"""
-
         # Const variable that is the period of time the rate is calculated over
         # Measured in seconds
-
         now = time.time()
         elapsed = (now - self.previous)
 
@@ -65,8 +68,6 @@ class Bandwidth:
             # Reset
             self.transferred_since_check = 0
             self.previous = now
-
-        self.start_rate_update()
 
     @staticmethod
     def calculate_packet_size(packet_name):
@@ -111,13 +112,12 @@ class Bandwidth:
         self.total += packet_size
         self.transferred_since_check += packet_size
 
-        if self.accept:
-            packet.accept()
+        self.accept(packet)
 
+    # TODO: I think it would be better to work out the rate as a total average
     def limit(self, packet):
-        """Used to limit the bandwidth of the channel"""
-
-        # Check if rate is over
+        """Used to limit the bandwidth rate"""
+        # Check if rate is over the limit
         if self.rate > self.bandwidth:
             self.packet_backlog.append(packet)
 
@@ -128,11 +128,15 @@ class Bandwidth:
             while self.rate < self.bandwidth and len(self.packet_backlog) > 0:
                 self.send_packet(self.packet_backlog[0])
 
+                self.calculate_rate()
+
                 # Packet is removed from the list
                 del self.packet_backlog[0]
 
     def start_rate_update(self):
-        threading.Timer(self.rate_update_period, self.calculate_rate).start()
+        """Used to start the thread that updates the rate of transfer"""
+        threading.Timer(self.rate_update_period, self.calculate_rate_job).start()
 
     def alter_bandwidth(self, new_value):
+        """Used to change bandwidth variable for an outside location"""
         self.bandwidth = new_value

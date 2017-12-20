@@ -16,6 +16,7 @@ from Effects.PacketLoss import PacketLoss
 from Effects.Throttle import Throttle
 from Effects.OutOfOrder import Order
 
+
 # Defines how many threads are in the pool
 pool = ThreadPool(1000)
 
@@ -148,8 +149,17 @@ def duplicate(packet):
     """Mode that takes a full duplication"""
     global duplication_factor
     if affect_packet(packet):
-        # TODO: BROKEN: Just sending the packet using scapy does not work
-        pass
+        # TODO: Needs fixing
+
+        # Get packet data
+        pkt = IP(packet.get_payload())
+
+        pkt[IP].dst = "192.168.1.1"
+
+        del pkt[ICMP].chksum
+        del pkt[IP].chksum
+
+        send(pkt, verbose=1, count=duplication_factor)
     else:
         packet.accept()
 
@@ -336,11 +346,11 @@ def parameters():
         mode = print_packet
 
     elif args.latency:
-        latency_obj = Latency(latency_value=args.latency, accept=True, method_print=True)
+        latency_obj = Latency(latency_value=args.latency, accept_packets=True)
         mode = packet_latency
 
     elif args.packet_loss:
-        packet_loss_obj = PacketLoss(percentage=args.packet_loss, accept=True)
+        packet_loss_obj = PacketLoss(percentage=args.packet_loss, accept_packets=True)
         mode = packet_loss
 
     elif args.throttle:
@@ -356,9 +366,9 @@ def parameters():
         mode = duplicate
 
     elif args.combination:
-        latency_obj = Latency(latency_value=args.combination[0], accept=False, method_print=False)
-        bandwidth_obj = Bandwidth(bandwidth=args.combination[2], accept=False, method_print=False)
-        packet_loss_obj = PacketLoss(percentage=args.combination[1], accept=True)
+        latency_obj = Latency(latency_value=args.combination[0], accept_packets=False, show_output=False)
+        bandwidth_obj = Bandwidth(bandwidth=args.combination[2], accept_packets=False, show_output=False)
+        packet_loss_obj = PacketLoss(percentage=args.combination[1], accept_packets=True)
         mode = combination_effect
 
     elif args.simulate:
@@ -377,9 +387,9 @@ def parameters():
 
         print_force('[*] Connection type is emulating: {}'.format(connection.name))
 
-        latency_obj = Latency(latency_value=0, accept=False, method_print=False)
-        bandwidth_obj = Bandwidth(bandwidth=0, accept=False, method_print=False)
-        packet_loss_obj = PacketLoss(percentage=0, accept=True, method_print=False)
+        latency_obj = Latency(latency_value=0, accept_packets=False, show_output=False)
+        bandwidth_obj = Bandwidth(bandwidth=0, accept_packets=False, show_output=False)
+        packet_loss_obj = PacketLoss(percentage=0, accept_packets=True, show_output=False)
         mode = emulate_real_connection_speed
 
     elif args.display_bandwidth:

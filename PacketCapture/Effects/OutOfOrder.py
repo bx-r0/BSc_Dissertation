@@ -1,44 +1,46 @@
+from Effects.Effect import Effect
 import threading
 import random
 
 
-class Order:
+class Order(Effect):
 
-    def __init__(self):
+    def __init__(self, accept_packet=True, show_output=True):
+        super().__init__(accept_packet, show_output)
+
+        # General vars
         self.send_interval = 1
-
         self.packet_list = []
-        self.active = True
+        self.total = 0
+        self.packet_send_job = None
+
         self.start_packet_send()
 
-        self.total = 0
-
-    def stats(self):
-        print('[*] Total packets received {}'.format(self.total), end='\r', flush=True)
+    def print_stats(self):
+        self.print('[*] Total packets received {}'.format(self.total), end='\r')
 
     def effect(self, packet):
         # Saves the packet
         self.packet_list.append(packet)
         self.total += 1
-        self.stats()
+        self.print_stats()
 
     def send_packet(self):
 
         # Grabs a position in the list
         list_len = len(self.packet_list)
 
-        # Sends and deletes the list
+        # Sends and deletes from the list
         while list_len > 0:
             index = random.randint(0, list_len - 1)
-            self.packet_list[index].accept()
+            self.accept(self.packet_list[index])
             del self.packet_list[index]
-
             list_len = len(self.packet_list)
 
         self.start_packet_send()
 
     def start_packet_send(self):
-        self.job = threading.Timer(self.send_interval, self.send_packet).start()
+        self.packet_send_job = threading.Timer(self.send_interval, self.send_packet).start()
 
     def stop(self):
-       self.job.stop()
+        self.packet_send_job.stop()

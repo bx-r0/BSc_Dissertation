@@ -1,19 +1,24 @@
+from Effects.Effect import Effect
 import threading
 import time
 
-# TODO: ISSUES
-# - For some reason the value printed as 'sent' is always twice the number that actually have been sent??
-# - There needs to be a wait before the packet is added to the pool?? Maybe they're being added too quickly
-class Throttle:
 
-    def __init__(self, period):
+class Throttle(Effect):
+
+    def __init__(self, period, accept_packet=True, show_output=True):
+        super().__init__(accept_packet, show_output)
+
+        # General vars
         self.throttle_pool = []
         self.throttle_job = None
-
         self.throttle_period = period / 1000
-        print('[*] Packet throttle delay set to {}s'.format(self.throttle_period), flush=True)
+
+        self.print('[*] Packet throttle delay set to {}s'.format(self.throttle_period), force=True)
 
     def effect(self, packet):
+        """General effect"""
+
+        # HACK: Why is this wait needed?
         time.sleep(0.00001)
         self.throttle_pool.append(packet)
 
@@ -22,20 +27,24 @@ class Throttle:
 
         # Sends all packets!
         for x in self.throttle_pool:
-            x.accept()
+            self.accept(x)
 
         pool_len = len(self.throttle_pool)
 
         if pool_len is not 0:
-            print("[!] Packets sent. Number: {}".format(pool_len))
+            self.print("[!] Packets sent. Number: {}".format(pool_len), end='\r')
 
         self.throttle_pool = []
         self.start_purge_monitor()
 
     def start_purge_monitor(self):
+        """Starts the timer that after the time period sends the batch of packets"""
+
         # Starts another thread
         self.throttle_job = threading.Timer(self.throttle_period, self.throttle_purge).start()
 
     def stop(self):
+        """Stops the purge monitor job"""
+
         self.throttle_job.cancel()
-        print('[!] Throttle purge job stopped!', flush=True)
+        self.print('[!] Throttle purge job stopped!')
