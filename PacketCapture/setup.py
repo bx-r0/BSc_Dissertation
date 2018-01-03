@@ -1,5 +1,4 @@
 # Setup.py
-from Main import version
 from setuptools import setup
 from setuptools import find_packages
 
@@ -24,9 +23,10 @@ classifiers = [
     'Topic :: System :: Networking'
 ]
 
-setup(name="DegredationSimulation",
-      version=version,
+setup(name="DPS",
+      version=1,
       description=short_description,
+      install_requires=['NetfilterQueue', 'scapy', 'python-nmap'],
       long_description=long_description,
       author="Aidan Fray",
       author_email="afray@hotmail.co.uk",
@@ -37,16 +37,3 @@ setup(name="DegredationSimulation",
       packages=find_packages(),
       platforms=['POSIX']
 )
-
-# Package Install
-try:
-    from netfilterqueue import NetfilterQueue
-except ImportError:
-    print('Cannot install: netfilterQueue')
-    print('Please install using \'pip install NetfilterQueue\'')
-
-try:
-    from scapy.all import *
-except ImportError:
-    print('Cannot install: scapy')
-    print('Please install using \'pip install scapy\'')

