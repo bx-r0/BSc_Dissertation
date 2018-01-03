@@ -4,7 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ClientServer.FTP"
-        mc:Ignorable="d" Height="300.683" Width="523.656" Background="White" Foreground="{x:Null}" WindowStyle="ToolWindow">
+        mc:Ignorable="d" Height="300.683" Width="523.656" Background="White" Foreground="{x:Null}" Title="FTP">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition/>

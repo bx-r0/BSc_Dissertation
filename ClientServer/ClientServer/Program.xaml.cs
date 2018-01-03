@@ -54,12 +54,6 @@ namespace ClientServer
                             case WindowToShow.Server:
                                 ShowWindow(new FTPServerWindow());
                                 break;
-                            case WindowToShow.Client:
-                                ShowWindow(new FTPClientWindow());
-                                break;
-                            case WindowToShow.Both:
-                                ShowTwoWindows(new FTPClientWindow(), new FTPServerWindow());
-                                break;
                         } 
                         break;
                     //# HTTP
@@ -156,13 +150,13 @@ namespace ClientServer
         private void ShowWindow(Window window)
         {
             window.Show();
-            this.Hide();
+            Close();
         }
         private void ShowTwoWindows(Window window1, Window window2)
         {
             window1.Show();
             window2.Show();
-            this.Hide();
+            Close();
         }
 
         /// <summary>

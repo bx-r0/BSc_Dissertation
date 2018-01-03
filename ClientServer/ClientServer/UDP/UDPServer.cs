@@ -10,14 +10,14 @@ using System.Timers;
 
 namespace ClientServer.UDP
 {
-    class UDPServer
+    public class UDPServer
     {
         //# Setup
         UdpClient Server = new UdpClient(port);
         public static int port = 1000;
 
         //Timeout in ms
-        private const int timeOut = 5000;
+        public const int timeOut = 5000;
        
         //# Size of the grid
         public const int GRID_SIZE = UDPClient.GRID_SIZE;
@@ -76,7 +76,7 @@ namespace ClientServer.UDP
             //This is where the program will end up after a timeout
             catch (Exception e)
             {
-                //TODO: Handle exception
+                Console.WriteLine(e.Message);
             }
         }
     }

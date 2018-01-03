@@ -36,6 +36,8 @@ namespace ClientServer.UDP
         {
             Client = new UdpClient();
             Client.Connect(_address, _port);
+
+
             //SendImage();
             SendGridPackets();
             Disconnect();
