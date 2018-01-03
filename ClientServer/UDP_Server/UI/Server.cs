@@ -4,7 +4,7 @@ using Microsoft.VisualStudio.TestTools.UITesting;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Threading;
 
-namespace UDP_Server.Server
+namespace UDP_Server.Server.UI
 {
     /// <summary>
     /// Summary description for CodedUITest1
@@ -18,7 +18,6 @@ namespace UDP_Server.Server
         {
 
         }
-
 
         //Shared functionality
         public void WaitForTimeout()

@@ -31,8 +31,10 @@ namespace ClientServer.Logging
             {
                 logMessage = $"{message.Time} - - {message.Exception.Message} - - {message.Message}";
 
+                 Console.WriteLine(logMessage);
+
                 //# Message box created
-                MessageBox.Show($"Exception thrown - \"{message.Exception.ToString().Substring(0, 40)}...\" \n\nPlease see the log for more details");
+                //MessageBox.Show($"Exception thrown - \"{message.Exception.ToString().Substring(0, 200)}...\" \n\nPlease see the log for more details");
             }
             else
             //#----- General message
@@ -59,9 +61,12 @@ namespace ClientServer.Logging
         //Will save the log to a text file
         private static void SaveLog(string msg)
         {
-            StreamWriter sr = new StreamWriter(fileName, true);
-            sr.WriteLine(msg);
-            sr.Close();
+            if (File.Exists(fileName))
+            {
+                StreamWriter sr = new StreamWriter(fileName, true);
+                sr.WriteLine(msg);
+                sr.Close();
+            }
         }
     }
 

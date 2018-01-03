@@ -6,11 +6,11 @@
     <ProductVersion>
     </ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{42335241-EEDA-4386-B25F-F6CCBE8E4356}</ProjectGuid>
+    <ProjectGuid>{E79EC742-67F2-49FF-8371-656A47E666CF}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>UDP_Server</RootNamespace>
-    <AssemblyName>UDP_Server</AssemblyName>
+    <RootNamespace>FTP</RootNamespace>
+    <AssemblyName>FTP</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -41,12 +41,9 @@
     <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <Private>False</Private>
     </Reference>
-    <Reference Include="PresentationCore" />
-    <Reference Include="PresentationFramework" />
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
-    <Reference Include="System.Windows" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="WindowsBase" />
   </ItemGroup>
@@ -56,21 +53,16 @@
     </CodeAnalysisDependentAssemblyPaths>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Bussiness-Logic\UDP_Client_BussinessLogic.cs" />
-    <Compile Include="Bussiness-Logic\UDP_Server_BussinessLogic.cs" />
-    <Compile Include="Live-Tests\UDP-Live-Tests.cs" />
-    <Compile Include="UI\Client.cs" />
-    <Compile Include="UI\Server.cs" />
+    <Compile Include="Bussiness-Logic\FTP_BussinessLogic.cs" />
+    <Compile Include="Live-Tests\FTP_Live-Tests.cs" />
+    <Compile Include="UIMap.Designer.cs">
+      <DependentUpon>UIMap.uitest</DependentUpon>
+    </Compile>
+    <Compile Include="UI\UI.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UIMap.cs">
       <DependentUpon>UIMap.uitest</DependentUpon>
     </Compile>
-    <Compile Include="UIMap.Designer.cs">
-      <DependentUpon>UIMap.uitest</DependentUpon>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="UIMap.uitest" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ClientServer\ClientServer.csproj">
@@ -78,7 +70,9 @@
       <Name>ClientServer</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <None Include="UIMap.uitest" />
+  </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
       <ItemGroup>

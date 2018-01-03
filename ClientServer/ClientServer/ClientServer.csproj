@@ -81,11 +81,6 @@
     <Compile Include="FTP\FTPServer.xaml.cs">
       <DependentUpon>FTPServer.xaml</DependentUpon>
     </Compile>
-    <Compile Include="HTTP\HTTPClient.cs" />
-    <Compile Include="HTTP\HTTPServer.cs" />
-    <Compile Include="HTTP\HTTPServer.xaml.cs">
-      <DependentUpon>HTTPServer.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Program.xaml.cs">
       <DependentUpon>Program.xaml</DependentUpon>
     </Compile>
@@ -102,22 +97,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="HTTP\HTTPClient.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="HTTP\HTTPClient.xaml.cs">
-      <DependentUpon>HTTPClient.xaml</DependentUpon>
-      <SubType>Code</SubType>
-    </Compile>
-    <Page Include="HTTP\HTTPServer.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="Program.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -162,10 +145,7 @@
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="HTTP\HTTP-Client-Code\" />
-    <Folder Include="HTTP\HTTP-Server-Code\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <Resource Include="Logging\LOG.txt" />
   </ItemGroup>

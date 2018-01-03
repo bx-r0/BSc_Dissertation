@@ -54,7 +54,7 @@ namespace ClientServer.UDP
         }
 
         //# Reading grid packages
-        private void Grid_Processing(ref IPEndPoint RemoteIpEndPoint)
+        protected void Grid_Processing(ref IPEndPoint RemoteIpEndPoint)
         {
             try
             {

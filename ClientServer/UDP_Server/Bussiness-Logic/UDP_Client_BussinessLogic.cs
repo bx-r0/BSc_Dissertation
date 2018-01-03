@@ -2,10 +2,10 @@
 using ClientServer.UDP;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace UDP_Server.Bussiness_Logic
+namespace UDP_Server.Client.Bussiness_Logic
 {
     [TestClass]
-    public class UDP_BussinessLogic
+    public class UDP_Client_BussinessLogic
     {
         UDPClient client;
 

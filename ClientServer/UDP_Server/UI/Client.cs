@@ -10,7 +10,7 @@ using Microsoft.VisualStudio.TestTools.UITest.Extension;
 using Keyboard = Microsoft.VisualStudio.TestTools.UITesting.Keyboard;
 using ClientServer.UDP;
 
-namespace UDP_Server.Client
+namespace UDP_Server.Client.UI
 {
     /// <summary>
     /// Summary description for CodedUITest1

@@ -7,7 +7,7 @@ using ClientServer.Logging;
 
 namespace ClientServer.FTP
 {
-    class FTPServer
+    public class FTPServer
     {
         //# Server
         private TcpListener server;
