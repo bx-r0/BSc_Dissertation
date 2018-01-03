@@ -9,6 +9,8 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.VisualStudio.TestTools.UITest.Extension;
 using Keyboard = Microsoft.VisualStudio.TestTools.UITesting.Keyboard;
 using Microsoft.VisualStudio.TestTools.UITest.Common.UIMap;
+using ClientServer.UDP;
+using System.Threading;
 
 namespace UDP_Server.Live_Tests
 {
@@ -22,6 +24,14 @@ namespace UDP_Server.Live_Tests
         {
         }
 
+        //Shared functionality
+        public void WaitForTimeout()
+        {
+            //Waits for timeout lenght
+            int timeout = UDPServer.timeOut;
+            Thread.Sleep(timeout);
+        }
+
         [TestInitialize]
         public void StartWindows()
         {
@@ -31,34 +41,48 @@ namespace UDP_Server.Live_Tests
         [TestCleanup]
         public void CloseWindows()
         {
-            //TODO:
+            this.UIMap.Close_Windows();
         }
 
+        /// <summary>
+        /// Tests that is looking for all valid packets to be send over loopback
+        /// It then checks the label to make sure all packets are recieved
+        /// </summary>
         [TestMethod]
-        public void SendAndRecieve()
+        public void SendAndRecieve_Valid()
         {
+            this.UIMap.SendAndRecieve();
+            this.WaitForTimeout();
 
+            //Checks packet lost label for "0"
+            this.UIMap.Assert_CheckValidSend();
+            this.UIMap.Assert_ConnectInvertCheck();
         }
 
-        #region Additional test attributes
+        /// <summary>
+        /// Does not send and packets and checks if window shows 100% packet loss
+        /// </summary>
+        [TestMethod]
+        public void SendAndRecieve_Invalid()
+        {
+            this.UIMap.SendAndRecieve_Invalid();
+            WaitForTimeout();
 
-        // You can use the following additional attributes as you write your tests:
+            //Checks the packet loss percentage for "100%"
+            this.UIMap.Assert_CheckForAllPacketsLost();
+        }
 
-        ////Use TestInitialize to run code before running each test 
-        //[TestInitialize()]
-        //public void MyTestInitialize()
-        //{        
-        //    // To generate code for this test, select "Generate Code for Coded UI Test" from the shortcut menu and select one of the menu items.
-        //}
+        /// <summary>
+        /// Test that performs a valid send, resets then runs again
+        /// </summary>
+        [TestMethod]
+        public void SendAndRecieve_Valid_Twice()
+        {
+            SendAndRecieve_Valid();
+            this.UIMap.RestartWindows();
+            SendAndRecieve_Valid();
+        }
 
-        ////Use TestCleanup to run code after each test has run
-        //[TestCleanup()]
-        //public void MyTestCleanup()
-        //{        
-        //    // To generate code for this test, select "Generate Code for Coded UI Test" from the shortcut menu and select one of the menu items.
-        //}
-
-        #endregion
 
         /// <summary>
         ///Gets or sets the test context which provides

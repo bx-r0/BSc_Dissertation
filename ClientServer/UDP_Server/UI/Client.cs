@@ -10,7 +10,7 @@ using Microsoft.VisualStudio.TestTools.UITest.Extension;
 using Keyboard = Microsoft.VisualStudio.TestTools.UITesting.Keyboard;
 using ClientServer.UDP;
 
-namespace UDP.Client
+namespace UDP_Server.Client
 {
     /// <summary>
     /// Summary description for CodedUITest1
@@ -24,7 +24,73 @@ namespace UDP.Client
         {
         }
 
-        
+        /// <summary>
+        /// Method that runs before every test.
+        /// Loads up a fresh window.
+        /// </summary>
+        [TestInitialize]
+        public void StartWindow()
+        {
+            System.Diagnostics.Process.Start("CMD.exe", "/C ClientServer.exe -u c");
+        }
+
+        [TestCleanup]
+        public void CloseWindow()
+        {
+            this.UIMap.Close_ClientWindow();
+        }
+
+        /// <summary>
+        /// Test that is just a click on the connect button
+        /// </summary>
+        [TestMethod]
+        public void ConnectClick()
+        {
+            this.UIMap.Connect_Click();
+        }
+
+        /// <summary>
+        /// Test that clicks the connect button and checks the buttons invert their "Enable"
+        /// property
+        /// </summary>
+        [TestMethod]
+        public void Connect_InvertCheck()
+        {
+            this.UIMap.Connect_Click();
+            this.UIMap.Assert_ConnectInvertCheck();
+        }
+
+        /// <summary>
+        /// Click of connect and then reset
+        /// </summary>
+        [TestMethod]
+        public void RestartClick()
+        {
+            this.UIMap.Connect_Click();
+            this.UIMap.Reset_Click();
+        }
+
+        /// <summary>
+        /// Connect click, reset click and then a check for the buttons "Enable"
+        /// property inverts properly
+        /// </summary>
+        [TestMethod]
+        public void Restart_InvertCheck()
+        {
+            this.UIMap.Connect_Click();
+            this.UIMap.Reset_Click();
+            this.UIMap.Assert_ResetCheck();
+        }
+
+        /// <summary>
+        /// Test enters values into the box and checks they end up in the class
+        /// </summary>
+        [TestMethod]
+        public void TextEntry()
+        {
+            this.UIMap.Add_LocalHostToTextbox();
+        }
+
 
         #region Additional test attributes
 

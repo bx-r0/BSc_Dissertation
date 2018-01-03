@@ -14,7 +14,7 @@ namespace ClientServer.UDP
     {
         //# Setup
         UdpClient Server = new UdpClient(port);
-        public static int port = 1000;
+        public static int port = 8888;
 
         //Timeout in ms
         public const int timeOut = 5000;
@@ -39,7 +39,7 @@ namespace ClientServer.UDP
                 int _port = port;
 
                 //IPEndPoint object will allow us to read datagrams sent from any source.
-                IPEndPoint RemoteIpEndPoint = new IPEndPoint(0, 0);
+                IPEndPoint RemoteIpEndPoint = new IPEndPoint(IPAddress.Any, 0);
 
                 //Image_Processing(ref RemoteIpEndPoint);
                 Grid_Processing(ref RemoteIpEndPoint);
@@ -48,7 +48,7 @@ namespace ClientServer.UDP
             }
             catch (Exception e)
             {
-                throw;
+                Console.WriteLine("SERVER START: " + e.Message);
             }
 
         }

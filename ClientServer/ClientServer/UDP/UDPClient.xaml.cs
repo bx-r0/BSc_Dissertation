@@ -44,7 +44,7 @@ namespace ClientServer.UDP
             CanRun(false);
             
             //# Connects
-            Client.Connect();
+            Client.Run();
         }
         private void Button_Reset_Click(object sender, RoutedEventArgs e)
         {

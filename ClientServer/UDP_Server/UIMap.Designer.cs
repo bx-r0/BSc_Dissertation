@@ -8,7 +8,7 @@
 //  </auto-generated>
 // ------------------------------------------------------------------------------
 
-namespace UDP
+namespace UDP_Server
 {
     using System;
     using System.CodeDom.Compiler;
@@ -337,6 +337,193 @@ namespace UDP
             Assert.AreEqual(this.Assert_CheckTotalSentValueResetExpectedValues.UIItemText1DisplayText, uIItemText1.DisplayText);
         }
         
+        /// <summary>
+        /// Close_Windows
+        /// </summary>
+        public void Close_Windows()
+        {
+            #region Variable Declarations
+            WinButton uICloseButton = this.UIUDPWindow1.UICloseButton;
+            WinButton uICloseButton1 = this.UIUDPClientWindow.UICloseButton;
+            #endregion
+
+            // Click 'Close' button
+            Mouse.Click(uICloseButton, new Point(27, 26));
+
+            // Click 'Close' button
+            Mouse.Click(uICloseButton1, new Point(16, 10));
+        }
+        
+        /// <summary>
+        /// SendAndRecieve
+        /// </summary>
+        public void SendAndRecieve()
+        {
+            #region Variable Declarations
+            WpfButton uISTARTButton = this.UIUDPWindow.UISTARTButton;
+            WpfButton uIConnectButton = this.UIUDPClientWindow1.UIConnectButton;
+            #endregion
+
+            // Click 'START' button
+            Mouse.Click(uISTARTButton, new Point(112, 7));
+
+            // Click 'Connect' button
+            Mouse.Click(uIConnectButton, new Point(89, 29));
+        }
+        
+        /// <summary>
+        /// Assert_CheckValidSend - Use 'Assert_CheckValidSendExpectedValues' to pass parameters into this method.
+        /// </summary>
+        public void Assert_CheckValidSend()
+        {
+            #region Variable Declarations
+            WpfText uIItemText2 = this.UIUDPWindow.UIItemText2;
+            #endregion
+
+            // Verify that the 'DisplayText' property of '-' label equals '0'
+            Assert.AreEqual(this.Assert_CheckValidSendExpectedValues.UIItemText2DisplayText, uIItemText2.DisplayText, "Packet Loss is not equal to zero");
+        }
+        
+        /// <summary>
+        /// SendAndRecieve_Invalid - Use 'SendAndRecieve_InvalidParams' to pass parameters into this method.
+        /// </summary>
+        public void SendAndRecieve_Invalid()
+        {
+            #region Variable Declarations
+            WpfEdit uITextBox_AddressEdit = this.UIUDPClientWindow1.UITextBox_AddressEdit;
+            WpfButton uISTARTButton = this.UIUDPWindow.UISTARTButton;
+            WpfButton uIConnectButton = this.UIUDPClientWindow1.UIConnectButton;
+            #endregion
+
+            // Type '192.168.1.1' in 'TextBox_Address' text box
+            uITextBox_AddressEdit.Text = this.SendAndRecieve_InvalidParams.UITextBox_AddressEditText;
+
+            // Click 'START' button
+            Mouse.Click(uISTARTButton, new Point(86, 6));
+
+            // Click 'TextBox_Address' text box
+            Mouse.Click(uITextBox_AddressEdit, new Point(33, 11));
+
+            // Click 'Connect' button
+            Mouse.Click(uIConnectButton, new Point(45, 22));
+        }
+        
+        /// <summary>
+        /// Assert_CheckForAllPacketsLost - Use 'Assert_CheckForAllPacketsLostExpectedValues' to pass parameters into this method.
+        /// </summary>
+        public void Assert_CheckForAllPacketsLost()
+        {
+            #region Variable Declarations
+            WpfText uIItemText = this.UIUDPWindow.UIItemText;
+            #endregion
+
+            // Verify that the 'DisplayText' property of '-' label equals '100%'
+            Assert.AreEqual(this.Assert_CheckForAllPacketsLostExpectedValues.UIItemTextDisplayText, uIItemText.DisplayText, "All packets have not been lost");
+        }
+        
+        /// <summary>
+        /// RestartWindows
+        /// </summary>
+        public void RestartWindows()
+        {
+            #region Variable Declarations
+            WpfButton uIRESTARTButton = this.UIUDPWindow.UIRESTARTButton;
+            WpfButton uIResetButton = this.UIUDPClientWindow1.UIResetButton;
+            #endregion
+
+            // Click 'RESTART' button
+            Mouse.Click(uIRESTARTButton, new Point(132, 7));
+
+            // Click 'Reset' button
+            Mouse.Click(uIResetButton, new Point(63, 22));
+        }
+        
+        /// <summary>
+        /// Assert_ResetCheck - Use 'Assert_ResetCheckExpectedValues' to pass parameters into this method.
+        /// </summary>
+        public void Assert_ResetCheck()
+        {
+            #region Variable Declarations
+            WpfButton uIConnectButton = this.UIUDPClientWindow1.UIConnectButton;
+            WpfButton uIResetButton = this.UIUDPClientWindow1.UIResetButton;
+            #endregion
+
+            // Verify that the 'Enabled' property of 'Connect' button equals 'True'
+            Assert.AreEqual(this.Assert_ResetCheckExpectedValues.UIConnectButtonEnabled, uIConnectButton.Enabled);
+
+            // Verify that the 'Enabled' property of 'Reset' button equals 'False'
+            Assert.AreEqual(this.Assert_ResetCheckExpectedValues.UIResetButtonEnabled, uIResetButton.Enabled);
+        }
+        
+        /// <summary>
+        /// Connect_Click
+        /// </summary>
+        public void Connect_Click()
+        {
+            #region Variable Declarations
+            WpfButton uIConnectButton = this.UIUDPClientWindow1.UIConnectButton;
+            #endregion
+
+            // Click 'Connect' button
+            Mouse.Click(uIConnectButton, new Point(80, 29));
+        }
+        
+        /// <summary>
+        /// Reset_Click
+        /// </summary>
+        public void Reset_Click()
+        {
+            #region Variable Declarations
+            WpfButton uIResetButton = this.UIUDPClientWindow1.UIResetButton;
+            #endregion
+
+            // Click 'Reset' button
+            Mouse.Click(uIResetButton, new Point(62, 18));
+        }
+        
+        /// <summary>
+        /// Assert_ConnectInvertCheck - Use 'Assert_ConnectInvertCheckExpectedValues' to pass parameters into this method.
+        /// </summary>
+        public void Assert_ConnectInvertCheck()
+        {
+            #region Variable Declarations
+            WpfButton uIResetButton = this.UIUDPClientWindow1.UIResetButton;
+            WpfButton uIConnectButton = this.UIUDPClientWindow1.UIConnectButton;
+            #endregion
+
+            // Verify that the 'Enabled' property of 'Reset' button equals 'True'
+            Assert.AreEqual(this.Assert_ConnectInvertCheckExpectedValues.UIResetButtonEnabled, uIResetButton.Enabled);
+
+            // Verify that the 'Enabled' property of 'Connect' button equals 'False'
+            Assert.AreEqual(this.Assert_ConnectInvertCheckExpectedValues.UIConnectButtonEnabled, uIConnectButton.Enabled);
+        }
+        
+        /// <summary>
+        /// Add_LocalHostToTextbox - Use 'Add_LocalHostToTextboxParams' to pass parameters into this method.
+        /// </summary>
+        public void Add_LocalHostToTextbox()
+        {
+            #region Variable Declarations
+            WpfEdit uITextBox_AddressEdit = this.UIUDPClientWindow1.UITextBox_AddressEdit;
+            #endregion
+
+            // Type '127.0.0.1' in 'TextBox_Address' text box
+            uITextBox_AddressEdit.Text = this.Add_LocalHostToTextboxParams.UITextBox_AddressEditText;
+        }
+        
+        /// <summary>
+        /// Close_ClientWindow
+        /// </summary>
+        public void Close_ClientWindow()
+        {
+            #region Variable Declarations
+            WinButton uICloseButton = this.UIUDPClientWindow.UICloseButton;
+            #endregion
+
+            // Click 'Close' button
+            Mouse.Click(uICloseButton, new Point(13, 6));
+        }
+        
         #region Properties
         public virtual testParams testParams
         {
@@ -470,6 +657,78 @@ namespace UDP
             }
         }
         
+        public virtual Assert_CheckValidSendExpectedValues Assert_CheckValidSendExpectedValues
+        {
+            get
+            {
+                if ((this.mAssert_CheckValidSendExpectedValues == null))
+                {
+                    this.mAssert_CheckValidSendExpectedValues = new Assert_CheckValidSendExpectedValues();
+                }
+                return this.mAssert_CheckValidSendExpectedValues;
+            }
+        }
+        
+        public virtual SendAndRecieve_InvalidParams SendAndRecieve_InvalidParams
+        {
+            get
+            {
+                if ((this.mSendAndRecieve_InvalidParams == null))
+                {
+                    this.mSendAndRecieve_InvalidParams = new SendAndRecieve_InvalidParams();
+                }
+                return this.mSendAndRecieve_InvalidParams;
+            }
+        }
+        
+        public virtual Assert_CheckForAllPacketsLostExpectedValues Assert_CheckForAllPacketsLostExpectedValues
+        {
+            get
+            {
+                if ((this.mAssert_CheckForAllPacketsLostExpectedValues == null))
+                {
+                    this.mAssert_CheckForAllPacketsLostExpectedValues = new Assert_CheckForAllPacketsLostExpectedValues();
+                }
+                return this.mAssert_CheckForAllPacketsLostExpectedValues;
+            }
+        }
+        
+        public virtual Assert_ResetCheckExpectedValues Assert_ResetCheckExpectedValues
+        {
+            get
+            {
+                if ((this.mAssert_ResetCheckExpectedValues == null))
+                {
+                    this.mAssert_ResetCheckExpectedValues = new Assert_ResetCheckExpectedValues();
+                }
+                return this.mAssert_ResetCheckExpectedValues;
+            }
+        }
+        
+        public virtual Assert_ConnectInvertCheckExpectedValues Assert_ConnectInvertCheckExpectedValues
+        {
+            get
+            {
+                if ((this.mAssert_ConnectInvertCheckExpectedValues == null))
+                {
+                    this.mAssert_ConnectInvertCheckExpectedValues = new Assert_ConnectInvertCheckExpectedValues();
+                }
+                return this.mAssert_ConnectInvertCheckExpectedValues;
+            }
+        }
+        
+        public virtual Add_LocalHostToTextboxParams Add_LocalHostToTextboxParams
+        {
+            get
+            {
+                if ((this.mAdd_LocalHostToTextboxParams == null))
+                {
+                    this.mAdd_LocalHostToTextboxParams = new Add_LocalHostToTextboxParams();
+                }
+                return this.mAdd_LocalHostToTextboxParams;
+            }
+        }
+        
         public UIRunWindow UIRunWindow
         {
             get
@@ -553,6 +812,30 @@ namespace UDP
                 return this.mUIProgramManagerWindow;
             }
         }
+        
+        public UIUDPClientWindow UIUDPClientWindow
+        {
+            get
+            {
+                if ((this.mUIUDPClientWindow == null))
+                {
+                    this.mUIUDPClientWindow = new UIUDPClientWindow();
+                }
+                return this.mUIUDPClientWindow;
+            }
+        }
+        
+        public UIUDPClientWindow1 UIUDPClientWindow1
+        {
+            get
+            {
+                if ((this.mUIUDPClientWindow1 == null))
+                {
+                    this.mUIUDPClientWindow1 = new UIUDPClientWindow1();
+                }
+                return this.mUIUDPClientWindow1;
+            }
+        }
         #endregion
         
         #region Fields
@@ -578,6 +861,18 @@ namespace UDP
         
         private Assert_CheckTotalSentValueResetExpectedValues mAssert_CheckTotalSentValueResetExpectedValues;
         
+        private Assert_CheckValidSendExpectedValues mAssert_CheckValidSendExpectedValues;
+        
+        private SendAndRecieve_InvalidParams mSendAndRecieve_InvalidParams;
+        
+        private Assert_CheckForAllPacketsLostExpectedValues mAssert_CheckForAllPacketsLostExpectedValues;
+        
+        private Assert_ResetCheckExpectedValues mAssert_ResetCheckExpectedValues;
+        
+        private Assert_ConnectInvertCheckExpectedValues mAssert_ConnectInvertCheckExpectedValues;
+        
+        private Add_LocalHostToTextboxParams mAdd_LocalHostToTextboxParams;
+        
         private UIRunWindow mUIRunWindow;
         
         private UICWindowssystem32cmdeWindow mUICWindowssystem32cmdeWindow;
@@ -591,6 +886,10 @@ namespace UDP
         private UIUDPWindow1 mUIUDPWindow1;
         
         private UIProgramManagerWindow mUIProgramManagerWindow;
+        
+        private UIUDPClientWindow mUIUDPClientWindow;
+        
+        private UIUDPClientWindow1 mUIUDPClientWindow1;
         #endregion
     }
     
@@ -798,6 +1097,106 @@ namespace UDP
         /// Verify that the 'DisplayText' property of '-' label equals '-'
         /// </summary>
         public string UIItemText1DisplayText = "-";
+        #endregion
+    }
+    
+    /// <summary>
+    /// Parameters to be passed into 'Assert_CheckValidSend'
+    /// </summary>
+    [GeneratedCode("Coded UITest Builder", "15.0.26208.0")]
+    public class Assert_CheckValidSendExpectedValues
+    {
+        
+        #region Fields
+        /// <summary>
+        /// Verify that the 'DisplayText' property of '-' label equals '0'
+        /// </summary>
+        public string UIItemText2DisplayText = "0";
+        #endregion
+    }
+    
+    /// <summary>
+    /// Parameters to be passed into 'SendAndRecieve_Invalid'
+    /// </summary>
+    [GeneratedCode("Coded UITest Builder", "15.0.26208.0")]
+    public class SendAndRecieve_InvalidParams
+    {
+        
+        #region Fields
+        /// <summary>
+        /// Type '192.168.1.1' in 'TextBox_Address' text box
+        /// </summary>
+        public string UITextBox_AddressEditText = "192.168.1.1";
+        #endregion
+    }
+    
+    /// <summary>
+    /// Parameters to be passed into 'Assert_CheckForAllPacketsLost'
+    /// </summary>
+    [GeneratedCode("Coded UITest Builder", "15.0.26208.0")]
+    public class Assert_CheckForAllPacketsLostExpectedValues
+    {
+        
+        #region Fields
+        /// <summary>
+        /// Verify that the 'DisplayText' property of '-' label equals '100%'
+        /// </summary>
+        public string UIItemTextDisplayText = "100%";
+        #endregion
+    }
+    
+    /// <summary>
+    /// Parameters to be passed into 'Assert_ResetCheck'
+    /// </summary>
+    [GeneratedCode("Coded UITest Builder", "15.0.26208.0")]
+    public class Assert_ResetCheckExpectedValues
+    {
+        
+        #region Fields
+        /// <summary>
+        /// Verify that the 'Enabled' property of 'Connect' button equals 'True'
+        /// </summary>
+        public bool UIConnectButtonEnabled = true;
+        
+        /// <summary>
+        /// Verify that the 'Enabled' property of 'Reset' button equals 'False'
+        /// </summary>
+        public bool UIResetButtonEnabled = false;
+        #endregion
+    }
+    
+    /// <summary>
+    /// Parameters to be passed into 'Assert_ConnectInvertCheck'
+    /// </summary>
+    [GeneratedCode("Coded UITest Builder", "15.0.26208.0")]
+    public class Assert_ConnectInvertCheckExpectedValues
+    {
+        
+        #region Fields
+        /// <summary>
+        /// Verify that the 'Enabled' property of 'Reset' button equals 'True'
+        /// </summary>
+        public bool UIResetButtonEnabled = true;
+        
+        /// <summary>
+        /// Verify that the 'Enabled' property of 'Connect' button equals 'False'
+        /// </summary>
+        public bool UIConnectButtonEnabled = false;
+        #endregion
+    }
+    
+    /// <summary>
+    /// Parameters to be passed into 'Add_LocalHostToTextbox'
+    /// </summary>
+    [GeneratedCode("Coded UITest Builder", "15.0.26208.0")]
+    public class Add_LocalHostToTextboxParams
+    {
+        
+        #region Fields
+        /// <summary>
+        /// Type '127.0.0.1' in 'TextBox_Address' text box
+        /// </summary>
+        public string UITextBox_AddressEditText = "127.0.0.1";
         #endregion
     }
     
@@ -2123,6 +2522,114 @@ namespace UDP
         
         #region Fields
         private WinList mUIDesktopList;
+        #endregion
+    }
+    
+    [GeneratedCode("Coded UITest Builder", "15.0.26208.0")]
+    public class UIUDPClientWindow : WinWindow
+    {
+        
+        public UIUDPClientWindow()
+        {
+            #region Search Criteria
+            this.SearchProperties[WinWindow.PropertyNames.Name] = "UDPClient";
+            this.SearchProperties.Add(new PropertyExpression(WinWindow.PropertyNames.ClassName, "HwndWrapper", PropertyExpressionOperator.Contains));
+            this.WindowTitles.Add("UDPClient");
+            #endregion
+        }
+        
+        #region Properties
+        public WinButton UICloseButton
+        {
+            get
+            {
+                if ((this.mUICloseButton == null))
+                {
+                    this.mUICloseButton = new WinButton(this);
+                    #region Search Criteria
+                    this.mUICloseButton.SearchProperties[WinButton.PropertyNames.Name] = "Close";
+                    this.mUICloseButton.WindowTitles.Add("UDPClient");
+                    #endregion
+                }
+                return this.mUICloseButton;
+            }
+        }
+        #endregion
+        
+        #region Fields
+        private WinButton mUICloseButton;
+        #endregion
+    }
+    
+    [GeneratedCode("Coded UITest Builder", "15.0.26208.0")]
+    public class UIUDPClientWindow1 : WpfWindow
+    {
+        
+        public UIUDPClientWindow1()
+        {
+            #region Search Criteria
+            this.SearchProperties[WpfWindow.PropertyNames.Name] = "UDPClient";
+            this.SearchProperties.Add(new PropertyExpression(WpfWindow.PropertyNames.ClassName, "HwndWrapper", PropertyExpressionOperator.Contains));
+            this.WindowTitles.Add("UDPClient");
+            #endregion
+        }
+        
+        #region Properties
+        public WpfButton UIConnectButton
+        {
+            get
+            {
+                if ((this.mUIConnectButton == null))
+                {
+                    this.mUIConnectButton = new WpfButton(this);
+                    #region Search Criteria
+                    this.mUIConnectButton.SearchProperties[WpfButton.PropertyNames.AutomationId] = "Button_Connect";
+                    this.mUIConnectButton.WindowTitles.Add("UDPClient");
+                    #endregion
+                }
+                return this.mUIConnectButton;
+            }
+        }
+        
+        public WpfEdit UITextBox_AddressEdit
+        {
+            get
+            {
+                if ((this.mUITextBox_AddressEdit == null))
+                {
+                    this.mUITextBox_AddressEdit = new WpfEdit(this);
+                    #region Search Criteria
+                    this.mUITextBox_AddressEdit.SearchProperties[WpfEdit.PropertyNames.AutomationId] = "TextBox_Address";
+                    this.mUITextBox_AddressEdit.WindowTitles.Add("UDPClient");
+                    #endregion
+                }
+                return this.mUITextBox_AddressEdit;
+            }
+        }
+        
+        public WpfButton UIResetButton
+        {
+            get
+            {
+                if ((this.mUIResetButton == null))
+                {
+                    this.mUIResetButton = new WpfButton(this);
+                    #region Search Criteria
+                    this.mUIResetButton.SearchProperties[WpfButton.PropertyNames.AutomationId] = "Button_Reset";
+                    this.mUIResetButton.WindowTitles.Add("UDPClient");
+                    #endregion
+                }
+                return this.mUIResetButton;
+            }
+        }
+        #endregion
+        
+        #region Fields
+        private WpfButton mUIConnectButton;
+        
+        private WpfEdit mUITextBox_AddressEdit;
+        
+        private WpfButton mUIResetButton;
         #endregion
     }
 }

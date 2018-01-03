@@ -4,7 +4,7 @@ using Microsoft.VisualStudio.TestTools.UITesting;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Threading;
 
-namespace UDP.Server
+namespace UDP_Server.Server
 {
     /// <summary>
     /// Summary description for CodedUITest1
@@ -12,8 +12,8 @@ namespace UDP.Server
     [CodedUITest]
     public class UI_UDPServer
     {
-
         static UDPServerWindow v = new UDPServerWindow();
+
         public UI_UDPServer()
         {
 
@@ -21,7 +21,7 @@ namespace UDP.Server
 
 
         //Shared functionality
-        private void WaitForTimeout()
+        public void WaitForTimeout()
         {
             //Waits for timeout lenght
             int timeout = UDPServer.timeOut;
@@ -45,7 +45,7 @@ namespace UDP.Server
         public void CloseWindow()
         {
             //Clicks the close button to close the window
-            this.UIMap.Close();
+            this.map.Close();
         }
 
         /// <summary>
