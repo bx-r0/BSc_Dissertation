@@ -4,7 +4,7 @@ using Microsoft.VisualStudio.TestTools.UITesting;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Threading;
 
-namespace UDP_Server.Server.UI
+namespace UDP.Server.UI
 {
     /// <summary>
     /// Summary description for CodedUITest1

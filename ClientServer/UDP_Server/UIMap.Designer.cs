@@ -8,7 +8,7 @@
 //  </auto-generated>
 // ------------------------------------------------------------------------------
 
-namespace UDP_Server
+namespace UDP
 {
     using System;
     using System.CodeDom.Compiler;

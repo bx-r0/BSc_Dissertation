@@ -12,7 +12,7 @@ using Microsoft.VisualStudio.TestTools.UITest.Common.UIMap;
 using ClientServer.UDP;
 using System.Threading;
 
-namespace UDP_Server.Live_Tests
+namespace UDP.Live_Tests
 {
     /// <summary>
     /// Summary description for CodedUITest1

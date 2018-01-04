@@ -46,6 +46,10 @@ namespace FTP.Live_Tests
 
         }
 
+
+        /// <summary>
+        /// Tests FileZilla connecting to the FTP Server
+        /// </summary>
         [TestMethod]
         public void Valid_Connect()
         {
@@ -57,6 +61,23 @@ namespace FTP.Live_Tests
             this.UIMap.Assert_CheckForErrorConnecting();
         }
 
+        /// <summary>
+        /// Test that downloads a file a checks it completes sucessfully
+        /// </summary>
+        [TestMethod]
+        public void DownloadFile()
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Test that checks the server can handle starting a download and interupting it
+        /// </summary>
+        [TestMethod]
+        public void StartDownload_ThenStop()
+        {
+            throw new NotImplementedException();
+        }
 
         /// <summary>
         ///Gets or sets the test context which provides

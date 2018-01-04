@@ -16,22 +16,22 @@ namespace ClientServer.Logging
     {
         //This is the single control that will be used to display the log messages
         public static ListBox ServerLogControl;
-        
+
         //Where the log will be saved - Grabs the project directory using the parent of the bin folder. 
         //The bin folder is the Current Directory because it is where the .exe is housed
-        static readonly string fileName = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.FullName + @"\Logging\LOG.txt";
+        static string fileName = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.FullName + @"\Logging\LOG.txt";
 
         //Will write the log to the output windows using Trace
         public static void Write(LogMessage message)
         {
             string logMessage;
-            
+
             //#---- Exception message
             if (message.ExceptionThrow)
             {
                 logMessage = $"{message.Time} - - {message.Exception.Message} - - {message.Message}";
 
-                 Console.WriteLine(logMessage);
+                Console.WriteLine(logMessage);
 
                 //# Message box created
                 //MessageBox.Show($"Exception thrown - \"{message.Exception.ToString().Substring(0, 200)}...\" \n\nPlease see the log for more details");
@@ -57,16 +57,19 @@ namespace ClientServer.Logging
             //Used as a stepping stone between the Write methods
             Write(new LogMessage(message));
         }
-        
+
         //Will save the log to a text file
         private static void SaveLog(string msg)
         {
-            if (File.Exists(fileName))
+            //For testing
+            if(!File.Exists(fileName))
             {
-                StreamWriter sr = new StreamWriter(fileName, true);
-                sr.WriteLine(msg);
-                sr.Close();
+                fileName = "LOG.txt";
             }
+
+            StreamWriter sr = new StreamWriter(fileName, true);
+            sr.WriteLine(msg);
+            sr.Close();
         }
     }
 
@@ -92,7 +95,7 @@ namespace ClientServer.Logging
 
             ExceptionThrow = true;
         }
-        
+
         //# Connection log
         //TODO: Add a log that deals with connection details, will need to include and IP etc
 
