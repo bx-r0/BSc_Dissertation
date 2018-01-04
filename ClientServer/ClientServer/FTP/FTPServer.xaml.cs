@@ -20,7 +20,7 @@ namespace ClientServer.FTP
             server = new FTPServer();
 
             //# Sets the output listbox
-            //Log_Manager.ServerLogControl = ListBox_ServerLog;
+            Log_Manager.ServerLogControl = ListBox_ServerLog;
         }
     }
 }

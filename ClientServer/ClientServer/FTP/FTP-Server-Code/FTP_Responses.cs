@@ -58,6 +58,15 @@ namespace ClientServer.FTP.FTP_Server
 
         //4xx
         /// <summary>
+        /// 421
+        /// </summary>
+        public static readonly string ServiceNotAvaliable = "421: Service not avaliable, closing control connection";
+
+        /// <summary>
+        /// 426
+        /// </summary>
+        public static readonly string ConnectionAborted = "425: Connection closed";
+        /// <summary>
         /// 450
         /// </summary>
         public static readonly string FileActionNotTaken = "450: Requested file action not taken";

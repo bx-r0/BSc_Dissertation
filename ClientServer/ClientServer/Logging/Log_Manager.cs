@@ -34,7 +34,7 @@ namespace ClientServer.Logging
                 Console.WriteLine(logMessage);
 
                 //# Message box created
-                //MessageBox.Show($"Exception thrown - \"{message.Exception.ToString().Substring(0, 200)}...\" \n\nPlease see the log for more details");
+                MessageBox.Show($"Exception thrown - \"{message.Exception.ToString().Substring(0, 200)}...\" \n\nPlease see the log for more details");
             }
             else
             //#----- General message
