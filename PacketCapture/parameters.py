@@ -12,6 +12,7 @@ cmd_ratelimit = '-rl'
 cmd_combination = '-c'
 cmd_outoforder = '-o'
 cmd_arp = '-a'
+cmd_save = '-sa'
 
 
 def Usage():
@@ -54,5 +55,8 @@ Extra Optionals:
 
 --arp, -a               <victimIP> <routerIP> <interface>       
     * Performs arp spoofing with the passed parameters
+    
+--save, -s
+    * Tells the program to start saving all the packets that run through the system
     """
 

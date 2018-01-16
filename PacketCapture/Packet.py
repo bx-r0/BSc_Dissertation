@@ -61,6 +61,10 @@ def print_force(message):
 def affect_packet(packet):
     """This function checks if the packet should be affected or not. This is part of the -t option"""
 
+    # Saving packets
+    if save_active:
+        pktdump.write(IP(packet.get_payload()))
+
     if target_packet_type == "ALL":
         return True
     else:
@@ -123,6 +127,7 @@ def edit_packet(packet, accept=True):
 
 def packet_latency(packet):
     """This function is used to incur latency on packets"""
+
     if affect_packet(packet):
         map_thread(latency_obj.effect, [packet])
     else:
@@ -220,6 +225,14 @@ def out_of_order(packet):
         packet.accept()
 
 
+def setup_packet_save(filename):
+    """Sets up a global object that is used to save the files
+    to a .pcap file"""
+
+    global pktdump
+    pktdump = PcapWriter(filename + '.pcap', append=False, sync=True)
+
+
 def run_packet_manipulation():
     """The main method here, will issue a iptables command and construct the NFQUEUE"""
 
@@ -254,7 +267,7 @@ def parameters():
     """This function deals with parameters passed to the script"""
 
     # Defines globals to be used above
-    global mode, target_packet_type, duplication_factor, arp_active
+    global mode, target_packet_type, duplication_factor, arp_active, save_active
 
     global latency_obj, throttle_obj, packet_loss_obj, bandwidth_obj, order_obj
     latency_obj = None
@@ -267,6 +280,7 @@ def parameters():
     mode = print_packet
     target_packet_type = 'ALL'
     arp_active = False
+    save_active = False
 
     # Arguments
     parser = argparse.ArgumentParser(prog="Packet.py",
@@ -337,6 +351,11 @@ def parameters():
     parser.add_argument('--arp', Parameter.cmd_arp,
                         action='store',
                         nargs=3,
+                        help=argparse.SUPPRESS)
+
+    parser.add_argument('--save', Parameter.cmd_save,
+                        nargs=1,
+                        dest='save',
                         help=argparse.SUPPRESS)
 
     args = parser.parse_args()
@@ -430,6 +449,12 @@ def parameters():
         cmd = ['pkexec', 'python', filepath + '/ArpSpoofing.py']
         cmd = cmd + ['-t', victim, '-r', router, '-i', interface]
         arp_process = subprocess.Popen(cmd)
+
+    if args.save:
+        print_force('[!] File saving on - Files will be saved under: \'{}.pcap\''.format(args.save[0]))
+
+        save_active = True
+        setup_packet_save(args.save[0])
 
     # When all parameters are handled
     run_packet_manipulation()
