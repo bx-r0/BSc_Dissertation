@@ -7,7 +7,7 @@ using ClientServer.Logging;
 
 namespace ClientServer.FTP
 {
-    class FTPServer
+    public class FTPServer
     {
         //# Server
         private TcpListener server;
@@ -28,7 +28,7 @@ namespace ClientServer.FTP
             }
             catch (Exception exception)
             {
-                Log_Manager.Write(new LogMessage(exception, "Error when setting up the server"));
+                Log_Manager.Write(new LogMessage(exception, "## Setup() ##"));
             }
           
         }
@@ -44,7 +44,7 @@ namespace ClientServer.FTP
             }
             catch (Exception exception)
             {
-                Log_Manager.Write(new LogMessage(exception, "Error when starting the server"));
+                Log_Manager.Write(new LogMessage(exception, "## Start() ##"));
             }
             
         }

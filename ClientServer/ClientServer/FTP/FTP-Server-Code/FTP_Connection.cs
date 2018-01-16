@@ -20,7 +20,7 @@ namespace ClientServer.FTP.FTP_Server
         private TcpClient _dataClient;
 
         private Stream _controlStream;
-        private StreamReader  _controlReader;
+        private StreamReader _controlReader;
         private StreamWriter _controlWriter;
 
         private StreamWriter _dataWriter;
@@ -49,7 +49,7 @@ namespace ClientServer.FTP.FTP_Server
         public FTP_Connection(TcpClient client)
         {
             _controlClient = client;
-        
+
             //Check
             if (!client.Connected)
             {
@@ -57,7 +57,7 @@ namespace ClientServer.FTP.FTP_Server
             }
 
             _controlStream = client.GetStream();
-            
+
             //# Creates the new stream objects
             _controlReader = new StreamReader(_controlStream);
             _controlWriter = new StreamWriter(_controlStream);
@@ -125,7 +125,7 @@ namespace ClientServer.FTP.FTP_Server
                             case "RMD":
                                 response = DeleteDir(arguments);
                                 break;
-                            
+
                             case "DELE":
                                 response = DeleteFile(arguments);
                                 break;
@@ -159,7 +159,7 @@ namespace ClientServer.FTP.FTP_Server
                                 break;
                         }
                     }
-                    
+
                     //Used to break out of the loop
                     if (_controlClient == null || !_controlClient.Connected)
                     {
@@ -185,13 +185,22 @@ namespace ClientServer.FTP.FTP_Server
             }
         }
         //#-------------------------#//
-        
+
 
         //## ----------------------- Commands --------------------------------- ##//
         //Changes the working directory
         private string ChangeWorkingDirectory(string pathname)
         {
-            _currentDirectory = pathname;
+            //If section of the path is specified
+            if (!pathname.StartsWith("/"))
+            {
+                _currentDirectory = _currentDirectory + "/" + pathname;
+            }
+            //If the whole path is specied
+            else
+            {
+                _currentDirectory = pathname;
+            }
 
             return FTP_Responses.FileActionOK;
         }
@@ -206,7 +215,7 @@ namespace ClientServer.FTP.FTP_Server
         {
             //Saves the username
             _username = username;
-            
+
             //Checks for users would go here
 
             return FTP_Responses.UsernameOKNeedPassword;
@@ -255,7 +264,7 @@ namespace ClientServer.FTP.FTP_Server
             //TODO: Implemented Upload
             return FTP_Responses.CommandNotImplemented;
         }
-    
+
 
         //TYPE - Handles Type coding -- http://www.nsftools.com/tips/RawFTP.htm#TYPE
         private string Type(string arguments)
@@ -369,6 +378,12 @@ namespace ClientServer.FTP.FTP_Server
             //Creates the path and checks if it is valid
             pathname = ResolvePath(pathname);
 
+            //Checks the directory can be opened
+            if (!CheckDirectoryStatus(pathname))
+            {
+                return "450: Access to direction is not allowed";
+            }
+
             //Checks if the pathname is a valid pathname
             if (Directory.Exists(pathname))
             {
@@ -397,8 +412,6 @@ namespace ClientServer.FTP.FTP_Server
 
             using (NetworkStream dataStream = _dataClient.GetStream())
             {
-
-                //TODO: Add error catch here for files that cannot be opened
                 //## DIRECTORIES ##//
                 IEnumerable<string> directories = Directory.EnumerateDirectories(pathname);
 
@@ -436,7 +449,6 @@ namespace ClientServer.FTP.FTP_Server
                 }
             }
 
-
             //CLOSES STREAMS
             _dataClient.Close();
             _dataClient = null;
@@ -445,31 +457,51 @@ namespace ClientServer.FTP.FTP_Server
             _controlWriter.Flush();
         }
 
+        private bool CheckDirectoryStatus(string pathname)
+        {
+            try
+            {
+                IEnumerable<string> test = Directory.EnumerateDirectories(pathname);
+                return true;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                return false;
+            }
+        }
+
         //RETR - tells the server to start downloading a file
         private string Retr(string pathname)
         {
             //Resolves the path name
             pathname = new DirectoryInfo(Path.Combine(_currentDirectory, pathname)).FullName;
 
-            if (Directory.Exists(_currentDirectory) && File.Exists(pathname))
+            //Error checks
+            if (!(Directory.Exists(_currentDirectory) && File.Exists(pathname)))
             {
-                //Active
-                if (_dataConnectionType == DataConnectionType.Active)
-                {
-                    _dataClient = new TcpClient();
-                    _dataClient.BeginConnect(_dataEndpoint.Address, _dataEndpoint.Port, RetrCommand, pathname);
-                }
-                //Passive
-                else
-                {
-                    _passiveListener.BeginAcceptTcpClient(RetrCommand, pathname);
-                }
-
-                return $"150: Opening {_dataConnectionType} mode data transfer for RETR";
+                return FTP_Responses.FileNotFound;
+            }
+            if (!CheckFileStatus(pathname))
+            {
+                return "550: File cannot be opened";
             }
 
-            //If there are errors with it not being a valid path or file
-            return FTP_Responses.FileNotFound;
+            //Active
+            if (_dataConnectionType == DataConnectionType.Active)
+            {
+                _dataClient = new TcpClient();
+                _dataClient.BeginConnect(_dataEndpoint.Address, _dataEndpoint.Port, RetrCommand, pathname);
+            }
+            //Passive
+            else
+            {
+                _passiveListener.BeginAcceptTcpClient(RetrCommand, pathname);
+            }
+
+            return $"150: Opening {_dataConnectionType} mode data transfer for RETR";
+
+
         }
         private void RetrCommand(IAsyncResult result)
         {
@@ -478,19 +510,38 @@ namespace ClientServer.FTP.FTP_Server
 
             using (NetworkStream dataStream = _dataClient.GetStream())
             {
-                //TODO: Error catch here for files being used by other processes
-                //Opens the file for reading
                 using (FileStream fs = new FileStream(pathname, FileMode.Open, FileAccess.Read))
                 {
                     CopyStream(fs, dataStream);
 
                     _dataClient.Close();
                     _dataClient = null;
-
-                    _controlWriter.Write(FTP_Responses.SucessfullAction);
-                    _controlWriter.Flush();
                 }
             }
+
+            _controlWriter.Write(FTP_Responses.SucessfullAction);
+            _controlWriter.Flush();
+        }
+
+        /// <summary>
+        /// This method checks if a file can be opended
+        /// </summary>
+        /// <param name="pathname"></param>
+        /// <returns></returns>
+        private bool CheckFileStatus(string pathname)
+        {
+            try
+            {
+                using (FileStream fs = new FileStream(pathname, FileMode.Open, FileAccess.Read))
+                {
+                    return true;
+                }
+            }
+            catch
+            {
+                return false;
+            }
+
         }
 
         /// <summary>
@@ -516,7 +567,7 @@ namespace ClientServer.FTP.FTP_Server
             //Grabs the directory listing
             return (string)result.AsyncState;
         }
-        
+
         //## Code from
         //https://www.codeproject.com/articles/380769/creating-an-ftp-server-in-csharp-with-ipv-support
         private static long CopyStream(Stream input, Stream output, int bufferSize)

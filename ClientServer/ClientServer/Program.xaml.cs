@@ -1,5 +1,4 @@
 ﻿using ClientServer.FTP;
-using ClientServer.HTTP;
 using ClientServer.UDP;
 using System;
 using System.Collections.Generic;
@@ -54,29 +53,7 @@ namespace ClientServer
                             case WindowToShow.Server:
                                 ShowWindow(new FTPServerWindow());
                                 break;
-                            case WindowToShow.Client:
-                                ShowWindow(new FTPClientWindow());
-                                break;
-                            case WindowToShow.Both:
-                                ShowTwoWindows(new FTPClientWindow(), new FTPServerWindow());
-                                break;
                         } 
-                        break;
-                    //# HTTP
-                    case "-h":
-                        switch (ServerOrClient(args[2]))
-                        {
-                            //# FTP Server
-                            case WindowToShow.Server:
-                                ShowWindow(new HTTPServerWindow());
-                                break;
-                            case WindowToShow.Client:
-                                ShowWindow(new HTTPClientWindow());
-                                break;
-                            case WindowToShow.Both:
-                                ShowTwoWindows(new HTTPClientWindow(), new HTTPServerWindow());
-                                break;
-                        }
                         break;
                     //#UDP
                     case "-u":
@@ -156,13 +133,13 @@ namespace ClientServer
         private void ShowWindow(Window window)
         {
             window.Show();
-            this.Hide();
+            Close();
         }
         private void ShowTwoWindows(Window window1, Window window2)
         {
             window1.Show();
             window2.Show();
-            this.Hide();
+            Close();
         }
 
         /// <summary>

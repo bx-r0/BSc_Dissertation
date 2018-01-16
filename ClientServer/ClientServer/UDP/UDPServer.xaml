@@ -4,7 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ClientServer.UDP"
-        mc:Ignorable="d" Height="442.434" Width="499.736" WindowStyle="ToolWindow">
+        mc:Ignorable="d" Height="442.434" Width="499.736" Title="UDP">
     <Grid Margin="0,0,0,1">
         <Grid.RowDefinitions>
             <RowDefinition/>

@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace ClientServer.UDP
 {
-    class UDPClient
+    public class UDPClient
     {
         //# Setup
         UdpClient Client;
@@ -31,20 +31,24 @@ namespace ClientServer.UDP
             _port = port;
         }
 
+        public void Run()
+        {
+            Connect();
+            SendGridPackets();
+            Disconnect();
+        }
+
         //# Functions
         public void Connect()
         {
             Client = new UdpClient();
             Client.Connect(_address, _port);
-            //SendImage();
-            SendGridPackets();
-            Disconnect();
         }
         public void Disconnect()
         {
             Client.Close();
         }
-        private void SendUDPPacket(string data)
+        public void SendUDPPacket(string data)
         {
             //Grabs the bytes encoding in ASCII
             byte[] dataBytes = Encoding.ASCII.GetBytes(data.ToCharArray());
@@ -53,12 +57,14 @@ namespace ClientServer.UDP
             Client.Send(dataBytes, dataBytes.Length);
         }
 
+        //Testing variable that is used to check if the correct about of packets are sent
+        public int test_GridCount;
         /// <summary>
         /// This method sends packets containing a single value that represents their pixel number
         /// </summary>
-        private void SendGridPackets()
+        public void SendGridPackets()
         {
-            List<int> test = new List<int>();
+            test_GridCount = 0;
 
             //Iterates through each element of a grid
             for (int y = 0; y < GRID_SIZE; y++)
@@ -70,6 +76,9 @@ namespace ClientServer.UDP
 
                     //Sends a packet containing the index
                     SendUDPPacket(cellValue.ToString());
+
+                    //TESTING
+                    test_GridCount++;
                 }
             }
         }
