@@ -1,4 +1,5 @@
 import os
+import numpy as np
 try:
     from matplotlib import pyplot as plt
 except ImportError:
@@ -10,22 +11,41 @@ except ImportError:
 
 
 class Graph:
-    """This class is used to make a new graph, it
-    contains two lists for x and y values that can
-    be viewed by using 'plot()'"""
+    """This class is used to make a new graph
+        Scatter Graph
+            - add_points()
+        Bar
+            - increment_category()
+        Line Graph
+            - add_points()
+    """
 
     def __init__(self):
         self.fig = plt.figure()
         self.x = []
         self.y = []
         self.n_index = 0
+        self.barGraphLists = [[], []]  # Bar graph
 
-        self.picture_filename = 'graph.png'
+        # Static
+        self.file_number = 0
+        self.picture_filename = 'Graphs/graph_0.png'
+        self.colours = 'rgbkymc'  # Used for bar colours
+
+    def refresh_filename(self):
+        self.picture_filename = 'Graphs/graph_{}.png'.format(self.file_number)
 
     # TODO: Is it possible to dynmaically find out who the user is?
     def show(self):
+
+        # Checks if there are existing files
+        while os.path.isfile(self.picture_filename):
+            self.file_number += 1
+            self.refresh_filename()
+
         self.fig.savefig(self.picture_filename)
-        os.system('sudo -u user_1 feh graph.png')
+        print('\n\n[*] Graph saved - File is called: \'{}\''.format(self.picture_filename), flush=True)
+        os.system('sudo -u user_1 feh {}'.format(self.picture_filename))
 
     def add_points(self, x, y):
         """Used to add values to the potential plot points"""
@@ -35,23 +55,61 @@ class Graph:
     def add_point(self, y):
         self.x.append(self.n_index)
         self.n_index = self.n_index + 1
-
         self.y.append(y)
 
+    def increment_catagory(self, name):
+        """Used to keep track of values for a bar graph
+        If the name doesn't exist, it's added to the list"""
+
+        index = 0
+        for n in self.barGraphLists[0]:
+
+            # If the name is found, increment it's value
+            if n == name:
+                self.barGraphLists[1][index] += 1
+
+                # Finish
+                return
+
+            index += 1
+
+        # If the name isn't found
+        self.barGraphLists[0].append(name)
+        self.barGraphLists[1].append(1)
+
     def plot(self):
+        """[Line Graph]"""
         """Adds all points to the graph, adds a line and displays the graph"""
         plt.plot(self.x, self.y, 'ro-')
+        self.show()
+
+    def bar(self):
+        """[Bar Graph]"""
+        """Plots the bars for the graph"""
+
+        x = np.arange(len(self.barGraphLists[0]))
+        bar = plt.bar(x, self.barGraphLists[1])
+        plt.xticks(x, self.barGraphLists[0])
+
+        # Colour alternation
+        total = 0
+        for x in bar:
+
+            # Reset when total goes over
+            if total is len(self.colours):
+                total = 0
+
+            # Grabs a colour
+            x.set_color(self.colours[total])
+            total += 1
 
         self.show()
 
     def points(self):
+        """[Scatter Graph]"""
         """Adds all the points to the graph (with no line) and display the graph"""
 
         for i in range(0, len(self.x)):
             plt.plot(self.x[i], self.y[i], 'ro-')
 
         self.show()
-
-
-
-

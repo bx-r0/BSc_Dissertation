@@ -1,9 +1,15 @@
+from Plotting import Graph
+
 class Effect:
     """Class that generally defines what an effect should contain """
 
-    def __init__(self, accept_packets=True, show_output=True):
+    def __init__(self, accept_packets=True, show_output=True, graphing=False):
         self.accept_packet = accept_packets
         self.show_output = show_output
+        self.graphing = graphing
+
+        if self.graphing:
+            self.graph = Graph()
 
     def print(self, message, end='\n', force=False):
         """General print method"""
@@ -23,3 +29,9 @@ class Effect:
     def effect(self):
         """Should be the main center for the effects code"""
         raise Exception('NotImplemented: Please add \'effect()\' to your class')
+
+    def stop(self):
+        """Called to stop the object"""
+
+        if self.graphing:
+            self.graph.plot()

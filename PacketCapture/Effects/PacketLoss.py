@@ -4,8 +4,8 @@ import random
 
 class PacketLoss(Effect):
 
-    def __init__(self, percentage, accept_packets=True, show_output=True):
-        super().__init__(accept_packets, show_output)
+    def __init__(self, percentage, accept_packets=True, show_output=True, graphing=False):
+        super().__init__(accept_packets, show_output, graphing)
 
         self.packet_loss_percentage = int(percentage)
         self.print('[*] Packet loss set to: {}%'.format(percentage), force=True)

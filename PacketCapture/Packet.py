@@ -9,7 +9,7 @@ logging.getLogger("scapy.runtime").setLevel(logging.ERROR)
 # General Imports
 import argparse
 import signal
-import threading
+import time
 import textwrap
 import Common_Connections
 import parameters as Parameter
@@ -47,6 +47,19 @@ afray@hotmail.co.uk
 
 ==============================================================
 """
+
+
+def start_timer():
+    """Keeps track of elapsed time"""
+
+    global time_start
+    time_start = time.time()
+
+
+def get_time_in_secconds():
+    now = time.time()
+    elapsed = now - time_start
+    return elapsed
 
 
 def map_thread(method, args):
@@ -242,10 +255,11 @@ def setup_packet_save(filename):
     pktdump = PcapWriter(filename + '.pcap', append=False, sync=True)
 
 
-def show_graph():
+def setup_graph():
+    """Sets up the script to save a graph file for the selected effect"""
+
     global graph
     graph = Graph()
-    graphing_active = True
 
 
 def run_packet_manipulation():
@@ -282,8 +296,7 @@ def parameters():
     """This function deals with parameters passed to the script"""
 
     # Defines globals to be used above
-    global mode, target_packet_type, duplication_factor, arp_active, save_active, graphing_active
-
+    global mode, target_packet_type, duplication_factor, arp_active, save_active
     global latency_obj, throttle_obj, packet_loss_obj, bandwidth_obj, order_obj
     latency_obj = None
     throttle_obj = None
@@ -296,7 +309,10 @@ def parameters():
     target_packet_type = 'ALL'
     arp_active = False
     save_active = False
-    graphing_active = False
+    graph_active = False
+
+    # Setup
+    start_timer()
 
     # Arguments
     parser = argparse.ArgumentParser(prog="Packet.py",
@@ -381,16 +397,21 @@ def parameters():
 
     args = parser.parse_args()
 
+    if args.graph:
+        print_force('[!] Graphing is on, press G at any point while running to display the graph')
+        graph_active = True
+        setup_graph()
+
     # Modes
     if args.print:
         mode = print_packet
 
     elif args.latency:
-        latency_obj = Latency(latency_value=args.latency, accept_packets=True)
+        latency_obj = Latency(latency_value=args.latency, accept_packets=True, graphing=graph_active)
         mode = packet_latency
 
     elif args.packet_loss:
-        packet_loss_obj = PacketLoss(percentage=args.packet_loss, accept_packets=True)
+        packet_loss_obj = PacketLoss(percentage=args.packet_loss, accept_packets=True, graphing=graph_active)
         mode = packet_loss
 
     elif args.throttle:
@@ -477,9 +498,6 @@ def parameters():
         save_active = True
         setup_packet_save(args.save[0])
 
-    if args.graph:
-        print_force('[!] Graphing is on, press G at any point while running to display the graph')
-
     # When all parameters are handled
     run_packet_manipulation()
 
@@ -487,7 +505,6 @@ def parameters():
 def stop_object(object):
     """This method attempts to stop an object, and
     catches the exception if it doesn't need closing"""
-
     try:
         object.stop()
     except AttributeError:
@@ -497,8 +514,11 @@ def stop_object(object):
 def clean_close(signum='', frame=''):
     """Used to close the script cleanly"""
 
-    # Kills any threads running in objects
+    # TODO: Better way to do this?
+    stop_object(packet_loss)
     stop_object(throttle_obj)
+    stop_object(latency_obj)
+    stop_object(bandwidth_obj)
     stop_object(order_obj)
 
     print_force("\n[*] ## Close signal recieved ##")
