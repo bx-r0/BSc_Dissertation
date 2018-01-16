@@ -1,6 +1,12 @@
+# Import graphing
+import matplotlib as mpl
+mpl.use('Agg')
+
+# Suppresses the Scapy WARNING Message
 import logging
-import logging
-logging.getLogger("scapy.runtime").setLevel(logging.ERROR)  # Suppresses the Scapy WARNING Message
+logging.getLogger("scapy.runtime").setLevel(logging.ERROR)
+
+# General Imports
 import argparse
 import signal
 import threading
@@ -10,11 +16,14 @@ import parameters as Parameter
 from netfilterqueue import NetfilterQueue
 from scapy.all import *
 from multiprocessing.dummy import Pool as ThreadPool
+
+# Module imports
 from Effects.Latency import Latency
 from Effects.LimitBandwidth import Bandwidth
 from Effects.PacketLoss import PacketLoss
 from Effects.Throttle import Throttle
 from Effects.OutOfOrder import Order
+from Plotting import Graph
 
 
 # Defines how many threads are in the pool
@@ -233,6 +242,12 @@ def setup_packet_save(filename):
     pktdump = PcapWriter(filename + '.pcap', append=False, sync=True)
 
 
+def show_graph():
+    global graph
+    graph = Graph()
+    graphing_active = True
+
+
 def run_packet_manipulation():
     """The main method here, will issue a iptables command and construct the NFQUEUE"""
 
@@ -267,7 +282,7 @@ def parameters():
     """This function deals with parameters passed to the script"""
 
     # Defines globals to be used above
-    global mode, target_packet_type, duplication_factor, arp_active, save_active
+    global mode, target_packet_type, duplication_factor, arp_active, save_active, graphing_active
 
     global latency_obj, throttle_obj, packet_loss_obj, bandwidth_obj, order_obj
     latency_obj = None
@@ -281,6 +296,7 @@ def parameters():
     target_packet_type = 'ALL'
     arp_active = False
     save_active = False
+    graphing_active = False
 
     # Arguments
     parser = argparse.ArgumentParser(prog="Packet.py",
@@ -356,6 +372,11 @@ def parameters():
     parser.add_argument('--save', Parameter.cmd_save,
                         nargs=1,
                         dest='save',
+                        help=argparse.SUPPRESS)
+
+    parser.add_argument('--graph', Parameter.cmd_graph,
+                        action='store_true',
+                        dest='graph',
                         help=argparse.SUPPRESS)
 
     args = parser.parse_args()
@@ -456,6 +477,9 @@ def parameters():
         save_active = True
         setup_packet_save(args.save[0])
 
+    if args.graph:
+        print_force('[!] Graphing is on, press G at any point while running to display the graph')
+
     # When all parameters are handled
     run_packet_manipulation()
 
@@ -498,11 +522,12 @@ def clean_close(signum='', frame=''):
 
 # Rebinds the all the close signals to clean_close the script
 signal.signal(signal.SIGINT, clean_close)   # Ctrl + C
-signal.signal(signal.SIGTSTP, clean_close)  # Ctrl + Z
 signal.signal(signal.SIGQUIT, clean_close)  # Ctrl + \
+signal.signal(signal.SIGTSTP, clean_close)  # Ctrl + Z
 
 # Check if user is root
 if os.getuid() != 0:
     exit("Error: User needs to be root to run this script")
+
 
 parameters()

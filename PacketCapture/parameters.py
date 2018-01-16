@@ -13,6 +13,7 @@ cmd_combination = '-c'
 cmd_outoforder = '-o'
 cmd_arp = '-a'
 cmd_save = '-sa'
+cmd_graph = '-g'
 
 
 def Usage():

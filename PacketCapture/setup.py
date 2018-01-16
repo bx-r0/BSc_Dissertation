@@ -35,5 +35,5 @@ setup(name="DPS",
       classifiers=classifiers,
       keywords='network degradation tool',
       packages=find_packages(),
-      platforms=['POSIX']
+      platforms=['LINUX']
 )
