@@ -435,14 +435,10 @@ def parameters():
     run_packet_manipulation()
 
 
-def kill_thread_pool():
-    """Method used to kill the thredpool"""
-    pool.close()
-    print_force("[!] Thread pool killed\n")
-
-
-# TODO: Refactor this?
 def stop_object(object):
+    """This method attempts to stop an object, and
+    catches the exception if it doesn't need closing"""
+
     try:
         object.stop()
     except AttributeError:
@@ -458,6 +454,9 @@ def clean_close(signum='', frame=''):
 
     print_force("\n[*] ## Close signal recieved ##")
 
+    pool.close()
+    print_force("[!] Thread pool killed")
+
     # Resets
     print_force("[!] iptables reverted")
     os.system("iptables -F INPUT")
@@ -468,10 +467,6 @@ def clean_close(signum='', frame=''):
     if arp_active:
         print_force('[!] Arp Spoofing stopped!')
         arp_process.terminate()
-
-    # Kills thread pool
-    stop_pool = threading.Thread(target=kill_thread_pool)
-    stop_pool.start()
 
     os._exit(0)
 
