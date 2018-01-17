@@ -79,6 +79,7 @@ Extra Optionals:
         Packet Loss:
         
             1 - Will show the packet loss percentage over time
+            2 - Shows total packets lost over time
             
         Bandwidth:
         

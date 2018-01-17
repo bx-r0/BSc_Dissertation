@@ -5,7 +5,10 @@ import random
 class PacketLoss(Effect):
 
     def __init__(self, percentage, accept_packets=True, show_output=True, graphing=False, graph_type_num=False):
-        super().__init__(accept_packets, show_output, graphing, graph_type_num)
+        super().__init__(accept_packets=accept_packets,
+                         show_output=show_output,
+                         graphing=graphing,
+                         graph_type_num=graph_type_num)
 
         self.packet_loss_percentage = int(percentage)
         self.print('[*] Packet loss set to: {}%'.format(percentage), force=True)
@@ -52,12 +55,19 @@ class PacketLoss(Effect):
 
         self.print_stats()
 
+    # --- Graphing
     def graphing_setup(self):
         """Performs all the necessary setup"""
 
+        # Tracks packet loss over time
         if self.graph_type_num is 1:
             self.graph.set_x_axis_label('Time (s)')
             self.graph.set_y_axis_label('Packet Loss (%)')
+
+        # Total packets lost over time
+        elif self.graph_type_num is 2:
+            self.graph.set_x_axis_label('Time (s)')
+            self.graph.set_y_axis_label('Individual Packets Lost (No Of Packets)')
 
     def graphing_effect(self, packet):
         """Performs the data collecting for the graph"""
@@ -66,10 +76,19 @@ class PacketLoss(Effect):
         if self.graph_type_num is 1:
             self.graph.add_points(self.get_elapsed_time(), self.dropped_percentage)
 
+        # Total packets lost over time
+        elif self.graph_type_num is 2:
+            self.graph.add_points(self.get_elapsed_time(), self.dropped_packets)
+
     def show_custom_graph(self):
         # Percentage loss over time
         if self.graph_type_num is 1:
             self.graph.plot('r,-')
+
+        # Total packets lost over time
+        elif self.graph_type_num is 2:
+            self.graph.plot('y,-')
+
 
 
 

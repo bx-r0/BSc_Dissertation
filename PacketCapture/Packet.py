@@ -27,6 +27,7 @@ from Effects.LimitBandwidth import Bandwidth
 from Effects.PacketLoss import PacketLoss
 from Effects.Throttle import Throttle
 from Effects.OutOfOrder import Order
+from Effects.Print import Print
 from Plotting import Graph
 #endregion
 
@@ -105,20 +106,11 @@ def affect_packet(packet):
             return False
 
 
-def print_packet(packet, accept=True):
+def print_packet(packet):
     """This function just prints the packet"""
 
-    # Thread functionality
-    def t_print(t_packet):
-        """The functionality that will spawned in a thread from the Print_Packet mode"""
-
-        if affect_packet(t_packet):
-            print_force("[!] " + str(t_packet))
-
-        if accept:
-            t_packet.accept()
-
-    map_thread(t_print, [packet])
+    if affect_packet(packet):
+        map_thread(print_obj.effect, [packet])
 
 
 def edit_packet(packet, accept=True):
@@ -294,12 +286,13 @@ def parameters():
 
     # Defines globals to be used above
     global mode, target_packet_type, duplication_factor, arp_active, save_active
-    global latency_obj, throttle_obj, packet_loss_obj, bandwidth_obj, order_obj
+    global latency_obj, throttle_obj, packet_loss_obj, bandwidth_obj, order_obj, print_obj
     latency_obj = None
     throttle_obj = None
     packet_loss_obj = None
     bandwidth_obj = None
     order_obj = None
+    print_obj = None
 
     # Defaults
     mode = print_packet
@@ -402,18 +395,18 @@ def parameters():
 
     # Modes
     if args.print:
+        print_obj = Print(graphing=graph_active,
+                          graph_type_num=graph_type_num)
         mode = print_packet
 
     elif args.latency:
         latency_obj = Latency(latency_value=args.latency,
-                              accept_packets=True,
                               graphing=graph_active,
                               graph_type_num=graph_type_num)
         mode = packet_latency
 
     elif args.packet_loss:
         packet_loss_obj = PacketLoss(percentage=args.packet_loss,
-                                     accept_packets=True,
                                      graphing=graph_active,
                                      graph_type_num=graph_type_num)
         mode = packet_loss
@@ -464,11 +457,14 @@ def parameters():
 
     elif args.rate_limit:
         # Sets the bandwidth object with the specified bandwidth limit
-        bandwidth_obj = Bandwidth(args.rate_limit)
+        bandwidth_obj = Bandwidth(bandwidth=args.rate_limit,
+                                  graphing=True,
+                                  graph_type_num=graph_type_num)
         mode = limit_bandwidth
 
     elif args.order:
-        order_obj = Order()
+        order_obj = Order(graphing=True,
+                          graph_type_num=graph_type_num)
         mode = out_of_order
 
     # Extra settings
@@ -515,7 +511,7 @@ def affect_all_objects(method):
     catches the exception if it doesn't need closing"""
 
     # TODO: Dynamic way to grab these?
-    objects = [latency_obj, packet_loss_obj, throttle_obj, bandwidth_obj, order_obj]
+    objects = [latency_obj, packet_loss_obj, throttle_obj, bandwidth_obj, order_obj, print_obj]
 
     for x in objects:
         try:
@@ -524,6 +520,8 @@ def affect_all_objects(method):
                 x.stop()
             elif method is 'graph':
                 x.show_graph()
+            elif method is 'graph_no_show':
+                x.save_graph()
         except AttributeError:
             pass
 
@@ -550,6 +548,7 @@ def user_input_thread(graph_active):
 def clean_close(signum='', frame=''):
     """Used to close the script cleanly"""
 
+    affect_all_objects('graph_no_show')
     affect_all_objects('stop')
 
     print_force("\n[*] ## Close signal recieved ##")

@@ -12,7 +12,10 @@ class Bandwidth(Effect):
     """
 
     def __init__(self, bandwidth=0, accept_packets=True, show_output=True, graphing=False, graph_type_num=0):
-        super().__init__(accept_packets, show_output, graphing, graph_type_num)
+        super().__init__(accept_packets=accept_packets,
+                         show_output=show_output,
+                         graphing=graphing,
+                         graph_type_num=graph_type_num)
 
         # Constants
         self.units = ['B', 'KB', 'MB', 'GB']
@@ -138,7 +141,6 @@ class Bandwidth(Effect):
 
         self.accept(packet)
 
-
     def start_rate_update(self):
         """Used to start the thread that updates the rate of transfer"""
         threading.Timer(self.rate_update_period, self.calculate_rate_job).start()
@@ -147,7 +149,7 @@ class Bandwidth(Effect):
         """Used to change bandwidth variable for an outside location"""
         self.bandwidth = new_value
 
-    """Graphing methods"""
+    # -- Graphing
     def graphing_setup(self):
         # Graph with Rate x Time
         if self.graph_type_num is 1:

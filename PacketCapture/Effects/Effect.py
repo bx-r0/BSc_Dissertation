@@ -39,15 +39,6 @@ class Effect:
         if self.accept_packet:
             packet.accept()
 
-    def print_stats(self):
-        """Blueprint method: Should print the custom stats for each method.
-        Note Print_stats should call 'self.print()' to show any output """
-        raise Exception('NotImplemented: Please add \'print_stats()\' to your class')
-
-    def effect(self):
-        """Should be the main center for the effects code"""
-        raise Exception('NotImplemented: Please add \'effect()\' to your class')
-
     def default_graphing(self, packet):
         """The main functionality for all the effects, where graphing is available"""
 
@@ -69,9 +60,11 @@ class Effect:
         """Used to init all axis and other variables required"""
 
         if self.graphing:
+            # Graph that tracks types of packets in the session
             if self.graph_type_num is 0:
                 self.graph.set_y_axis_label('Number of packets')
 
+            # Graph that processes total number of packets over time
             elif self.graph_type_num is 10:
                 self.graph.set_x_axis_label('Time (s)')
                 self.graph.set_y_axis_label('Total Packets')
@@ -79,16 +72,33 @@ class Effect:
                 self.graphing_setup()
 
     def show_default_graphs(self):
+        # Graph that tracks types of packets in the session
         if self.graph_type_num is 0:
             self.graph.bar()
+
+        # Graph that processes total number of packets over time
         elif self.graph_type_num is 10:
             self.graph.plot('g,-')
+
         else:
             self.show_custom_graph()
 
     def show_graph(self):
         """Called to display any type of graph"""
         self.show_default_graphs()
+
+    def save_graph(self):
+        """Will just save the graph to file"""
+        self.graph.save()
+
+    def print_stats(self):
+        """[Blueprint] - Should print the custom stats for each method.
+        Note Print_stats should call 'self.print()' to show any output """
+        raise Exception('NotImplemented: Please add \'print_stats()\' to your class')
+
+    def effect(self):
+        """[Blueprint] - Should be the main center for the effects code"""
+        raise Exception('NotImplemented: Please add \'effect()\' to your class')
 
     def graphing_setup(self):
         """[Blueprint] - Custom code for each effects graph setup"""

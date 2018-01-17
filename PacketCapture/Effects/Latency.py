@@ -14,7 +14,10 @@ class Latency(Effect):
     """Class that is used to issue latency degradation"""
 
     def __init__(self, latency_value, accept_packets=True, show_output=True, graphing=False, graph_type_num=0):
-        super().__init__(accept_packets, show_output, graphing, graph_type_num)
+        super().__init__(accept_packets=accept_packets,
+                         show_output=show_output,
+                         graphing=graphing,
+                         graph_type_num=graph_type_num)
 
         self.latency_value = latency_value / 1000
         self.print('[*] Latency set to: {}s'.format(self.latency_value), force=True)
@@ -36,17 +39,9 @@ class Latency(Effect):
 
         self.accept(packet)
 
-    def graphing_effect(self, packet):
-        """Performs the data collecting for the graph"""
-        pass
-
     def alter_latency_value(self, new_value):
         """This is useful if latency isn't static and can be obtained from a range"""
         self.print('[*] Latency: {:.2f}s - '.format(new_value), end='')
         self.latency_value = new_value
-
-    def show_custom_graph(self):
-        """Called to display any type of graph"""
-        pass
 
 

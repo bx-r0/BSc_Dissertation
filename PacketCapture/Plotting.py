@@ -37,6 +37,15 @@ class Graph:
 
     # TODO: Is it possible to dynamically find out who the user is?
     def show(self):
+        """Used to display the graph using the 'feh' command"""
+
+        self.save()
+
+        # Shows the file
+        os.system('sudo -u user_1 feh {}'.format(self.picture_filename))
+
+    def save(self):
+        """Saves the file to disk"""
 
         # Checks if there are existing files
         while os.path.isfile(self.picture_filename):
@@ -44,9 +53,6 @@ class Graph:
             self.refresh_filename()
 
         self.fig.savefig(self.picture_filename)
-
-        # Shows the file
-        os.system('sudo -u user_1 feh {}'.format(self.picture_filename))
 
     def add_points(self, x, y):
         """Used to add values to the potential plot points"""

@@ -5,8 +5,11 @@ import time
 
 class Throttle(Effect):
 
-    def __init__(self, period, accept_packet=True, show_output=True):
-        super().__init__(accept_packet, show_output)
+    def __init__(self, period, accept_packet=True, show_output=True, graphing=False, graph_type_num=0):
+        super().__init__(accept_packet=accept_packet,
+                         show_output=show_output,
+                         graphing=graphing,
+                         graph_type_num=graph_type_num)
 
         # General vars
         self.throttle_pool = []
@@ -48,3 +51,17 @@ class Throttle(Effect):
 
         self.throttle_job.cancel()
         self.print('[!] Throttle purge job stopped!')
+
+    # --- Graphing
+    def graphing_setup(self):
+        """Performs the setup for the custom graphs"""
+        pass
+
+    def graphing_effect(self, packet):
+        """Performs the data collecting for the graph"""
+        pass
+
+    def show_custom_graph(self):
+        """Called to display any type of graph"""
+        pass
+
