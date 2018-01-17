@@ -11,8 +11,8 @@ class Bandwidth(Effect):
     - Displaying Bandwidth
     """
 
-    def __init__(self, bandwidth=0, accept_packets=True, show_output=True):
-        super().__init__(accept_packets, show_output)
+    def __init__(self, bandwidth=0, accept_packets=True, show_output=True, graphing=False, graph_type_num=0):
+        super().__init__(accept_packets, show_output, graphing, graph_type_num)
 
         # Constants
         self.units = ['B', 'KB', 'MB', 'GB']
@@ -36,6 +36,35 @@ class Bandwidth(Effect):
             self.print('[*] Bandwidth set to: {} B/s'.format(bandwidth), force=True)
 
         self.start_rate_update()
+
+    # -b Option
+    def display(self, packet):
+        """Used to display the bandwidth"""
+
+        self.default_graphing(packet)
+        self.send_packet(packet)
+
+    # -rl Option
+    def limit(self, packet):
+        """Used to limit the bandwidth rate"""
+
+        self.default_graphing(packet)
+
+        # Check if rate is over the limit
+        if self.rate > self.bandwidth:
+            self.packet_backlog.append(packet)
+
+        # If it's not over, send packets until it is over
+        else:
+            self.send_packet(packet)
+
+            while self.rate < self.bandwidth and len(self.packet_backlog) > 0:
+                self.send_packet(self.packet_backlog[0])
+
+                self.calculate_rate()
+
+                # Packet is removed from the list
+                del self.packet_backlog[0]
 
     def print_stats(self):
         """Stat output"""
@@ -100,11 +129,6 @@ class Bandwidth(Effect):
 
         return value, unit
 
-    def display(self, packet):
-        """Used to display the bandwidth"""
-
-        self.send_packet(packet)
-
     def send_packet(self, packet):
         """Sends a packet and increases the total"""
         packet_size = self.calculate_packet_size(packet)
@@ -114,24 +138,6 @@ class Bandwidth(Effect):
 
         self.accept(packet)
 
-    # TODO: I think it would be better to work out the rate as a total average
-    def limit(self, packet):
-        """Used to limit the bandwidth rate"""
-        # Check if rate is over the limit
-        if self.rate > self.bandwidth:
-            self.packet_backlog.append(packet)
-
-        # If it's not over, send packets until it is over
-        else:
-            self.send_packet(packet)
-
-            while self.rate < self.bandwidth and len(self.packet_backlog) > 0:
-                self.send_packet(self.packet_backlog[0])
-
-                self.calculate_rate()
-
-                # Packet is removed from the list
-                del self.packet_backlog[0]
 
     def start_rate_update(self):
         """Used to start the thread that updates the rate of transfer"""
@@ -140,3 +146,19 @@ class Bandwidth(Effect):
     def alter_bandwidth(self, new_value):
         """Used to change bandwidth variable for an outside location"""
         self.bandwidth = new_value
+
+    """Graphing methods"""
+    def graphing_setup(self):
+        # Graph with Rate x Time
+        if self.graph_type_num is 1:
+            self.graph.set_x_axis_label('Time (s)')
+            self.graph.set_y_axis_label('Rate (B/s)')
+
+    def graphing_effect(self, packet):
+        if self.graph_type_num is 1:
+            self.graph.add_points(self.get_elapsed_time(), self.rate)
+
+    def show_graph(self):
+        # Graph with Rate x Time
+        if self.graph_type_num is 1:
+            self.graph.plot('r,-')

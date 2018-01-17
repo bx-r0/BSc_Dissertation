@@ -63,17 +63,23 @@ Extra Optionals:
 --graph, -g             <chart_type>
     * Sets the program in graph mode where it collates information to create a graph
     
-    Chart_Types
+    ## Chart_Types ##
         
-        0 (defaut) [For all modes]
-            - Will show a bar graph with the total number of a protcol that the script has collected
+        All-Modes:
+        
+            0 - Will show a bar graph with the total number of a packets' 
+                protocol that the script has collected
             
         Latency:
         
-            TODO:
+            1 - TODO
             
         Packet Loss:
         
             1 - Will show the packet loss percentage over time
+            
+        Bandwidth:
+        
+            1 - Will show the rate of transfer over time
     """
 

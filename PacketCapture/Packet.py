@@ -458,7 +458,8 @@ def parameters():
         mode = emulate_real_connection_speed
 
     elif args.display_bandwidth:
-        bandwidth_obj = Bandwidth()
+        bandwidth_obj = Bandwidth(graphing=graph_active,
+                                  graph_type_num=graph_type_num)
         mode = track_bandwidth
 
     elif args.rate_limit:
