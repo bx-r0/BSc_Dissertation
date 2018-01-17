@@ -30,8 +30,12 @@ class Effect:
         """Should be the main center for the effects code"""
         raise Exception('NotImplemented: Please add \'effect()\' to your class')
 
-    def stop(self):
-        """Called to stop the object"""
+    def show_graph(self):
+        """Called to display the graph"""
 
         if self.graphing:
             self.graph.plot()
+
+    def stop(self):
+        """Called to stop the object"""
+        pass

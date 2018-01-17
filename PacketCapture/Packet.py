@@ -1,3 +1,4 @@
+#region Imports
 # Import graphing
 import matplotlib as mpl
 mpl.use('Agg')
@@ -10,12 +11,14 @@ logging.getLogger("scapy.runtime").setLevel(logging.ERROR)
 import argparse
 import signal
 import time
+import threading
 import textwrap
 import Common_Connections
 import parameters as Parameter
 from netfilterqueue import NetfilterQueue
 from scapy.all import *
 from multiprocessing.dummy import Pool as ThreadPool
+import keyboard
 
 # Module imports
 from Effects.Latency import Latency
@@ -24,7 +27,7 @@ from Effects.PacketLoss import PacketLoss
 from Effects.Throttle import Throttle
 from Effects.OutOfOrder import Order
 from Plotting import Graph
-
+#endregion
 
 # Defines how many threads are in the pool
 pool = ThreadPool(1000)
@@ -498,28 +501,54 @@ def parameters():
         save_active = True
         setup_packet_save(args.save[0])
 
+    # Starts the listener thread for user input
+    threading.Thread(target=user_input_thread, args=[graph_active]).start()
+
     # When all parameters are handled
     run_packet_manipulation()
 
 
-def stop_object(object):
+def affect_all_objects(method):
     """This method attempts to stop an object, and
     catches the exception if it doesn't need closing"""
-    try:
-        object.stop()
-    except AttributeError:
-        pass
+
+    # TODO: Dynamic way to grab these?
+    objects = [latency_obj, packet_loss_obj, throttle_obj, bandwidth_obj, order_obj]
+
+    for x in objects:
+        try:
+            # Add more functionality to this list
+            if method is 'stop':
+                x.stop()
+            elif method is 'graph':
+                x.show_graph()
+        except AttributeError:
+            pass
+
+
+def user_input_thread(graph_active):
+    """This thread is a listener for users input"""
+
+    while True:
+        try:
+            if keyboard.is_pressed('g'):
+                # Waits until the key is released
+                while keyboard.is_pressed('g'):
+                    pass
+
+                if graph_active:
+                    # Clears any fragments from the screen including the button pressed
+                    print('\r ' + ' ' * 30, end='\r', flush=True)
+                    affect_all_objects('graph')
+
+        except RuntimeError:
+            pass
 
 
 def clean_close(signum='', frame=''):
     """Used to close the script cleanly"""
 
-    # TODO: Better way to do this?
-    stop_object(packet_loss)
-    stop_object(throttle_obj)
-    stop_object(latency_obj)
-    stop_object(bandwidth_obj)
-    stop_object(order_obj)
+    affect_all_objects('stop')
 
     print_force("\n[*] ## Close signal recieved ##")
 

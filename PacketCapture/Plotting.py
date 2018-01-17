@@ -35,7 +35,7 @@ class Graph:
     def refresh_filename(self):
         self.picture_filename = 'Graphs/graph_{}.png'.format(self.file_number)
 
-    # TODO: Is it possible to dynmaically find out who the user is?
+    # TODO: Is it possible to dynamically find out who the user is?
     def show(self):
 
         # Checks if there are existing files
@@ -44,7 +44,7 @@ class Graph:
             self.refresh_filename()
 
         self.fig.savefig(self.picture_filename)
-        print('\n\n[*] Graph saved - File is called: \'{}\''.format(self.picture_filename), flush=True)
+        #print('\n\n[*] Graph saved - File is called: \'{}\''.format(self.picture_filename), flush=True)
         os.system('sudo -u user_1 feh {}'.format(self.picture_filename))
 
     def add_points(self, x, y):

@@ -41,5 +41,5 @@ class Latency(Effect):
         self.print('[*] Latency: {:.2f}s - '.format(new_value), end='')
         self.latency_value = new_value
 
-    def stop(self):
+    def show_graph(self):
         self.graph.bar()
