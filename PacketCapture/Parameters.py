@@ -59,5 +59,21 @@ Extra Optionals:
     
 --save, -s
     * Tells the program to start saving all the packets that run through the system
+    
+--graph, -g             <chart_type>
+    * Sets the program in graph mode where it collates information to create a graph
+    
+    Chart_Types
+        
+        0 (defaut) [For all modes]
+            - Will show a bar graph with the total number of a protcol that the script has collected
+            
+        Latency:
+        
+            TODO:
+            
+        Packet Loss:
+        
+            1 - Will show the packet loss percentage over time
     """
 

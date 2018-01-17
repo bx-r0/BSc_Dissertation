@@ -2,10 +2,19 @@ from Effects.Effect import Effect
 import time
 
 
-class Latency(Effect):
+"""
+graph_type_num:
 
-    def __init__(self, latency_value, accept_packets=True, show_output=True, graphing=False):
-        super().__init__(accept_packets, show_output, graphing)
+    0 - Default graph - Number of types of various packets
+
+"""
+
+
+class Latency(Effect):
+    """Class that is used to issue latency degradation"""
+
+    def __init__(self, latency_value, accept_packets=True, show_output=True, graphing=False, graph_type_num=0):
+        super().__init__(accept_packets, show_output, graphing, graph_type_num)
 
         self.latency_value = latency_value / 1000
         self.print('[*] Latency set to: {}s'.format(self.latency_value), force=True)
@@ -17,9 +26,7 @@ class Latency(Effect):
     def effect(self, packet):
         """Thread functionality"""
 
-        # Turning the graphing mode on
-        if self.graphing:
-            self.graphing_effect(packet)
+        self.default_graphing(packet)
 
         self.print_stats()
         self.total_packets += 1
@@ -30,11 +37,8 @@ class Latency(Effect):
         self.accept(packet)
 
     def graphing_effect(self, packet):
-        """Performs the data collectiong for the graph"""
-
-        # Graph that tracks types of packets in the session
-        sections = str(packet).split(' ')
-        self.graph.increment_catagory(sections[0])
+        """Performs the data collecting for the graph"""
+        pass
 
     def alter_latency_value(self, new_value):
         """This is useful if latency isn't static and can be obtained from a range"""
@@ -42,4 +46,9 @@ class Latency(Effect):
         self.latency_value = new_value
 
     def show_graph(self):
-        self.graph.bar()
+        """Called to display any type of graph"""
+        # Default
+        if self.graph_type_num is 0:
+            self.graph.bar()
+
+

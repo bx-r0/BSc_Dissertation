@@ -14,13 +14,14 @@ import time
 import threading
 import textwrap
 import Common_Connections
-import parameters as Parameter
+
 from netfilterqueue import NetfilterQueue
 from scapy.all import *
 from multiprocessing.dummy import Pool as ThreadPool
 import keyboard
 
 # Module imports
+import Parameters as Parameter
 from Effects.Latency import Latency
 from Effects.LimitBandwidth import Bandwidth
 from Effects.PacketLoss import PacketLoss
@@ -258,13 +259,6 @@ def setup_packet_save(filename):
     pktdump = PcapWriter(filename + '.pcap', append=False, sync=True)
 
 
-def setup_graph():
-    """Sets up the script to save a graph file for the selected effect"""
-
-    global graph
-    graph = Graph()
-
-
 def run_packet_manipulation():
     """The main method here, will issue a iptables command and construct the NFQUEUE"""
 
@@ -394,27 +388,34 @@ def parameters():
                         help=argparse.SUPPRESS)
 
     parser.add_argument('--graph', Parameter.cmd_graph,
-                        action='store_true',
+                        action='store',
                         dest='graph',
                         help=argparse.SUPPRESS)
 
     args = parser.parse_args()
 
+    graph_type_num = 0
     if args.graph:
-        print_force('[!] Graphing is on, press G at any point while running to display the graph')
+        print_force('[!] Graphing is on, press \'G\' at any point while running to display the graph')
         graph_active = True
-        setup_graph()
+        graph_type_num = int(args.graph[0])
 
     # Modes
     if args.print:
         mode = print_packet
 
     elif args.latency:
-        latency_obj = Latency(latency_value=args.latency, accept_packets=True, graphing=graph_active)
+        latency_obj = Latency(latency_value=args.latency,
+                              accept_packets=True,
+                              graphing=graph_active,
+                              graph_type_num=graph_type_num)
         mode = packet_latency
 
     elif args.packet_loss:
-        packet_loss_obj = PacketLoss(percentage=args.packet_loss, accept_packets=True, graphing=graph_active)
+        packet_loss_obj = PacketLoss(percentage=args.packet_loss,
+                                     accept_packets=True,
+                                     graphing=graph_active,
+                                     graph_type_num=graph_type_num)
         mode = packet_loss
 
     elif args.throttle:

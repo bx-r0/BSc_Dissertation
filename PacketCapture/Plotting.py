@@ -44,7 +44,8 @@ class Graph:
             self.refresh_filename()
 
         self.fig.savefig(self.picture_filename)
-        #print('\n\n[*] Graph saved - File is called: \'{}\''.format(self.picture_filename), flush=True)
+
+        # Shows the file
         os.system('sudo -u user_1 feh {}'.format(self.picture_filename))
 
     def add_points(self, x, y):
@@ -53,9 +54,18 @@ class Graph:
         self.y.append(y)
 
     def add_point(self, y):
+        """Adds one point with an auto incrementing x"""
         self.x.append(self.n_index)
         self.n_index = self.n_index + 1
         self.y.append(y)
+
+    def set_x_axis_label(self, label):
+        """Sets the x axis for the most recent graph"""
+        plt.xlabel(label)
+
+    def set_y_axis_label(self, label):
+        """Sets the y axis for the most recent graph"""
+        plt.ylabel(label)
 
     def increment_catagory(self, name):
         """Used to keep track of values for a bar graph
@@ -77,10 +87,10 @@ class Graph:
         self.barGraphLists[0].append(name)
         self.barGraphLists[1].append(1)
 
-    def plot(self):
+    def plot(self, colour='ro-'):
         """[Line Graph]"""
         """Adds all points to the graph, adds a line and displays the graph"""
-        plt.plot(self.x, self.y, 'ro-')
+        plt.plot(self.x, self.y, colour)
         self.show()
 
     def bar(self):
@@ -105,11 +115,11 @@ class Graph:
 
         self.show()
 
-    def points(self):
+    def points(self, colour='ro-'):
         """[Scatter Graph]"""
         """Adds all the points to the graph (with no line) and display the graph"""
 
         for i in range(0, len(self.x)):
-            plt.plot(self.x[i], self.y[i], 'ro-')
+            plt.plot(self.x[i], self.y[i], colour)
 
         self.show()
