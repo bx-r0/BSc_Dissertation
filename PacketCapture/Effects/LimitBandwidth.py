@@ -158,7 +158,7 @@ class Bandwidth(Effect):
         if self.graph_type_num is 1:
             self.graph.add_points(self.get_elapsed_time(), self.rate)
 
-    def show_graph(self):
+    def show_custom_graph(self):
         # Graph with Rate x Time
         if self.graph_type_num is 1:
             self.graph.plot('r,-')

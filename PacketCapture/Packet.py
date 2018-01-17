@@ -398,7 +398,7 @@ def parameters():
     if args.graph:
         print_force('[!] Graphing is on, press \'G\' at any point while running to display the graph')
         graph_active = True
-        graph_type_num = int(args.graph[0])
+        graph_type_num = int(args.graph)
 
     # Modes
     if args.print:

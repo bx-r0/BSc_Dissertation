@@ -45,10 +45,8 @@ class Latency(Effect):
         self.print('[*] Latency: {:.2f}s - '.format(new_value), end='')
         self.latency_value = new_value
 
-    def show_graph(self):
+    def show_custom_graph(self):
         """Called to display any type of graph"""
-        # Default
-        if self.graph_type_num is 0:
-            self.graph.bar()
+        pass
 
 

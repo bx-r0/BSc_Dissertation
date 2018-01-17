@@ -67,8 +67,10 @@ Extra Optionals:
         
         All-Modes:
         
-            0 - Will show a bar graph with the total number of a packets' 
-                protocol that the script has collected
+            0 -     Will show a bar graph with the total number of a packets' 
+                    protocol that the script has collected
+                
+            10 -    Will process a line graph with number of packets over time
             
         Latency:
         

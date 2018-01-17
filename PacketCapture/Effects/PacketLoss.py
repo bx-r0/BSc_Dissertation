@@ -66,14 +66,10 @@ class PacketLoss(Effect):
         if self.graph_type_num is 1:
             self.graph.add_points(self.get_elapsed_time(), self.dropped_percentage)
 
-    def show_graph(self):
-
-        # Default
-        if self.graph_type_num is 0:
-            self.graph.bar()
+    def show_custom_graph(self):
         # Percentage loss over time
-        elif self.graph_type_num is 1:
-            self.graph.plot()
+        if self.graph_type_num is 1:
+            self.graph.plot('r,-')
 
 
 
