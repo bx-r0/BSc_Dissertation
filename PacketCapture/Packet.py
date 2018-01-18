@@ -53,6 +53,8 @@ afray@hotmail.co.uk
 ==============================================================
 """
 
+# Terminal Sizing
+terminal_height, terminal_width = os.popen('stty size', 'r').read().split()
 
 def start_timer():
     """Keeps track of elapsed time"""
@@ -274,6 +276,7 @@ def run_packet_manipulation():
             print_force("[!] Queue already created")
 
         # Shows the start waiting message
+        print_seperator()
         print_force("[*] Waiting ")
         nfqueue.run()
 
@@ -389,7 +392,7 @@ def parameters():
 
     graph_type_num = 0
     if args.graph:
-        print_force('[!] Graphing is on, press \'G\' at any point while running to display the graph')
+        print_force('[!] Graphing is on, press \'g\' at any point while running to display the graph')
         graph_active = True
         graph_type_num = int(args.graph)
 
@@ -522,6 +525,8 @@ def affect_all_objects(method):
                 x.show_graph()
             elif method is 'graph_no_show':
                 x.save_graph()
+            else:
+                Exception('Invalid entry into affect_all_objects()')
         except AttributeError:
             pass
 
@@ -543,7 +548,6 @@ def user_input_thread(graph_active):
 
         except RuntimeError:
             pass
-
 
 def clean_close(signum='', frame=''):
     """Used to close the script cleanly"""
@@ -580,4 +584,9 @@ if os.getuid() != 0:
     exit("Error: User needs to be root to run this script")
 
 
+def print_seperator():
+    # -5 Due to the start sequence '[*] '
+    print('[*]', '=' * (int(terminal_width) - 5), flush=True)
+
+print_seperator()
 parameters()

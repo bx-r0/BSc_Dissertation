@@ -86,3 +86,27 @@ Extra Optionals:
             1 - Will show the rate of transfer over time
     """
 
+
+class GraphDescription:
+    """Used to hold descriptions for the graph types"""
+
+    def __init__(self, effect_name, graph_number, description):
+        self.effect_name = effect_name
+        self.number = graph_number
+        self.description = description
+
+
+# Graphing Descriptions - It has to be present here to it can be counted as a valid graph number
+graph_descriptions = [
+
+    # None applies to All
+    GraphDescription(None, 0, 'Bar graph collating the different packet protocols collected'),
+    GraphDescription(None, 10, 'Line graph of Total Packets (No) X Time (s)'),
+
+    GraphDescription('Latency', 1, 'TODO'),
+
+    GraphDescription('PacketLoss', 1, 'Packet Loss (%) X Time (s)'),
+    GraphDescription('PacketLoss', 2, 'Packets Lost (No) X Time (s)'),
+
+    GraphDescription('Bandwidth', 1, 'Transfer Rate (B/s) X Time (s)')
+]

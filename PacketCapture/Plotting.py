@@ -42,8 +42,7 @@ class Graph:
         self.save()
 
         # Shows the file
-        #os.system('sudo -u user_1 feh {}'.format(self.picture_filename))
-        #os.system('sudo -u user_1 python Plotting.py')
+        os.system('sudo -u user_1 feh {}'.format(self.picture_filename))
 
     def save(self):
         """Saves the file to disk"""
@@ -179,7 +178,3 @@ class AnimateGraph:
                                        blit=True)
 
         plt.show()
-
-
-
-

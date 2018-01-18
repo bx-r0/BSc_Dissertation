@@ -1,6 +1,6 @@
 import time
+import Parameters
 from Plotting import Graph
-
 
 class Effect:
     """Class that generally defines what an effect should contain """
@@ -16,12 +16,28 @@ class Effect:
             self.default_graphing_setup()
 
             if show_output:
-                print('[*] Graph set to mode \'{}\''.format(graph_type_num))
+                description = self.check_for_graph_type()
+                print("""[*] Graph number is \'{}\' and the description is: \n[*]\t\"{}\"""".format(self.graph_type_num, description))
 
         # --- Universal stats --- #
         # Every effect has a starting time
         self.start_time = time.time()
         self.total_packets = 0  # Number of total packets processed
+
+    def check_for_graph_type(self):
+        """This method checks for the graph number provided is valid"""
+        class_name = self.__class__.__name__
+
+        for x in Parameters.graph_descriptions:
+            graph = x
+
+            if graph.effect_name is class_name or graph.effect_name is None:
+                if graph.number is self.graph_type_num:
+                    return graph.description
+
+        # If a graph cannot be found
+        print('\n[ERROR] Invalid graph number provided\n')
+        exit(0)
 
     def get_elapsed_time(self):
         """Used to find out how long ago the effect started"""
