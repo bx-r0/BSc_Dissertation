@@ -1,15 +1,15 @@
 import os
 import numpy as np
 try:
+    from matplotlib import animation
     from matplotlib import pyplot as plt
 except ImportError:
     print('\nError: cannot import matplotlib, please install here')
     print('https://matplotlib.org/users/installing.html\n')
     exit(0)
 
+
 # TODO: Put download link on README for matplotlib
-
-
 class Graph:
     """This class is used to make a new graph
         Scatter Graph
@@ -42,7 +42,8 @@ class Graph:
         self.save()
 
         # Shows the file
-        os.system('sudo -u user_1 feh {}'.format(self.picture_filename))
+        #os.system('sudo -u user_1 feh {}'.format(self.picture_filename))
+        #os.system('sudo -u user_1 python Plotting.py')
 
     def save(self):
         """Saves the file to disk"""
@@ -129,3 +130,56 @@ class Graph:
             plt.plot(self.x[i], self.y[i], colour)
 
         self.show()
+
+
+class AnimateGraph:
+
+    def __init__(self, limit_x, limit_y, custom_method=None):
+        # Graph init
+        self.fig = plt.figure()
+        self.ax = plt.axes(xlim=(0, limit_x), ylim=(0, limit_y))
+        self.line, = self.ax.plot([], [], lw=2)
+
+        # Allows passing in of lambda functions
+        self.graph_function = custom_method
+
+        # Records
+        self.limit_x = limit_x
+        self.limit_y = limit_y
+
+        # Data
+        self.x = []
+        self.y = []
+
+    def init(self):
+        """Called at the end and start of each interval"""
+        return self.line,
+
+    def animate(self, i):
+        """The method that is called every frame"""
+
+        if self.graph_function is not None:
+            self.graph_function(i, self.x, self.y)
+
+        self.line.set_data(self.x, self.y)
+        return self.line,
+
+    def add_points(self, x, y):
+        self.x.append(x)
+        self.y.append(y)
+
+    def start(self):
+        """Starts and displays the animated graph"""
+
+        anim = animation.FuncAnimation(self.fig,
+                                       self.animate,
+                                       init_func=self.init,
+                                       frames=2000,
+                                       interval=20,
+                                       blit=True)
+
+        plt.show()
+
+
+
+
