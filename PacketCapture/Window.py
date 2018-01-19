@@ -346,7 +346,6 @@ class PacketCaptureGTK:
     def clean_close(self):
         """Function that is designed to stop the subprocess as cleanly as possible"""
         try:
-
             # Checks if the variables have been assigned and therefore if the process are running
             packet = False
             arp = False

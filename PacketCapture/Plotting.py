@@ -52,6 +52,12 @@ class Graph:
             self.file_number += 1
             self.refresh_filename()
 
+        # Grabs the full filename
+        filename = os.path.dirname(os.path.abspath(__file__))
+
+        print("[*] Your graph has been saved!", flush=True)
+        print('[*] \t{}'.format(self.picture_filename), '\n[*]', flush=True)
+
         self.fig.savefig(self.picture_filename)
 
     def add_points(self, x, y):

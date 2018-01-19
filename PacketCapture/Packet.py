@@ -1,35 +1,4 @@
-#region Imports
-# Import graphing
-import matplotlib as mpl
-mpl.use('Agg')
-
-# Suppresses the Scapy WARNING Message
-import logging
-logging.getLogger("scapy.runtime").setLevel(logging.ERROR)
-
-# General Imports
-import argparse
-import signal
-import time
-import threading
-import textwrap
-import Common_Connections
-
-from netfilterqueue import NetfilterQueue
-from scapy.all import *
-from multiprocessing.dummy import Pool as ThreadPool
-import keyboard
-
-# Module imports
-import Parameters as Parameter
-from Effects.Latency import Latency
-from Effects.LimitBandwidth import Bandwidth
-from Effects.PacketLoss import PacketLoss
-from Effects.Throttle import Throttle
-from Effects.OutOfOrder import Order
-from Effects.Print import Print
-from Plotting import Graph
-#endregion
+elapsed
 
 # Defines how many threads are in the pool
 pool = ThreadPool(1000)
@@ -55,6 +24,7 @@ afray@hotmail.co.uk
 
 # Terminal Sizing
 terminal_height, terminal_width = os.popen('stty size', 'r').read().split()
+
 
 def start_timer():
     """Keeps track of elapsed time"""
@@ -147,9 +117,13 @@ def edit_packet(packet, accept=True):
 
 def packet_latency(packet):
     """This function is used to incur latency on packets"""
-
     if affect_packet(packet):
-        map_thread(latency_obj.effect, [packet])
+        try:
+            pool.apply(latency_obj.effect, [packet, time.time()])
+        except AssertionError:
+            # This stops the pool from throwing an error when it's closed after
+            # a SIGINT signal is sent
+            pass
     else:
         packet.accept()
 
@@ -525,6 +499,10 @@ def affect_all_objects(method):
                 x.show_graph()
             elif method is 'graph_no_show':
                 x.save_graph()
+            elif method is 'increase':
+                x.increase_effect()
+            elif method is 'decrease':
+                x.decrease_effect()
             else:
                 Exception('Invalid entry into affect_all_objects()')
         except AttributeError:
@@ -533,6 +511,14 @@ def affect_all_objects(method):
 
 def user_input_thread(graph_active):
     """This thread is a listener for users input"""
+
+    def reset_cursor(msg):
+        """Used to stop input from messing up terminal format
+        and displays what command was entered"""
+
+        print('\r', end='', flush=True)
+        print(' ' * 50, end='', flush=True)
+        print('\r[{}]\r'.format(msg), end='', flush=True)
 
     while True:
         try:
@@ -545,17 +531,36 @@ def user_input_thread(graph_active):
                     # Clears any fragments from the screen including the button pressed
                     print('\r ' + ' ' * 30, end='\r', flush=True)
                     affect_all_objects('graph')
+                reset_cursor('Show graph')
+
+            # More degredation
+            elif keyboard.is_pressed('e'):
+                # Waits until the key is released
+                while keyboard.is_pressed('e'):
+                    pass
+                affect_all_objects('increase')
+                reset_cursor('increase')
+
+            # Less degradation
+            elif keyboard.is_pressed('q'):
+                # Waits until the key is released
+                while keyboard.is_pressed('q'):
+                    pass
+                affect_all_objects('decrease')
+                reset_cursor('decrease')
 
         except RuntimeError:
             pass
 
+
 def clean_close(signum='', frame=''):
     """Used to close the script cleanly"""
 
+    print_force('\n')
+    print_force("[*] ## Close signal recieved ##")
+
     affect_all_objects('graph_no_show')
     affect_all_objects('stop')
-
-    print_force("\n[*] ## Close signal recieved ##")
 
     pool.close()
     print_force("[!] Thread pool killed")

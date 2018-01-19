@@ -72,10 +72,6 @@ Extra Optionals:
                 
             10 -    Will process a line graph with number of packets over time
             
-        Latency:
-        
-            1 - TODO
-            
         Packet Loss:
         
             1 - Will show the packet loss percentage over time
@@ -103,7 +99,7 @@ graph_descriptions = [
     GraphDescription(None, 0, 'Bar graph collating the different packet protocols collected'),
     GraphDescription(None, 10, 'Line graph of Total Packets (No) X Time (s)'),
 
-    GraphDescription('Latency', 1, 'TODO'),
+    #GraphDescription('Latency', 1, 'TODO'),
 
     GraphDescription('PacketLoss', 1, 'Packet Loss (%) X Time (s)'),
     GraphDescription('PacketLoss', 2, 'Packets Lost (No) X Time (s)'),

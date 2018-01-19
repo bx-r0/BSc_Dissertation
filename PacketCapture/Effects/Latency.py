@@ -23,19 +23,25 @@ class Latency(Effect):
         self.print('[*] Latency set to: {}s'.format(self.latency_value), force=True)
         self.total_packets = 0
 
+        # In seconds
+        self.latency_max = 1
+
     def print_stats(self):
         self.print('[*] Total Packets effected: {}'.format(self.total_packets), end='\r')
 
-    def effect(self, packet):
+    def effect(self, packet, start):
         """Thread functionality"""
 
         self.default_graphing(packet)
-
         self.print_stats()
         self.total_packets += 1
 
         # Issues latency of the entered value
-        time.sleep(self.latency_value)
+        now = time.time()
+        e = (now - start) / 1000  # Converts to ms
+        total_time = self.latency_value - e
+
+        time.sleep(total_time)
 
         self.accept(packet)
 
@@ -43,5 +49,22 @@ class Latency(Effect):
         """This is useful if latency isn't static and can be obtained from a range"""
         self.print('[*] Latency: {:.2f}s - '.format(new_value), end='')
         self.latency_value = new_value
+
+    # TODO: Include a way to display the change?
+    def increase_effect(self):
+        """Called when the 'e' key is pressed"""
+        increment_value = 0.001
+
+        # Validation
+        if (self.latency_value + increment_value) < self.latency_max:
+            self.latency_value += increment_value
+
+    def decrease_effect(self):
+        """Called when the 'q' key is pressed"""
+        decrement_value = 0.001
+
+        # Validation - Checks if result would be non negative
+        if (self.latency_value - decrement_value) > 0:
+            self.latency_value -= decrement_value
 
 

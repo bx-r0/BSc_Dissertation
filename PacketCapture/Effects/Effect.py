@@ -131,3 +131,12 @@ class Effect:
     def stop(self):
         """[Blueprint] - Called to stop the object"""
         pass
+
+    # Variance
+    def increase_effect(self):
+        """[Blueprint] - Used to make the degradation higher """
+        pass
+
+    def decrease_effect(self):
+        """[Blueprint] - Used to make the degradation lower"""
+        pass
