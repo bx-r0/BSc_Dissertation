@@ -32,7 +32,7 @@ from Plotting import Graph
 #endregion
 
 # Defines how many threads are in the pool
-pool = ThreadPool(1000)
+pool = ThreadPool(100)
 
 logo = """
 ==============================================================
@@ -114,6 +114,8 @@ def print_packet(packet):
 
     if affect_packet(packet):
         map_thread(print_obj.effect, [packet])
+    else:
+        packet.accept()
 
 
 def edit_packet(packet, accept=True):
@@ -150,10 +152,8 @@ def packet_latency(packet):
     """This function is used to incur latency on packets"""
     if affect_packet(packet):
         try:
-            pool.apply(latency_obj.effect, [packet, time.time()])
-        except AssertionError:
-            # This stops the pool from throwing an error when it's closed after
-            # a SIGINT signal is sent
+            pool.apply_async(latency_obj.effect, [packet, time.time()])
+        except ValueError:
             pass
     else:
         packet.accept()
@@ -552,6 +552,11 @@ def user_input_thread(graph_active):
         print('\r[{}]\r'.format(msg), end='', flush=True)
 
     while True:
+
+        # HACK: Stops this from looping too fast and soaking up to much performance
+        # A better solution would be to introduce events
+        time.sleep(0.1)
+
         try:
             if keyboard.is_pressed('g'):
                 # Waits until the key is released
@@ -564,7 +569,7 @@ def user_input_thread(graph_active):
                     affect_all_objects('graph')
                 reset_cursor('Show graph')
 
-            # More degredation
+            # More degradation
             elif keyboard.is_pressed('e'):
                 # Waits until the key is released
                 while keyboard.is_pressed('e'):
