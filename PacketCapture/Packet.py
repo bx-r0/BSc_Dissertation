@@ -466,12 +466,12 @@ def parameters():
     elif args.rate_limit:
         # Sets the bandwidth object with the specified bandwidth limit
         bandwidth_obj = Bandwidth(bandwidth=args.rate_limit,
-                                  graphing=True,
+                                  graphing=graph_active,
                                   graph_type_num=graph_type_num)
         mode = limit_bandwidth
 
     elif args.order:
-        order_obj = Order(graphing=True,
+        order_obj = Order(graphing=graph_active,
                           graph_type_num=graph_type_num)
         mode = out_of_order
 

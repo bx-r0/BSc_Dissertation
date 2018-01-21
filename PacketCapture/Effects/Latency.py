@@ -27,7 +27,8 @@ class Latency(Effect):
         self.latency_max = 1
 
     def print_stats(self):
-        self.print('[*] Total Packets effected: {}'.format(self.total_packets), end='\r')
+        self.print('[*] Latency: {:.0f}ms - Total Packets effected: {} '.
+                   format((self.latency_value * 1000), self.total_packets), end='\r')
 
     def effect(self, packet, start=0):
         """Thread functionality"""
@@ -50,10 +51,9 @@ class Latency(Effect):
         self.print('[*] Latency: {:.2f}s - '.format(new_value), end='')
         self.latency_value = new_value
 
-    # TODO: Include a way to display the change?
     def increase_effect(self):
         """Called when the 'e' key is pressed"""
-        increment_value = 0.001
+        increment_value = 0.01
 
         # Validation
         if (self.latency_value + increment_value) < self.latency_max:
@@ -61,7 +61,7 @@ class Latency(Effect):
 
     def decrease_effect(self):
         """Called when the 'q' key is pressed"""
-        decrement_value = 0.001
+        decrement_value = 0.01
 
         # Validation - Checks if result would be non negative
         if (self.latency_value - decrement_value) > 0:

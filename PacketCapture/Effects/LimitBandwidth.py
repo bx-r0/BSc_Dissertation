@@ -76,9 +76,19 @@ class Bandwidth(Effect):
         print_rate, unit_rate = self.recalculate_units(self.rate)
         print_total, unit_total = self.recalculate_units(self.total)
 
-        # This line justs makes sure there is sections of previous lines present
-        self.print('[*] Total: {:.1f} {} - Rate: {:.1f} {}/s '.format(
-            print_total, unit_total, print_rate, unit_rate), end='\r')
+        print_message = '[*] Total: {:.1f} {} - Rate: {:.1f} {}/s '
+
+        # If the rate limiting is on
+        if self.bandwidth is not 0:
+
+            print_message += "- Target Rate {:.1f}"
+
+            self.print(print_message.format(print_total, unit_total, print_rate, unit_rate, self.bandwidth), end='\r')
+
+        # If it is just displaying bandwidth
+        else:
+            self.print(print_message.format(print_total, unit_total, print_rate, unit_rate), end='\r')
+
 
     def calculate_rate_job(self):
         """Calculates the rate of throughput"""
