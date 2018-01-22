@@ -22,12 +22,17 @@ import keyboard
 
 # Module imports
 import Parameters as Parameter
+
+from Effects import *
+
 from Effects.Latency import Latency
 from Effects.LimitBandwidth import Bandwidth
 from Effects.PacketLoss import PacketLoss
 from Effects.Surge import Surge
 from Effects.OutOfOrder import Order
 from Effects.Print import Print
+from Effects.Duplicate import Duplicate
+from Effects.EditPacket import Edit
 from Plotting import Graph
 #endregion
 
@@ -118,34 +123,13 @@ def print_packet(packet):
         packet.accept()
 
 
-def edit_packet(packet, accept=True):
+def edit_packet(packet):
     """This function will be used to edit sections of a packet, this is currently incomplete"""
 
-    # Thread functionality
-    def edit(t_packet):
-        """Thread functionality"""
-
-        if affect_packet(t_packet):
-            pkt = IP(t_packet.get_payload())
-
-            # Changes the Time To Live of the packet
-            pkt.ttl = 150
-
-            # Recalculates the check sum
-            del pkt[IP].chksum
-
-            # Sets the packet to the modified version
-            t_packet.set_payload(bytes(pkt))
-
-            if accept:
-                t_packet.accept()
-        else:
-            t_packet.accept()
-
-    try:
-        map_thread(edit, [packet])
-    except KeyboardInterrupt:
-        clean_close()
+    if affect_packet(packet):
+        map_thread(edit_obj.effect, [packet])
+    else:
+        packet.accept()
 
 
 def packet_latency(packet):
@@ -177,19 +161,8 @@ def surge(packet):
 
 def duplicate(packet):
     """Mode that takes a full duplication"""
-    global duplication_factor
     if affect_packet(packet):
-        # TODO: Needs fixing
-
-        # Get packet data
-        pkt = IP(packet.get_payload())
-
-        pkt[IP].dst = "192.168.1.1"
-
-        del pkt[ICMP].chksum
-        del pkt[IP].chksum
-
-        send(pkt, verbose=1, count=duplication_factor)
+        map_thread(duplicate_obj.effect, [packet])
     else:
         packet.accept()
 
@@ -293,14 +266,16 @@ def parameters():
     """This function deals with parameters passed to the script"""
 
     # Defines globals to be used above
-    global mode, target_packet_type, duplication_factor, arp_active, save_active
-    global latency_obj, throttle_obj, packet_loss_obj, bandwidth_obj, order_obj, print_obj
+    global mode, target_packet_type, arp_active, save_active
+    global latency_obj, throttle_obj, packet_loss_obj, bandwidth_obj, order_obj, print_obj, duplicate_obj, edit_obj
     latency_obj = None
     throttle_obj = None
     packet_loss_obj = None
     bandwidth_obj = None
     order_obj = None
     print_obj = None
+    duplicate_obj = None
+    edit_obj = None
 
     # Defaults
     mode = print_packet
@@ -373,6 +348,11 @@ def parameters():
                         dest='order',
                         help=argparse.SUPPRESS)
 
+    effect.add_argument('--edit-packets', Parameter.cmd_edit,
+                        action='store',
+                        dest='edit',
+                        help=argparse.SUPPRESS)
+
     # Extra parameters
     parser.add_argument('--target-packet', Parameter.cmd_target_packet,
                         action='store',
@@ -425,10 +405,11 @@ def parameters():
         mode = surge
 
     elif args.duplicate:
-        local_args = args.duplicate
+        duplicate_obj = Duplicate(int(args.duplicate),
+                                  graphing=graph_active,
+                                  graph_type_num=graph_type_num)
 
-        duplication_factor = int(local_args)
-        print_force('[*] Packet duplication set. Factor is: {}'.format(duplication_factor))
+        print_force('[*] Packet duplication set. Factor is: {}'.format(args.duplicate))
         mode = duplicate
 
     elif args.combination:
@@ -474,6 +455,13 @@ def parameters():
         order_obj = Order(graphing=graph_active,
                           graph_type_num=graph_type_num)
         mode = out_of_order
+
+    elif args.edit:
+        edit_obj = Edit(edit_type=args.edit,
+                        graphing=graph_active,
+                        graph_type_num=graph_type_num)
+
+        mode = edit_packet
 
     # Extra settings
     if args.target_packet:

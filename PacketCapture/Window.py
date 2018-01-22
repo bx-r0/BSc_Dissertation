@@ -12,7 +12,7 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 from gi.repository import GObject
 import GUI.Controls as Control
-import parameters as Parameter
+import Parameters as Parameter
 
 # Add to this list to add or remove filters for the packet manipulation
 target_protcols = ['TCP', 'UDP', 'ICMP']

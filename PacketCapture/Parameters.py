@@ -14,6 +14,7 @@ cmd_outoforder = '-o'
 cmd_arp = '-a'
 cmd_save = '-sa'
 cmd_graph = '-g'
+cmd_edit = '-e'
 
 
 def Usage():
@@ -48,6 +49,13 @@ Effects:
     
 --out-of-order, -o 
     * Sets the mode to out of order that alters the order of incoming packets
+    
+--edit-packets, -e <edit_mode>
+    * Sets the mode to mangle packets in certain ways specified by the 'edit_mode'
+    
+        Edit Modes
+        
+            1 - TTL Incrementing
                                 
 Extra Optionals:
 
@@ -105,4 +113,14 @@ graph_descriptions = [
     GraphDescription('PacketLoss', 2, 'Packets Lost (No) X Time (s)'),
 
     GraphDescription('Bandwidth', 1, 'Transfer Rate (B/s) X Time (s)')
+]
+
+
+edit_mode_descrptions = \
+[
+    # Number
+    [1],
+
+    # Desctiption
+    ['TTL Incrementing']
 ]
