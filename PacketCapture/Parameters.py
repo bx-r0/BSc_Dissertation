@@ -31,8 +31,8 @@ Effects:
 --packet-loss, -pl  <loss_percentage>  
     * Performs packet loss on the connection
 
---throttle, -t      <delay_ms> 
-    * Throttles the connection by the given delay 
+--surge, -t      <delay_ms> 
+    * Creates a packet surge on connection by the given delay 
     
 --duplicate, -d     <factor>                 
     * Duplicates a packet by the specified factor

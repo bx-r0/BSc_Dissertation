@@ -21,7 +21,7 @@ class Bandwidth(Effect):
         self.units = ['B', 'KB', 'MB', 'GB']
 
         # General variables
-        self.total = 0
+        self.total_size = 0
         self.transferred_since_check = 0
         self.rate = 0
         self.packet_backlog = []
@@ -54,34 +54,32 @@ class Bandwidth(Effect):
         self.default_graphing(packet)
 
         # Check if rate is over the limit
-        if self.rate > self.bandwidth:
-            self.packet_backlog.append(packet)
+        self.packet_backlog.append(packet)
 
-        # If it's not over, send packets until it is over
-        else:
-            self.send_packet(packet)
+        while self.rate < self.bandwidth and len(self.packet_backlog) > 0:
+            self.send_packet(self.packet_backlog[0])
 
-            while self.rate < self.bandwidth and len(self.packet_backlog) > 0:
-                self.send_packet(self.packet_backlog[0])
+            self.calculate_rate_overall_avg()
 
-                self.calculate_rate()
-
-                # Packet is removed from the list
-                del self.packet_backlog[0]
+            # Packet is removed from the list
+            del self.packet_backlog[0]
 
     def print_stats(self):
         """Stat output"""
 
         # Displays totals and rate in more relevant units
         print_rate, unit_rate = self.recalculate_units(self.rate)
-        print_total, unit_total = self.recalculate_units(self.total)
+        print_total, unit_total = self.recalculate_units(self.total_size)
+
+        # Stops any
+        self.print_clear()
 
         print_message = '[*] Total: {:.1f} {} - Rate: {:.1f} {}/s '
 
         # If the rate limiting is on
         if self.bandwidth is not 0:
 
-            print_message += "- Target Rate {:.1f}"
+            print_message += "- Target Rate {:.1f}B/s"
 
             self.print(print_message.format(print_total, unit_total, print_rate, unit_rate, self.bandwidth), end='\r')
 
@@ -89,10 +87,14 @@ class Bandwidth(Effect):
         else:
             self.print(print_message.format(print_total, unit_total, print_rate, unit_rate), end='\r')
 
-
     def calculate_rate_job(self):
         """Calculates the rate of throughput"""
-        self.calculate_rate()
+
+        if self.bandwidth is 0:
+            self.calculate_rate()
+        else:
+            self.calculate_rate_overall_avg()
+
         self.start_rate_update()
 
     def calculate_rate(self):
@@ -110,6 +112,15 @@ class Bandwidth(Effect):
             # Reset
             self.transferred_since_check = 0
             self.previous = now
+
+    def calculate_rate_overall_avg(self):
+        """Used to calculate the rate as an overall average"""
+
+        now = time.time()
+        elapsed = now - self.start
+
+        self.rate = self.total_size / elapsed
+        self.print_stats()
 
     @staticmethod
     def calculate_packet_size(packet_name):
@@ -146,7 +157,7 @@ class Bandwidth(Effect):
         """Sends a packet and increases the total"""
         packet_size = self.calculate_packet_size(packet)
 
-        self.total += packet_size
+        self.total_size += packet_size
         self.transferred_since_check += packet_size
 
         self.accept(packet)
@@ -174,3 +185,16 @@ class Bandwidth(Effect):
         # Graph with Rate x Time
         if self.graph_type_num is 1:
             self.graph.plot('r,-')
+
+    # -- Controls
+    def increase_effect(self):
+        step_value = 100
+
+        if self.bandwidth is not 0:
+            self.bandwidth += step_value
+
+    def decrease_effect(self):
+        step_value = 100
+
+        if self.bandwidth is not 0:
+            self.bandwidth -= step_value

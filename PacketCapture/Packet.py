@@ -25,7 +25,7 @@ import Parameters as Parameter
 from Effects.Latency import Latency
 from Effects.LimitBandwidth import Bandwidth
 from Effects.PacketLoss import PacketLoss
-from Effects.Throttle import Throttle
+from Effects.Surge import Surge
 from Effects.OutOfOrder import Order
 from Effects.Print import Print
 from Plotting import Graph
@@ -167,8 +167,8 @@ def packet_loss(packet):
         packet.accept()
 
 
-def throttle(packet):
-    """Mode assigned to throttle packets"""
+def surge(packet):
+    """Mode assigned to send packets in a surge"""
     if affect_packet(packet):
         throttle_obj.effect(packet)
     else:
@@ -338,7 +338,7 @@ def parameters():
                         help=argparse.SUPPRESS,
                         type=int)
 
-    effect.add_argument('--throttle', Parameter.cmd_throttle,
+    effect.add_argument('--surge', Parameter.cmd_throttle,
                         action='store',
                         help=argparse.SUPPRESS,
                         type=int)
@@ -419,10 +419,10 @@ def parameters():
                                      graph_type_num=graph_type_num)
         mode = packet_loss
 
-    elif args.throttle:
-        throttle_obj = Throttle(period=args.throttle)
+    elif args.surge:
+        throttle_obj = Surge(period=args.surge)
         throttle_obj.start_purge_monitor()
-        mode = throttle
+        mode = surge
 
     elif args.duplicate:
         local_args = args.duplicate
@@ -547,9 +547,8 @@ def user_input_thread(graph_active):
         """Used to stop input from messing up terminal format
         and displays what command was entered"""
 
-        print('\r', end='', flush=True)
-        print(' ' * 50, end='', flush=True)
-        print('\r[{}]\r'.format(msg), end='', flush=True)
+        print('\r', ' ' * 70, end='\r', flush=True)
+        print('[{}]'.format(msg), end='\r', flush=True)
 
     while True:
 
@@ -575,7 +574,7 @@ def user_input_thread(graph_active):
                 while keyboard.is_pressed('e'):
                     pass
                 affect_all_objects('increase')
-                reset_cursor('increase')
+                reset_cursor('Increase Effect')
 
             # Less degradation
             elif keyboard.is_pressed('q'):
@@ -583,7 +582,7 @@ def user_input_thread(graph_active):
                 while keyboard.is_pressed('q'):
                     pass
                 affect_all_objects('decrease')
-                reset_cursor('decrease')
+                reset_cursor('Decrease Effect')
 
         except RuntimeError:
             pass
@@ -628,6 +627,7 @@ if os.getuid() != 0:
 def print_seperator():
     # -5 Due to the start sequence '[*] '
     print('[*]', '=' * (int(terminal_width) - 5), flush=True)
+
 
 print_seperator()
 parameters()
