@@ -16,10 +16,13 @@ cmd_save = '-sa'
 cmd_graph = '-g'
 cmd_edit = '-e'
 
+cmd_flood = '-fs'
+
 
 def Usage():
     return"""
-Effects:
+## ---- Effects:
+
 --print, -p                                  
     * Prints all the packets
     
@@ -56,8 +59,13 @@ Effects:
         Edit Modes
         
             1 - TTL Incrementing
+              
+## ---- Attacks:
+
+--udp-flood, -f   <target_ip> 
+    * Attacks a target IP address with a barrage of UDP packets
                                 
-Extra Optionals:
+## ---- Extra Optionals:
 
 --target-packet, -tp    <packet-type>        
     * Only performs an affect on the specified packet type

@@ -32,8 +32,6 @@ def scan_for_active_hosts():
             if nm[x].state() == 'up':
                 active_hosts.append(x)
 
-        print('[*] Scan complete')
-
         # So the script can be used two ways
         if __name__ == '__main__':
             print(active_hosts)
@@ -42,6 +40,8 @@ def scan_for_active_hosts():
 
     except KeyboardInterrupt:
         print('[!] Local scan canceled')
+    except Exception as e:
+        print('Error:', e)
 
 
 if __name__ == '__main__':

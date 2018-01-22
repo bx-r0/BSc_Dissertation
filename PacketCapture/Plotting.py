@@ -160,6 +160,14 @@ class AnimateGraph:
         """Called at the end and start of each interval"""
         return self.line,
 
+    def set_x_axis_label(self, label):
+        """Sets the x axis for the most recent graph"""
+        plt.xlabel(label)
+
+    def set_y_axis_label(self, label):
+        """Sets the y axis for the most recent graph"""
+        plt.ylabel(label)
+
     def animate(self, i):
         """The method that is called every frame"""
 

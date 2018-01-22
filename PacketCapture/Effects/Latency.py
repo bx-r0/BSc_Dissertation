@@ -13,7 +13,12 @@ graph_type_num:
 class Latency(Effect):
     """Class that is used to issue latency degradation"""
 
-    def __init__(self, latency_value, accept_packets=True, show_output=True, graphing=False, graph_type_num=0):
+    def __init__(self, latency_value,
+                 accept_packets=True,
+                 show_output=True,
+                 graphing=False,
+                 graph_type_num=0):
+
         super().__init__(accept_packets=accept_packets,
                          show_output=show_output,
                          graphing=graphing,

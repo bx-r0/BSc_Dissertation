@@ -33,6 +33,7 @@ from Effects.OutOfOrder import Order
 from Effects.Print import Print
 from Effects.Duplicate import Duplicate
 from Effects.EditPacket import Edit
+from Effects.Attacks.UDP_Flooding import UDP_Flood
 from Plotting import Graph
 #endregion
 
@@ -254,7 +255,7 @@ def run_packet_manipulation():
             print_force("[!] Queue already created")
 
         # Shows the start waiting message
-        print_seperator()
+            print_seperator()
         print_force("[*] Waiting ")
         nfqueue.run()
 
@@ -266,8 +267,19 @@ def parameters():
     """This function deals with parameters passed to the script"""
 
     # Defines globals to be used above
-    global mode, target_packet_type, arp_active, save_active
-    global latency_obj, throttle_obj, packet_loss_obj, bandwidth_obj, order_obj, print_obj, duplicate_obj, edit_obj
+    global mode, target_packet_type, arp_active, save_active, NFQUEUE_Active
+
+    global \
+        latency_obj, \
+        throttle_obj, \
+        packet_loss_obj, \
+        bandwidth_obj, \
+        order_obj, \
+        print_obj, \
+        duplicate_obj, \
+        edit_obj, \
+        udp_obj
+
     latency_obj = None
     throttle_obj = None
     packet_loss_obj = None
@@ -276,6 +288,7 @@ def parameters():
     print_obj = None
     duplicate_obj = None
     edit_obj = None
+    udp_obj = None
 
     # Defaults
     mode = print_packet
@@ -286,6 +299,7 @@ def parameters():
 
     # Setup
     start_timer()
+    NFQUEUE_Active = True
 
     # Arguments
     parser = argparse.ArgumentParser(prog="Packet.py",
@@ -351,6 +365,13 @@ def parameters():
     effect.add_argument('--edit-packets', Parameter.cmd_edit,
                         action='store',
                         dest='edit',
+                        help=argparse.SUPPRESS)
+
+    # Attacks
+    effect.add_argument('--udp-flood', '-f',
+                        action='store',
+                        nargs=1,
+                        dest='flood',
                         help=argparse.SUPPRESS)
 
     # Extra parameters
@@ -463,6 +484,12 @@ def parameters():
 
         mode = edit_packet
 
+    # --- Attacks
+    elif args.flood:
+        NFQUEUE_Active = False
+        udp_obj = UDP_Flood(args.flood[0])
+        udp_obj.start()
+
     # Extra settings
     if args.target_packet:
         local_args = args.target_packet
@@ -499,7 +526,8 @@ def parameters():
     threading.Thread(target=user_input_thread, args=[graph_active]).start()
 
     # When all parameters are handled
-    run_packet_manipulation()
+    if NFQUEUE_Active:
+        run_packet_manipulation()
 
 
 def affect_all_objects(method):
@@ -507,7 +535,7 @@ def affect_all_objects(method):
     catches the exception if it doesn't need closing"""
 
     # TODO: Dynamic way to grab these?
-    objects = [latency_obj, packet_loss_obj, throttle_obj, bandwidth_obj, order_obj, print_obj]
+    objects = [latency_obj, packet_loss_obj, throttle_obj, bandwidth_obj, order_obj, print_obj, udp_obj]
 
     for x in objects:
         try:
@@ -581,23 +609,27 @@ def clean_close(signum='', frame=''):
 
     print_force('\n')
     print_force("[*] ## Close signal recieved ##")
-
-    affect_all_objects('graph_no_show')
     affect_all_objects('stop')
 
-    pool.close()
-    print_force("[!] Thread pool killed")
+    if NFQUEUE_Active:
 
-    # Resets
-    print_force("[!] iptables reverted")
-    os.system("iptables -F INPUT")
+        affect_all_objects('graph_no_show')
 
-    print_force("[!] NFQUEUE unbinded")
-    nfqueue.unbind()
+        pool.close()
+        print_force("[!] Thread pool killed")
 
-    if arp_active:
-        print_force('[!] Arp Spoofing stopped!')
-        arp_process.terminate()
+        # Resets
+        print_force("[!] iptables reverted")
+        os.system("iptables -F INPUT")
+
+        print_force("[!] NFQUEUE unbinded")
+        nfqueue.unbind()
+
+        if arp_active:
+            print_force('[!] Arp Spoofing stopped!')
+            arp_process.terminate()
+
+        print_force('[!] ## Script Stopped ##')
 
     os._exit(0)
 
@@ -614,7 +646,7 @@ if os.getuid() != 0:
 
 def print_seperator():
     # -5 Due to the start sequence '[*] '
-    print('[*]', '=' * (int(terminal_width) - 5), flush=True)
+    print('[*]', '=' * (int(terminal_width) - 5))
 
 
 print_seperator()

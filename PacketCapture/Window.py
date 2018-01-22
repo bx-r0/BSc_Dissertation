@@ -13,6 +13,7 @@ from gi.repository import Gtk
 from gi.repository import GObject
 import GUI.Controls as Control
 import Parameters as Parameter
+import Plotting
 
 # Add to this list to add or remove filters for the packet manipulation
 target_protcols = ['TCP', 'UDP', 'ICMP']
@@ -70,6 +71,9 @@ class PacketCaptureGTK:
             iface_list_store.append([item])
         self.comboBox_packetFilter.set_model(iface_list_store)
         self.comboBox_packetFilter.set_active(0)
+
+        # Test
+        self.textbuffer_console = self.textViews['TextView_ConsoleOutput'].get_buffer()
 
     def arp_window_init(self):
         builder = Gtk.Builder()
@@ -167,6 +171,9 @@ class PacketCaptureGTK:
 
     def print_Clicked(self, button):
         self.run_packet_capture(Parameter.cmd_print)
+
+    def graph_Clicked(self, button):
+        self.clear_textView()
 
     # NEW BUTTONS HERE <-------------------------------------
 
@@ -345,7 +352,9 @@ class PacketCaptureGTK:
 
     def clean_close(self):
         """Function that is designed to stop the subprocess as cleanly as possible"""
+
         try:
+
             # Checks if the variables have been assigned and therefore if the process are running
             packet = False
             arp = False
@@ -373,7 +382,7 @@ class PacketCaptureGTK:
                 self.arp_proc.kill()
 
         except Exception as e:
-            print(e)
+            print('Error in clean_close: ', e)
 
     def progressRunning(self, state):
         """Used to toggle the button being enabled, so when a progress is running

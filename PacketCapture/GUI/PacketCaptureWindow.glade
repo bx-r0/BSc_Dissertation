@@ -60,18 +60,20 @@
             <property name="height_request">150</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
+            <property name="margin_top">2</property>
             <property name="shadow_type">in</property>
             <child>
               <object class="GtkTextView" id="TextView_ConsoleOutput">
-                <property name="width_request">1000</property>
-                <property name="height_request">1000</property>
+                <property name="width_request">600</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
+                <property name="double_buffered">False</property>
                 <property name="halign">center</property>
                 <property name="hscroll_policy">natural</property>
                 <property name="vscroll_policy">natural</property>
-                <property name="wrap_mode">word</property>
+                <property name="editable">False</property>
                 <property name="cursor_visible">False</property>
+                <property name="accepts_tab">False</property>
               </object>
             </child>
           </object>

@@ -5,13 +5,19 @@ from Plotting import Graph
 class Effect:
     """Class that generally defines what an effect should contain """
 
-    def __init__(self, accept_packets=True, show_output=True, graphing=False, graph_type_num=0):
+    def __init__(self,
+                 accept_packets=True,
+                 show_output=True,
+                 graphing=False,
+                 graph_type_num=0):
+
         self.accept_packet = accept_packets
         self.show_output = show_output
         self.graphing = graphing
         self.graph_type_num = graph_type_num
 
         if self.graphing:
+
             self.graph = Graph()
             self.default_graphing_setup()
 
