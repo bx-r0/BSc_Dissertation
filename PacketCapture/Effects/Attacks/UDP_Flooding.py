@@ -1,8 +1,9 @@
+import sys
 import time
 import random
-import LocalNetworkScan as Scan
 import threading
 from scapy.all import *
+import LocalNetworkScan as Scan
 
 
 class UDP_Flood:
@@ -16,7 +17,7 @@ class UDP_Flood:
         self.threadlist = []
 
         # Characteristics
-        self.number_of_threads = 15
+        self.number_of_threads = 100
         self.generate_threads()
 
         self.running = True

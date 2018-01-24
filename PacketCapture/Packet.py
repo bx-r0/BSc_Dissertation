@@ -34,6 +34,7 @@ from Effects.Print import Print
 from Effects.Duplicate import Duplicate
 from Effects.EditPacket import Edit
 from Effects.Attacks.UDP_Flooding import UDP_Flood
+from Effects.Attacks.ARP_Spamming import ARP_Spamming
 from Plotting import Graph
 #endregion
 
@@ -278,7 +279,8 @@ def parameters():
         print_obj, \
         duplicate_obj, \
         edit_obj, \
-        udp_obj
+        udp_obj, \
+        arp_spam_obj
 
     latency_obj = None
     throttle_obj = None
@@ -289,6 +291,7 @@ def parameters():
     duplicate_obj = None
     edit_obj = None
     udp_obj = None
+    arp_spam_obj = None
 
     # Defaults
     mode = print_packet
@@ -368,10 +371,15 @@ def parameters():
                         help=argparse.SUPPRESS)
 
     # Attacks
-    effect.add_argument('--udp-flood', '-f',
+    effect.add_argument('--udp-flood', Parameter.cmd_flood,
                         action='store',
                         nargs=1,
                         dest='flood',
+                        help=argparse.SUPPRESS)
+
+    effect.add_argument('--arp-spam', Parameter.cmd_arp_spam,
+                        action='store_true',
+                        dest='arp_spam',
                         help=argparse.SUPPRESS)
 
     # Extra parameters
@@ -489,6 +497,11 @@ def parameters():
         NFQUEUE_Active = False
         udp_obj = UDP_Flood(args.flood[0])
         udp_obj.start()
+
+    elif args.arp_spam:
+        NFQUEUE_Active = False
+        arp_spam_obj = ARP_Spamming()
+        arp_spam_obj.start()
 
     # Extra settings
     if args.target_packet:

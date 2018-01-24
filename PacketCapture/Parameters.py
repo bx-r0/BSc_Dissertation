@@ -17,6 +17,7 @@ cmd_graph = '-g'
 cmd_edit = '-e'
 
 cmd_flood = '-fs'
+cmd_arp_spam = '-as'
 
 
 def Usage():
@@ -64,6 +65,9 @@ def Usage():
 
 --udp-flood, -f   <target_ip> 
     * Attacks a target IP address with a barrage of UDP packets
+    
+--arp-spam, -as
+    * Starts spamming the network with incorrect ARP values
                                 
 ## ---- Extra Optionals:
 
