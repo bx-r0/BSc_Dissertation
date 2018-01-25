@@ -3,7 +3,7 @@ import time
 import threading
 import os
 
-
+# TODO: Add ability to run the parent Effect.effect()
 class Bandwidth(Effect):
     """
     Class that deals with bandwidth functionality

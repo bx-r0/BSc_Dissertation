@@ -34,14 +34,12 @@ class Edit(Effect):
     def print_stats(self):
         self.print('[*] Packets edited: {}'.format(self.total_packets), end='\r')
 
-    def effect(self, packet):
+    def custom_effect(self, packet):
         # Switch for modes
         if self.edit_type is 1:
             self.TTL_Incrementing(packet)
 
         #       <-- Add more modes here
-
-        self.print_stats()
 
     # Edit modes
     def TTL_Incrementing(self, packet):

@@ -31,18 +31,13 @@ class PacketLoss(Effect):
         self.print('Packet loss: {}% -- '.format(new_value), end='')
         self.packet_loss_percentage = new_value
 
-    def effect(self, packet):
+    def custom_effect(self, packet):
         """This function will issue packet loss,
            a percentage is defined and anything
            lower is dropped and anything higher is accepted"""
 
-        # --- Graphing
-        self.default_graphing(packet)
-
         # random value from 0 to 100
         random_value = random.uniform(0, 100)
-
-        self.total_packets += 1
 
         # If the generated value is smaller than the percentage discard
         if self.packet_loss_percentage > random_value:
@@ -52,8 +47,6 @@ class PacketLoss(Effect):
         # Accept the packet
         else:
             self.accept(packet)
-
-        self.print_stats()
 
     # --- Graphing
     def graphing_setup(self):

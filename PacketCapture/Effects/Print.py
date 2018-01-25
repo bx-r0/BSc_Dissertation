@@ -9,8 +9,6 @@ class Print(Effect):
                          graphing=graphing,
                          graph_type_num=graph_type_num)
 
-    def effect(self, packet):
-        self.default_graphing(packet)
-
+    def custom_effect(self, packet):
         print('[!]', str(packet), flush=True)
         self.accept(packet)

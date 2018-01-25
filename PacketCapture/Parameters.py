@@ -77,7 +77,7 @@ def Usage():
 --arp, -a               <victimIP> <routerIP> <interface>       
     * Performs arp spoofing with the passed parameters
     
---save, -s
+--save, -s              <filename>
     * Tells the program to start saving all the packets that run through the system
     
 --graph, -g             <chart_type>
@@ -94,12 +94,12 @@ def Usage():
             
         Packet Loss:
         
-            1 - Will show the packet loss percentage over time
-            2 - Shows total packets lost over time
+            1 -     Will show the packet loss percentage over time
+            2 -     Shows total packets lost over time
             
         Bandwidth:
         
-            1 - Will show the rate of transfer over time
+            1 -     Will show the rate of transfer over time
     """
 
 

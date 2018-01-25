@@ -22,13 +22,9 @@ class Order(Effect):
     def print_stats(self):
         self.print('[*] Total packets received {}'.format(self.total), end='\r')
 
-    def effect(self, packet):
-        self.default_graphing(packet)
-
+    def custom_effect(self, packet):
         # Saves the packet
         self.packet_list.append(packet)
-        self.total += 1
-        self.print_stats()
 
     def send_packet(self):
 

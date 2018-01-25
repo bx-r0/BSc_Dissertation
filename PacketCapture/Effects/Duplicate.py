@@ -16,7 +16,7 @@ class Duplicate(Effect):
         # TODO: Add stats - what would be useful?
         self.print('Duplicate')
 
-    def effect(self, packet):
+    def custom_effect(self, packet):
 
         # TODO needs fixing
         # Get packet data

@@ -1,6 +1,8 @@
 import time
 import Parameters
 from Plotting import Graph
+from scapy.all import *
+
 
 class Effect:
     """Class that generally defines what an effect should contain """
@@ -23,12 +25,37 @@ class Effect:
 
             if show_output:
                 description = self.check_for_graph_type()
-                print("""[*] Graph number is \'{}\' and the description is: \n[*]\t\"{}\"""".format(self.graph_type_num, description))
+                print("""[*] Graph number is \'{}\' and the description is: \n[*]\t\"{}\"""".
+                      format(self.graph_type_num, description))
 
         # --- Universal stats --- #
         # Every effect has a starting time
         self.start_time = time.time()
         self.total_packets = 0  # Number of total packets processed
+
+        self.tcp_flags = []
+
+    def effect(self, packet):
+        """The first method run for all effects - Here custom code will be added
+        to collate information"""
+
+        # TCP tracking
+        self.track_TCP_stats(packet)
+
+        # Shared functionality between all effects
+        self.print_stats()
+        self.total_packets += 1
+        self.default_graphing(packet)
+        self.custom_effect(packet)
+
+    def custom_effect(self, packet):
+        """Each effect will need it's own custom effect"""
+        raise Exception('NotImplemented: Please add \'custom_effect()\' to your class')
+
+    def print_stats(self):
+        """[Blueprint] - Should print the custom stats for each method.
+        Note Print_stats should call 'self.print()' to show any output """
+        pass
 
     def check_for_graph_type(self):
         """This method checks for the graph number provided is valid"""
@@ -54,7 +81,8 @@ class Effect:
         if self.show_output or force:
             print(message, end=end, flush=True)
 
-    def print_clear(self):
+    @staticmethod
+    def print_clear():
         """Method that is used to clear the output line, this is
         so no fragments are left after a stat print refresh"""
         print(' ' * 70, end='\r', flush=True)
@@ -118,15 +146,6 @@ class Effect:
         """Will just save the graph to file"""
         self.graph.save()
 
-    def print_stats(self):
-        """[Blueprint] - Should print the custom stats for each method.
-        Note Print_stats should call 'self.print()' to show any output """
-        raise Exception('NotImplemented: Please add \'print_stats()\' to your class')
-
-    def effect(self):
-        """[Blueprint] - Should be the main center for the effects code"""
-        raise Exception('NotImplemented: Please add \'effect()\' to your class')
-
     def graphing_setup(self):
         """[Blueprint] - Custom code for each effects graph setup"""
         pass
@@ -151,3 +170,58 @@ class Effect:
     def decrease_effect(self):
         """[Blueprint] - Used to make the degradation lower"""
         pass
+
+    def check_packet_type(self, packet, target_packet):
+        """Checks if the packet is of a certain type"""
+
+        # Grabs the first section of the Packet
+        packet_string = str(packet)
+        split = packet_string.split(' ')
+
+        # Checks for the target packet type
+        if target_packet == split[0]:
+            return True
+        else:
+            return False
+
+    # Stats
+    def track_TCP_stats(self, packet):
+        """Method that tracks characteristics of the TCP packets """
+
+        try:
+            FIN = 0x01
+            SYN = 0x02
+            RST = 0x04
+            PSH = 0x08
+            ACK = 0x10
+            URG = 0x20
+            ECE = 0x40
+            CWR = 0x80
+
+            if self.check_packet_type(packet, 'TCP'):
+                pkt = IP()/TCP(packet.get_payload())
+                flags = pkt['TCP'].flags
+
+                # Saves the flags
+                active_flags = ['***'] * 8
+                if flags & FIN:
+                    active_flags[0] = 'FIN'
+                if flags & SYN:
+                    active_flags[1] = 'SYN'
+                if flags & RST:
+                    active_flags[2] = 'RST'
+                if flags & PSH:
+                    active_flags[3] = 'PSH'
+                if flags & ACK:
+                    active_flags[4] = 'ACK'
+                if flags & URG:
+                    active_flags[5] = 'URG'
+                if flags & ECE:
+                    active_flags[6] = 'ECE'
+                if flags & CWR:
+                    active_flags[7] = 'CWR'
+
+                # Saves the TCP flags
+                self.tcp_flags.append(active_flags)
+        except Exception as e:
+            print(e)

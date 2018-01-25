@@ -19,7 +19,7 @@ class Surge(Effect):
 
         self.print('[*] Packet surge delay set to {}s'.format(self.collection_period), force=True)
 
-    def effect(self, packet):
+    def custom_effect(self, packet):
         """General effect"""
 
         # HACK: Why is this wait needed?

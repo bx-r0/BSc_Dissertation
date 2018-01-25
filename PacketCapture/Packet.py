@@ -105,15 +105,21 @@ def affect_packet(packet):
     if target_packet_type == "ALL":
         return True
     else:
-        # Grabs the first section of the Packet
-        packet_string = str(packet)
-        split = packet_string.split(' ')
+        return check_packet_type(packet, target_packet_type)
 
-        # Checks for the target packet type
-        if target_packet_type == split[0]:
-            return True
-        else:
-            return False
+
+def check_packet_type(packet, target_packet):
+    """Checks if the packet is of a certain type"""
+
+    # Grabs the first section of the Packet
+    packet_string = str(packet)
+    split = packet_string.split(' ')
+
+    # Checks for the target packet type
+    if target_packet == split[0]:
+        return True
+    else:
+        return False
 
 
 def print_packet(packet):
@@ -137,10 +143,7 @@ def edit_packet(packet):
 def packet_latency(packet):
     """This function is used to incur latency on packets"""
     if affect_packet(packet):
-        try:
-            pool.apply_async(latency_obj.effect, [packet, time.time()])
-        except ValueError:
-            pass
+        map_thread(latency_obj.effect, [packet])
     else:
         packet.accept()
 

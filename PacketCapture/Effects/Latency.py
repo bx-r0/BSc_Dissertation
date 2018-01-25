@@ -35,20 +35,10 @@ class Latency(Effect):
         self.print('[*] Latency: {:.0f}ms - Total Packets effected: {} '.
                    format((self.latency_value * 1000), self.total_packets), end='\r')
 
-    def effect(self, packet, start=0):
+    def custom_effect(self, packet):
         """Thread functionality"""
 
-        self.default_graphing(packet)
-        self.print_stats()
-        self.total_packets += 1
-
-        if start is not 0:
-            # Issues latency of the entered value
-            e = (time.time() - start) / 1000  # Converts to ms
-            time.sleep(self.latency_value - e)
-        else:
-            time.sleep(self.latency_value)
-
+        time.sleep(self.latency_value)
         self.accept(packet)
 
     def alter_latency_value(self, new_value):
