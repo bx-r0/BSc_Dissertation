@@ -34,8 +34,7 @@ class Effect:
         self.total_packets = 0  # Number of total packets processed
 
         self.tcp_flags = []
-        self.tcp_sessions = []
-        self.retransmissions = 0
+        self.tcp_sessions = [TCP_Session(1, 1, 1, 1)]
 
     def effect(self, packet):
         """The first method run for all effects - Here custom code will be added
@@ -187,6 +186,9 @@ class Effect:
             return False
 
     # Stats
+    # TODO: Make this section better
+    #       at the moment it just storing the TCP packets into a list
+    #       and searching through them for any exact matches, this is inefficient and needs to be improved
     def track_TCP_stats(self, packet):
         """Method that tracks characteristics of the TCP packets """
 
@@ -218,22 +220,13 @@ class Effect:
         ack_num = pkt.ack
 
         # Creates the session object
-        session = TCP_Session(dst, dst_port, src, src_port)
         tcp_packet = TCP_Packet(seq_num, ack_num, len(pkt), packet)
-
-        #print(packet, tcp_packet)
-
-        self.check_if_existing_session(session)
 
         # Loops round and checks all session
         for session_loop in self.tcp_sessions:
 
-            # If the session is the same
-            if session_loop.compare(session):
-
-                # Checks for transmission and adds it to the list
-                session_loop.retransmit(tcp_packet)
-                break
+            # Checks for transmission and adds it to the list
+            session_loop.retransmit(tcp_packet)
 
     def check_if_existing_session(self, session):
         """Looks in the list for a session that is the same, if one cannot be found it adds it to the list"""
@@ -257,6 +250,8 @@ class TCP_Session:
 
         self.previous_packets = []
 
+        self.retransmissions = 0
+
     def compare(self, s):
         """Used to compare the parent session and a new session together"""
         if (s.dst_ip == self.dst_ip) and (s.src_ip == self.src_ip) and (s.dst_port == self.dst_port) and \
@@ -268,7 +263,7 @@ class TCP_Session:
     def retransmit(self, packet):
         """Method that checks if the values are from the same connection"""
 
-        count = 0
+        add = True
         for p_packets in self.previous_packets:
 
             # If there is another packet the same
@@ -277,16 +272,16 @@ class TCP_Session:
                 # Not to count RST flags as retransmissions
                 if not p_packets.has_flag('RST'):
 
-                    if p_packets.just_has_flag('ACK'):
-                        print('[DU-ACK]', packet)
-                    else:
-                        print('[RETRAN]', packet)
+                    self.retransmissions += 1
 
-                    # Gets rid of it once a retransmission has been found
-                    del self.previous_packets[count]
+                    # print('[R]', packet, self.retransmissions)
+
+                    # Only adds if
+                    add = False
 
         # Adds the new packet to the list
-        self.previous_packets.append(packet)
+        if add:
+            self.previous_packets.append(packet)
 
     def add_packet(self, packet):
         """Used to add a packet to a list of previously occuring packets"""
@@ -303,26 +298,35 @@ class TCP_Packet():
         self.packet_flags = self.get_flags(packet)
 
     def __str__(self):
+        """String returned when print() is called on the object"""
+
         return "SEQ: {0:<11} ACK: {1:<11} SIZE: {2:<4} FLAGS: {3:}".\
             format(self.seq_num, self.ack_num, self.size, self.packet_flags)
 
     def compare(self, t):
+        """Used to compare one packet to another to detect a match"""
+
         if (t.ack_num == self.ack_num) and (t.seq_num == self.seq_num) and (t.size == self.size):
             return self.same_flags(t.packet_flags)
         else:
             return False
 
     def has_flag(self, name):
+        """Checks for the presense of a single flag"""
+
         if name in self.packet_flags:
             return True
         else:
             return False
 
     def same_flags(self, other_flags):
+        """Compares the two packets flags"""
 
         return set(self.packet_flags) == set(other_flags)
 
     def just_has_flag(self, name):
+        """Checks if the packet has just a single flag"""
+
         if len(self.packet_flags) > 1:
             return False
         elif self.packet_flags[0] == name:
