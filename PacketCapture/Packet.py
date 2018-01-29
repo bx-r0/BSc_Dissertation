@@ -17,7 +17,7 @@ import Common_Connections
 
 from netfilterqueue import NetfilterQueue
 from scapy.all import *
-from multiprocessing.dummy import Pool as ThreadPool
+from multiprocessing.dummy import Pool
 import keyboard
 
 # Module imports
@@ -39,7 +39,7 @@ from Plotting import Graph
 #endregion
 
 # Defines how many threads are in the pool
-pool = ThreadPool(100)
+pool = Pool(100)
 
 logo = """
 ==============================================================
@@ -83,7 +83,7 @@ def map_thread(method, args):
     # If this try is caught, it occurs for every thread active so anything in the
     # except is triggered for all active threads
     try:
-        pool.map_async(method, args)
+        pool.apply(method, args)
     except ValueError:
         # Stops the program from exploding when he pool is terminated
         pass
@@ -121,15 +121,16 @@ def check_packet_type(packet, target_packet):
     else:
         return False
 
+def print_e(x):
+    print(x)
+
 
 def print_packet(packet):
     """This function just prints the packet"""
-
     if affect_packet(packet):
         map_thread(print_obj.effect, [packet])
     else:
         packet.accept()
-
 
 def edit_packet(packet):
     """This function will be used to edit sections of a packet, this is currently incomplete"""
@@ -243,10 +244,10 @@ def run_packet_manipulation():
         global nfqueue
 
         # Packets for this machine
-        os.system("iptables -A INPUT -j NFQUEUE")
+        os.system("iptables -A OUTPUT -j NFQUEUE --queue-num 1")
 
         # Packets for forwarding or other routes
-        os.system("iptables -t nat -A PREROUTING -j NFQUEUE")
+        os.system("iptables -t nat -A PREROUTING -j NFQUEUE --queue-num 1")
 
         print_force("[*] Mode is: " + mode.__name__)
 
@@ -254,12 +255,12 @@ def run_packet_manipulation():
         nfqueue = NetfilterQueue()
 
         try:
-            nfqueue.bind(0, mode)  # 0 is the default NFQUEUE
+            nfqueue.bind(1, mode)  # 0 is the default NFQUEUE
         except OSError:
             print_force("[!] Queue already created")
 
         # Shows the start waiting message
-            print_seperator()
+        print_seperator()
         print_force("[*] Waiting ")
         nfqueue.run()
 
@@ -636,7 +637,7 @@ def clean_close(signum='', frame=''):
 
         # Resets
         print_force("[!] iptables reverted")
-        os.system("iptables -F INPUT")
+        os.system("iptables -F")
 
         print_force("[!] NFQUEUE unbinded")
         nfqueue.unbind()

@@ -191,9 +191,7 @@ class Effect:
         """Method that tracks characteristics of the TCP packets """
 
         try:
-            if self.check_packet_type(packet, 'TCP'):
-                self.track_flags(packet)
-                self.check_for_retransmissions(packet)
+            self.check_for_retransmissions(packet)
         except Exception as e:
             pass
 
@@ -209,7 +207,6 @@ class Effect:
 
         # Ports
         dst_port = pkt.dport
-        src_port = pkt.sport
 
         # Sequence number
         seq_num = pkt.seq
@@ -218,28 +215,89 @@ class Effect:
         ack_num = pkt.ack
 
         # Creates the session object
-        session = TCP_Session(dst, dst_port, src, src_port, seq_num, ack_num)
+        session = TCP_Session(dst, dst_port, src, seq_num, ack_num, len(pkt))
+        flags = session.get_flags(packet)
 
-        any_connection = True
+        # 3rd position is the RST flag
+        # It will ignore the session if it is a RST packet
+        if flags[2] is None:
+            any_connection = True
 
-        # Loops through the collected list of distinct sessions
-        for x in self.tcp_sessions:
+            # Loops through the collected list of distinct sessions
+            for x in self.tcp_sessions:
 
-            # Checks if the SEQ and ACK values are correct
-            if x.Check_For_Retransmit(session):
+                # Checks if the SEQ and ACK values are correct
+                if x.Check_For_Retransmit(session):
 
-                # Stops the connection from being saved
-                any_connection = False
+                    # Stops the connection from being saved
+                    any_connection = False
 
-                self.retransmissions += 1
-                print(session)
-                break
+                    self.retransmissions += 1
 
-        # Adds connections to the list
-        if any_connection:
-            self.tcp_sessions.append(session)
+                    print(session)
+                    break
 
-    def track_flags(self, packet):
+            # Adds connections to the list
+            if any_connection:
+                self.tcp_sessions.append(session)
+
+
+class TCP_Session:
+
+    def __init__(self, dst_ip, dst_port, src_ip, seq_num, ack_num, size):
+        self.dst_ip = dst_ip
+        self.dst_port = dst_port
+
+        self.src_ip = src_ip
+
+        self.seq_num = int(seq_num)
+        self.ack_num = ack_num
+
+        self.size = size
+
+    def __str__(self):
+        return "Dest: {} - Src: {} - DPort: {} - Seq: {} - Ack: {} - Size: {}".\
+            format(self.dst_ip, self.src_ip, self.dst_port, self.seq_num, self.ack_num, self.size)
+
+    def Check_For_Retransmit(self, connection):
+        """Method that checks if the values are from the same connection"""
+
+        dst_ip = connection.dst_ip
+        dst_port = connection.dst_port
+        src_ip = connection.src_ip
+
+        if (self.dst_ip == dst_ip) and \
+                (self.dst_port == dst_port) and \
+                (self.src_ip == src_ip):
+            return self.retransmit(connection.seq_num, connection.ack_num, connection.size)
+        else:
+            return False
+
+    def retransmit(self, actual_seq_num, actual_ack_num, actual_size):
+        """Method that checks for any problems in a sequence
+        False - Not a Retransmit
+        True - Is a Retransmit"""
+
+        # If the packet is correct
+        if (self.seq_num < actual_seq_num) and (self.ack_num <= actual_ack_num):
+
+            # Updates sequence number
+            self.seq_num = actual_seq_num
+
+            # Updates ack number
+            self.ack_num = actual_ack_num
+            return False
+
+        # If the packet is identical
+        elif (self.seq_num == actual_seq_num) and \
+                (self.ack_num == actual_ack_num) and \
+                (self.size == actual_size):
+            return True
+
+        return False
+
+    @staticmethod
+    def get_flags(packet):
         FIN = 0x01
         SYN = 0x02
         RST = 0x04
@@ -253,7 +311,7 @@ class Effect:
         flags = pkt['TCP'].flags
 
         # Saves the flags
-        active_flags = ['***'] * 8
+        active_flags = [None] * 8
         if flags & FIN:
             active_flags[0] = 'FIN'
         if flags & SYN:
@@ -271,55 +329,4 @@ class Effect:
         if flags & CWR:
             active_flags[7] = 'CWR'
 
-        # Saves the TCP flags
-        self.tcp_flags.append(active_flags)
-
-class TCP_Session:
-
-    def __init__(self, dst_ip, dst_port, src_ip, src_port, seq_num, ack_num):
-        self.dst_ip = dst_ip
-        self.dst_port = dst_port
-
-        self.src_ip = src_ip
-        self.src_port = src_port
-
-        self.seq_num = int(seq_num)
-
-        self.ack_num = ack_num
-
-    def __str__(self):
-        return "Dest: {} - Src: {} - DPort: {} - SPort: {} - Seq: {}".\
-            format(self.dst_ip, self.src_ip, self.dst_port, self.src_port, self.seq_num, self.ack_num)
-
-    def Check_For_Retransmit(self, connection):
-        """Method that checks if the values are from the same connection"""
-
-        dst_ip = connection.dst_ip
-        dst_port = connection.dst_port
-        src_ip = connection.src_ip
-        src_port = connection.src_port
-
-        if \
-                (self.dst_ip == dst_ip) and \
-                        (self.dst_port == dst_port) and \
-                        (self.src_ip == src_ip) and \
-                        (self.src_port == src_port):
-            return self.retransmit(connection.seq_num, connection.ack_num)
-        else:
-            return False
-
-    def retransmit(self, actual_seq_num, actual_ack_num):
-        """Method that checks for any problems in a sequence"""
-
-        # The SEQ number should be more or equal
-        if self.seq_num < actual_seq_num:
-            self.seq_num = actual_seq_num
-            return False
-        # Could be out of order or a retransmit
-        elif self.seq_num == actual_seq_num:
-            # TODO: Have a check here for ACK, SYN flags
-            return False
-        else:
-            if self.ack_num != actual_ack_num:
-                return False
-            return True
+        return active_flags
