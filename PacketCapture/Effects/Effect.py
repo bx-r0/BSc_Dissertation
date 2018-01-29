@@ -192,8 +192,10 @@ class Effect:
 
         try:
             self.check_for_retransmissions(packet)
-        except Exception as e:
+        except AttributeError:
             pass
+        except Exception as e:
+            print('Error:', e)
 
     def check_for_retransmissions(self, packet):
         """This method checks for any TCP packets that
@@ -207,6 +209,7 @@ class Effect:
 
         # Ports
         dst_port = pkt.dport
+        src_port = pkt.sport
 
         # Sequence number
         seq_num = pkt.seq
@@ -215,86 +218,117 @@ class Effect:
         ack_num = pkt.ack
 
         # Creates the session object
-        session = TCP_Session(dst, dst_port, src, seq_num, ack_num, len(pkt))
-        flags = session.get_flags(packet)
+        session = TCP_Session(dst, dst_port, src, src_port)
+        tcp_packet = TCP_Packet(seq_num, ack_num, len(pkt), packet)
 
-        # 3rd position is the RST flag
-        # It will ignore the session if it is a RST packet
-        if flags[2] is None:
-            any_connection = True
+        #print(packet, tcp_packet)
 
-            # Loops through the collected list of distinct sessions
-            for x in self.tcp_sessions:
+        self.check_if_existing_session(session)
 
-                # Checks if the SEQ and ACK values are correct
-                if x.Check_For_Retransmit(session):
+        # Loops round and checks all session
+        for session_loop in self.tcp_sessions:
 
-                    # Stops the connection from being saved
-                    any_connection = False
+            # If the session is the same
+            if session_loop.compare(session):
 
-                    self.retransmissions += 1
+                # Checks for transmission and adds it to the list
+                session_loop.retransmit(tcp_packet)
+                break
 
-                    print(session)
-                    break
+    def check_if_existing_session(self, session):
+        """Looks in the list for a session that is the same, if one cannot be found it adds it to the list"""
 
-            # Adds connections to the list
-            if any_connection:
-                self.tcp_sessions.append(session)
+        # Checks if it already exists
+        matches = [ses for ses in self.tcp_sessions if ses.compare(session)]
+
+        # If it's a new session
+        if len(matches) is 0:
+            self.tcp_sessions.append(session)
 
 
 class TCP_Session:
 
-    def __init__(self, dst_ip, dst_port, src_ip, seq_num, ack_num, size):
+    def __init__(self, dst_ip, dst_port, src_ip, src_port):
         self.dst_ip = dst_ip
         self.dst_port = dst_port
 
         self.src_ip = src_ip
+        self.src_port = src_port
 
-        self.seq_num = int(seq_num)
-        self.ack_num = ack_num
+        self.previous_packets = []
 
-        self.size = size
-
-    def __str__(self):
-        return "Dest: {} - Src: {} - DPort: {} - Seq: {} - Ack: {} - Size: {}".\
-            format(self.dst_ip, self.src_ip, self.dst_port, self.seq_num, self.ack_num, self.size)
-
-    def Check_For_Retransmit(self, connection):
-        """Method that checks if the values are from the same connection"""
-
-        dst_ip = connection.dst_ip
-        dst_port = connection.dst_port
-        src_ip = connection.src_ip
-
-        if (self.dst_ip == dst_ip) and \
-                (self.dst_port == dst_port) and \
-                (self.src_ip == src_ip):
-            return self.retransmit(connection.seq_num, connection.ack_num, connection.size)
+    def compare(self, s):
+        """Used to compare the parent session and a new session together"""
+        if (s.dst_ip == self.dst_ip) and (s.src_ip == self.src_ip) and (s.dst_port == self.dst_port) and \
+            (s.src_port == self.src_port):
+            return True
         else:
             return False
 
-    def retransmit(self, actual_seq_num, actual_ack_num, actual_size):
-        """Method that checks for any problems in a sequence
-        False - Not a Retransmit
-        True - Is a Retransmit"""
+    def retransmit(self, packet):
+        """Method that checks if the values are from the same connection"""
 
-        # If the packet is correct
-        if (self.seq_num < actual_seq_num) and (self.ack_num <= actual_ack_num):
+        count = 0
+        for p_packets in self.previous_packets:
 
-            # Updates sequence number
-            self.seq_num = actual_seq_num
+            # If there is another packet the same
+            if p_packets.compare(packet):
 
-            # Updates ack number
-            self.ack_num = actual_ack_num
+                # Not to count RST flags as retransmissions
+                if not p_packets.has_flag('RST'):
+
+                    if p_packets.just_has_flag('ACK'):
+                        print('[DU-ACK]', packet)
+                    else:
+                        print('[RETRAN]', packet)
+
+                    # Gets rid of it once a retransmission has been found
+                    del self.previous_packets[count]
+
+        # Adds the new packet to the list
+        self.previous_packets.append(packet)
+
+    def add_packet(self, packet):
+        """Used to add a packet to a list of previously occuring packets"""
+        self.previous_packets.append(packet)
+
+
+class TCP_Packet():
+    """Used to hold values about packets in a session"""
+
+    def __init__(self, seq_num, ack_num, size, packet):
+        self.ack_num = ack_num
+        self.seq_num = seq_num
+        self.size = size
+        self.packet_flags = self.get_flags(packet)
+
+    def __str__(self):
+        return "SEQ: {0:<11} ACK: {1:<11} SIZE: {2:<4} FLAGS: {3:}".\
+            format(self.seq_num, self.ack_num, self.size, self.packet_flags)
+
+    def compare(self, t):
+        if (t.ack_num == self.ack_num) and (t.seq_num == self.seq_num) and (t.size == self.size):
+            return self.same_flags(t.packet_flags)
+        else:
             return False
 
-        # If the packet is identical
-        elif (self.seq_num == actual_seq_num) and \
-                (self.ack_num == actual_ack_num) and \
-                (self.size == actual_size):
+    def has_flag(self, name):
+        if name in self.packet_flags:
             return True
+        else:
+            return False
 
-        return False
+    def same_flags(self, other_flags):
+
+        return set(self.packet_flags) == set(other_flags)
+
+    def just_has_flag(self, name):
+        if len(self.packet_flags) > 1:
+            return False
+        elif self.packet_flags[0] == name:
+            return True
+        else:
+            return False
 
     @staticmethod
     def get_flags(packet):
@@ -307,11 +341,11 @@ class TCP_Session:
         ECE = 0x40
         CWR = 0x80
 
-        pkt = IP() / TCP(packet.get_payload())
+        pkt = IP(packet.get_payload())
         flags = pkt['TCP'].flags
 
         # Saves the flags
-        active_flags = [None] * 8
+        active_flags = ['***'] * 8
         if flags & FIN:
             active_flags[0] = 'FIN'
         if flags & SYN:
@@ -329,4 +363,8 @@ class TCP_Session:
         if flags & CWR:
             active_flags[7] = 'CWR'
 
+        # Filters out blanks
+        active_flags = [i for i in active_flags if i != '***']
+
         return active_flags
+
