@@ -121,9 +121,6 @@ def check_packet_type(packet, target_packet):
     else:
         return False
 
-def print_e(x):
-    print(x)
-
 
 def print_packet(packet):
     """This function just prints the packet"""
@@ -131,6 +128,7 @@ def print_packet(packet):
         map_thread(print_obj.effect, [packet])
     else:
         packet.accept()
+
 
 def edit_packet(packet):
     """This function will be used to edit sections of a packet, this is currently incomplete"""

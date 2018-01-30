@@ -24,8 +24,15 @@ class PacketLoss(Effect):
         else:
             self.dropped_percentage = 0
 
-        self.print("[*] Total Packets: {} - Target Loss {:.0f}% - Actual Loss {:.2f}%".format(
-            self.total_packets, self.packet_loss_percentage, self.dropped_percentage), end='\r')
+        self.print("[*] Total Packets: {} - "
+                   "Target Loss {:.0f}% - "
+                   "Actual Loss {:.2f}% - "
+                   "Retransmission: {}"
+
+            .format(self.total_packets,
+                    self.packet_loss_percentage,
+                    self.dropped_percentage,
+                    self.retransmission), end='\r')
 
     def alter_percentage(self, new_value):
         self.print('Packet loss: {}% -- '.format(new_value), end='')
@@ -62,6 +69,11 @@ class PacketLoss(Effect):
             self.graph.set_x_axis_label('Time (s)')
             self.graph.set_y_axis_label('Individual Packets Lost (No Of Packets)')
 
+        # Total Retransmissions over time
+        elif self.graph_type_num is 3:
+            self.graph.set_x_axis_label('Time (s)')
+            self.graph.set_y_axis_label('No of TCP Retransmission (Estimation)')
+
     def graphing_effect(self, packet):
         """Performs the data collecting for the graph"""
 
@@ -73,6 +85,10 @@ class PacketLoss(Effect):
         elif self.graph_type_num is 2:
             self.graph.add_points(self.get_elapsed_time(), self.dropped_packets)
 
+        # Total Retransmissions over time
+        elif self.graph_type_num is 3:
+            self.graph.add_points(self.get_elapsed_time(), self.retransmission)
+
     def show_custom_graph(self):
         """Shows the custom graphs for the packet loss effect"""
 
@@ -83,6 +99,10 @@ class PacketLoss(Effect):
         # Total packets lost over time
         elif self.graph_type_num is 2:
             self.graph.plot('y,-')
+
+        # Total Retransmissions over time
+        elif self.graph_type_num is 3:
+            self.graph.plot('b,-')
 
     def increase_effect(self):
         """Called when the 'e' key is pressed"""

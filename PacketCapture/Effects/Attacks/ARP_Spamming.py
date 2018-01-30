@@ -17,7 +17,6 @@ class ARP_Spamming:
         self.gen_random_mac_set(len(self.active_hosts))
         print(self.rnd_mac_addresses)
 
-
         self.running = True
         self.total_packets = 0
 

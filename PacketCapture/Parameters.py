@@ -96,6 +96,7 @@ def Usage():
         
             1 -     Will show the packet loss percentage over time
             2 -     Shows total packets lost over time
+            3 -     Displays an estimation on the number of retransmissions over time
             
         Bandwidth:
         
@@ -119,10 +120,11 @@ graph_descriptions = [
     GraphDescription(None, 0, 'Bar graph collating the different packet protocols collected'),
     GraphDescription(None, 10, 'Line graph of Total Packets (No) X Time (s)'),
 
-    #GraphDescription('Latency', 1, 'TODO'),
+    # GraphDescription('Latency', 1, 'TODO'),
 
     GraphDescription('PacketLoss', 1, 'Packet Loss (%) X Time (s)'),
     GraphDescription('PacketLoss', 2, 'Packets Lost (No) X Time (s)'),
+    GraphDescription('PacketLoss', 3, 'TCP Retransmission Rate X Time (s)'),
 
     GraphDescription('Bandwidth', 1, 'Transfer Rate (B/s) X Time (s)')
 ]
