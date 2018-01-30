@@ -39,7 +39,7 @@ from Plotting import Graph
 #endregion
 
 # Defines how many threads are in the pool
-pool = Pool(100)
+pool = Pool(1000)
 
 logo = """
 ==============================================================
@@ -242,10 +242,10 @@ def run_packet_manipulation():
         global nfqueue
 
         # Packets for this machine
-        os.system("iptables -A OUTPUT -j NFQUEUE --queue-num 1")
+        os.system("iptables -A INPUT -j NFQUEUE")
 
         # Packets for forwarding or other routes
-        os.system("iptables -t nat -A PREROUTING -j NFQUEUE --queue-num 1")
+        os.system("iptables -t nat -A PREROUTING -j NFQUEUE")
 
         print_force("[*] Mode is: " + mode.__name__)
 
@@ -253,7 +253,7 @@ def run_packet_manipulation():
         nfqueue = NetfilterQueue()
 
         try:
-            nfqueue.bind(1, mode)  # 0 is the default NFQUEUE
+            nfqueue.bind(0, mode)  # 0 is the default NFQUEUE
         except OSError:
             print_force("[!] Queue already created")
 

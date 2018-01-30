@@ -86,7 +86,7 @@ def set_ip_forward(state):
         os.system("sysctl net.ipv4.ip_forward=1")
 
         # Pushes the forwarded packets into the NFQUEUE so the Packet.py can take affect
-        os.system("iptables -A FORWARD  -j NFQUEUE")
+        os.system("iptables -A FORWARD -j NFQUEUE")
 
     else:
         os.system("sysctl net.ipv4.ip_forward=0")
