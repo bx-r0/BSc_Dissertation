@@ -5,17 +5,27 @@ from scapy.all import *
 
 
 class Effect:
-    """Class that generally defines what an effect should contain """
+    """Class that generally defines what an effect should contain
+
+    Params
+        accept_packets  - Defines if packets should be accepted (Used when stringing effects together)
+        show_output     - Says if the effect should show any output
+        graphing        - Toggles if the effect should collect data for a graph
+        gather_stats    - Switches on or off the data collection for packets like tcp
+        graph_type_num  - Defines the different graph to be generated. List in the the usage menu
+    """
 
     def __init__(self,
                  accept_packets=True,
                  show_output=True,
                  graphing=False,
+                 gather_stats=True,
                  graph_type_num=0):
 
         self.accept_packet = accept_packets
         self.show_output = show_output
         self.graphing = graphing
+        self.gather_stats = gather_stats
         self.graph_type_num = graph_type_num
 
         if self.graphing:
@@ -42,7 +52,8 @@ class Effect:
         to collate information"""
 
         # TCP tracking
-        self.track_TCP_stats(packet)
+        if self.gather_stats:
+            self.track_TCP_stats(packet)
 
         # Shared functionality between all effects
         self.print_stats()
@@ -197,7 +208,6 @@ class Effect:
                 self.check_for_retransmissions(packet)
 
         except AttributeError:
-            print(';')
             pass
         except Exception as e:
             print('Error:', e)

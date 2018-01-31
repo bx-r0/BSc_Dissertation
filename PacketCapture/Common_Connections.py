@@ -51,9 +51,10 @@ class Connection:
 
 # Hard coded real-world values
 # The values are specified as lists representing ranges
+
 _3G = Connection(
     latency=[53, 86],
-    bandwidth=[1600000, 1700000], # ~1.6Mbits/S measured in Bits
+    bandwidth=[1600000, 1700000],
     packet_loss=[1, 2],
     name='3G')
 

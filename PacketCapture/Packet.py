@@ -192,10 +192,16 @@ def emulate_real_connection_speed(packet):
 
     if affect_packet(packet):
 
+        rnd_latency = connection.rnd_latency()
+        rnd_packet_loss = connection.rnd_packet_loss()
+        rnd_bandwidth = connection.rnd_bandwidth()
+
+        print('[*] Current values: L: {}s P: {}% B: {}B/s '.format(rnd_latency, rnd_packet_loss, rnd_bandwidth), end='\r')
+
         # Adjusts the values
-        latency_obj.alter_latency_value(connection.rnd_latency())
-        packet_loss_obj.alter_percentage(connection.rnd_packet_loss())
-        bandwidth_obj.alter_bandwidth(connection.rnd_bandwidth())
+        latency_obj.alter_latency_value(rnd_latency)
+        packet_loss_obj.alter_percentage(rnd_packet_loss)
+        bandwidth_obj.alter_bandwidth(rnd_bandwidth)
 
         # Calls mode
         map_thread(combination, [packet])
@@ -471,9 +477,9 @@ def parameters():
         print_force('[*] Bandwidth:     {}B/s -> {}B/s'.format(connection.bandwidth[0], connection.bandwidth[1]))
         print_force('[*] ------------------------------------------- [*]')
 
-        latency_obj = Latency(latency_value=0, accept_packets=False, show_output=False)
-        bandwidth_obj = Bandwidth(bandwidth=0, accept_packets=False, show_output=False)
-        packet_loss_obj = PacketLoss(percentage=0, accept_packets=True, show_output=False)
+        latency_obj = Latency(latency_value=0, accept_packets=False, gather_stats=False, show_output=False)
+        bandwidth_obj = Bandwidth(bandwidth=0, accept_packets=False, gather_stats=False, show_output=False)
+        packet_loss_obj = PacketLoss(percentage=0, accept_packets=True, gather_stats=False, show_output=False)
         mode = emulate_real_connection_speed
 
     elif args.display_bandwidth:

@@ -17,11 +17,13 @@ class Latency(Effect):
                  accept_packets=True,
                  show_output=True,
                  graphing=False,
+                 gather_stats=True,
                  graph_type_num=0):
 
         super().__init__(accept_packets=accept_packets,
                          show_output=show_output,
                          graphing=graphing,
+                         gather_stats=gather_stats,
                          graph_type_num=graph_type_num)
 
         self.latency_value = latency_value / 1000
