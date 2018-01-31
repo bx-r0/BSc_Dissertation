@@ -1,5 +1,5 @@
 from Effects.Effect import Effect
-
+from scapy.all import *
 
 class Print(Effect):
 
@@ -10,5 +10,11 @@ class Print(Effect):
                          graph_type_num=graph_type_num)
 
     def custom_effect(self, packet):
-        print('[!]', str(packet), flush=True)
+
+        pkt = IP(packet.get_payload())
+
+        src = pkt[IP].src
+        dst = pkt[IP].dst
+
+        print('[!] {} -- Src: {} Dst: {}'.format(str(packet), src, dst), flush=True)
         self.accept(packet)
