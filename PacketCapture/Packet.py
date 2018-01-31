@@ -84,7 +84,7 @@ def map_thread(method, args):
     # except is triggered for all active threads
     try:
         pool.apply(method, args)
-    except ValueError:
+    except ValueError and AssertionError:
         # Stops the program from exploding when he pool is terminated
         pass
 
@@ -453,7 +453,7 @@ def parameters():
         global connection
 
         # Checks if the parameter is a valid connection
-        connection = Nones
+        connection = None
         for c in Common_Connections.connections:
             if c.name == str(args.simulate):
                 connection = c
@@ -463,7 +463,13 @@ def parameters():
             print('Error: Could no find the \'{}\' connection entered'.format(args.simulate))
             sys.exit(0)
 
+        # Prints a summary table for the connection speed
         print_force('[*] Connection type is emulating: {}'.format(connection.name))
+        print_force('[*] ------------------------------------------- [*]')
+        print_force('[*] Latency:       {}ms -> {}ms'.format(connection.latency[0], connection.latency[1]))
+        print_force('[*] Packet Loss:   {}% -> {}%'.format(connection.packet_loss[0], connection.packet_loss[1]))
+        print_force('[*] Bandwidth:     {}B/s -> {}B/s'.format(connection.bandwidth[0], connection.bandwidth[1]))
+        print_force('[*] ------------------------------------------- [*]')
 
         latency_obj = Latency(latency_value=0, accept_packets=False, show_output=False)
         bandwidth_obj = Bandwidth(bandwidth=0, accept_packets=False, show_output=False)

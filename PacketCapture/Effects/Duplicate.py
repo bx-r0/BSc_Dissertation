@@ -13,21 +13,19 @@ class Duplicate(Effect):
         self.duplication_factor = duplication_factor
 
     def print_stats(self):
-        # TODO: Add stats - what would be useful?
-        self.print('Duplicate')
+        self.print('[*] Duplicated: {}'.format(self.total_packets), end='\r')
 
     def custom_effect(self, packet):
 
-        # TODO needs fixing
-        # Get packet data
         pkt = IP(packet.get_payload())
 
-        pkt[IP].dst = "192.168.1.1"
+        # This displays all the valid information, nothing that doesn't look right
+        pkt.show()
 
-        del pkt[ICMP].chksum
-        del pkt[IP].chksum
-
-        send(pkt, verbose=1, count=self.duplication_factor)
+        # TODO: Need to check that this is actually sending using another machine
+        # Maybe the new packets being sent are being caught in the NFQUEUE?
+        sendp(pkt, verbose=0)
+        packet.drop()
 
     # Graphing
         # TODO: Add graphing to Duplicate

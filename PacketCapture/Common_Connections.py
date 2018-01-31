@@ -12,7 +12,7 @@ class Connection:
                 raise Exception('Invalid parameters passed for Connection object: {}!'.format(value))
 
             self.latency = latency
-            self.packetloss = packet_loss
+            self.packet_loss = packet_loss
             self.bandwidth = bandwidth
             self.name = name
 
@@ -27,7 +27,7 @@ class Connection:
         return self.rnd(self.latency) / 1000
 
     def rnd_packet_loss(self):
-        return int(self.rnd(self.packetloss))
+        return int(self.rnd(self.packet_loss))
 
     def rnd_bandwidth(self):
         return int(self.rnd(self.bandwidth))
@@ -42,30 +42,30 @@ class Connection:
         return random.randint(low, high)
 
 
-# TODO: Add accurate values
+# References for values
+# 3G and 4G
+#   https://www.ofcom.org.uk/about-ofcom/latest/media/media-releases/2014/3g-4g-bb-speeds
+
+# Wifi
+#   https://www.ispreview.co.uk/index.php/2017/04/ofcom-2017-study-average-uk-home-broadband-speeds-rise-36-2mbps.html
+
 # Hard coded real-world values
-#   The values are specified as lists representing ranges
+# The values are specified as lists representing ranges
 _3G = Connection(
-    latency=[200, 250],
-    bandwidth=[600, 1000],
+    latency=[53, 86],
+    bandwidth=[1600000, 1700000], # ~1.6Mbits/S measured in Bits
     packet_loss=[1, 2],
     name='3G')
 
 _4G = Connection(
-    latency=[100, 150],
-    bandwidth=[10000, 15000],
+    latency=[47, 62],
+    bandwidth=[10400000, 18400000],
     packet_loss=[0.5, 1],
     name='4G')
 
-_GPRS = Connection(
-    latency=[400, 500],
-    bandwidth=[40, 50],
-    packet_loss=[1, 2],
-    name='GPRS')
-
 _WIFI = Connection(
     latency=[30, 40],
-    bandwidth=[25000, 30000],
+    bandwidth=[30000000, 36000000],
     packet_loss=[0, 1],
     name='WIFI')
 
@@ -81,7 +81,7 @@ connections = \
     [
         _3G,
         _4G,
-        _GPRS,
         _WIFI,
         _NoConnection
     ]
+

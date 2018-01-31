@@ -43,7 +43,14 @@ def Usage():
     * Duplicates a packet by the specified factor
 
 --simulate, -s      <connection_name>        
-    * Simulates real world connections e.g. 3G
+    * Simulates real world connections
+    
+        Supported connections:
+        
+            - 3G
+            - 4G
+            - Wifi
+            - NoConnection
     
 --rate-limit, -rl   <rate_bytes>            
     * Limits the throughput of the program
@@ -83,24 +90,23 @@ def Usage():
 --graph, -g             <chart_type>
     * Sets the program in graph mode where it collates information to create a graph
     
-    ## Chart_Types ##
+    #-- Chart_Types --#:
+    All-Modes:
         
-        All-Modes:
-        
-            0 -     Will show a bar graph with the total number of a packets' 
-                    protocol that the script has collected
+        0   -   Will show a bar graph with the total number of a packets' 
+                protocol that the script has collected
                 
-            10 -    Will process a line graph with number of packets over time
+        10  -   Will process a line graph with number of packets over time
             
-        Packet Loss:
+    Packet Loss:
         
-            1 -     Will show the packet loss percentage over time
-            2 -     Shows total packets lost over time
-            3 -     Displays an estimation on the number of retransmissions over time
+        1   -   Will show the packet loss percentage over time
+        2   -   Shows total packets lost over time
+        3   -   Displays an estimation on the number of retransmissions over time
             
-        Bandwidth:
+    Bandwidth:
         
-            1 -     Will show the rate of transfer over time
+        1   -   Will show the rate of transfer over time
     """
 
 
