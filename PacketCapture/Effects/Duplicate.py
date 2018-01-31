@@ -3,6 +3,7 @@ from scapy.all import *
 
 
 class Duplicate(Effect):
+    """Used to duplicate packets as many times as the parameter specifies"""
 
     def __init__(self, duplication_factor, accept_packets=True, show_output=True, graphing=False, graph_type_num=0):
         super().__init__(accept_packets=accept_packets,
@@ -17,18 +18,19 @@ class Duplicate(Effect):
 
     def custom_effect(self, packet):
 
-        pkt = IP(packet.get_payload())
+        dst = "192.168.1.16"
+        src = "192.168.1.14"
+        try:
+            pkt = IP(packet.get_payload())
+            send(pkt, verbose=0, count=self.duplication_factor)
 
-        # This displays all the valid information, nothing that doesn't look right
-        pkt.show()
+        except Exception as e:
+            pass
 
-        # TODO: Need to check that this is actually sending using another machine
-        # Maybe the new packets being sent are being caught in the NFQUEUE?
-        sendp(pkt, verbose=0)
-        packet.drop()
+        packet.accept()
 
     # Graphing
-        # TODO: Add graphing to Duplicate
+    # TODO: Add graphing to Duplicate
 
     # Alter effect
-        # TODO: Add alter effect to Duplicate
+    # TODO: Add alter effect to Duplicate
