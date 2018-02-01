@@ -573,7 +573,7 @@ def user_input_thread(graph_active):
 
         # HACK: Stops this from looping too fast and soaking up to much performance
         # A better solution would be to introduce events
-        time.sleep(0.1)
+        time.sleep(0.01)
 
         try:
             if keyboard.is_pressed('g'):

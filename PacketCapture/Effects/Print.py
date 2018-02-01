@@ -16,5 +16,5 @@ class Print(Effect):
         src = pkt[IP].src
         dst = pkt[IP].dst
 
-        print('[!] {} -- Src: {} Dst: {}'.format(str(packet), src, dst), flush=True)
+        print('[!] {0:<25} Src: {1:<15} Dst: {2:<15}'.format(str(packet), src, dst), flush=True)
         self.accept(packet)

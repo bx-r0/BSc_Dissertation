@@ -55,6 +55,7 @@ class Graph:
         # Grabs the full filename
         filename = os.path.dirname(os.path.abspath(__file__))
 
+        print(" " * 50, end='\r')  # Line clear
         print("[*] Your graph has been saved!", flush=True)
         print('[*] \t{}'.format(self.picture_filename), '\n[*]', flush=True)
 
