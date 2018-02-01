@@ -16,7 +16,6 @@ buttons_values = \
 non_func_buttons = \
     [
         'Button_Combination',
-        'Button_Duplicate',
         'Button_Simulate',
     ]
 
@@ -26,7 +25,6 @@ textbox_values = \
         'TextBox_PacketLoss',
         'TextBox_Throttle',
         'TextBox_RateLimit',
-        'TextBox_Duplicate',
         'TextBox_Simulate'
     ]
 

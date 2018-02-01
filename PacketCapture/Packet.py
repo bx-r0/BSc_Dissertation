@@ -31,7 +31,6 @@ from Effects.PacketLoss import PacketLoss
 from Effects.Surge import Surge
 from Effects.OutOfOrder import Order
 from Effects.Print import Print
-from Effects.Duplicate import Duplicate
 from Effects.EditPacket import Edit
 from Effects.Attacks.UDP_Flooding import UDP_Flood
 from Effects.Attacks.ARP_Spamming import ARP_Spamming
@@ -163,14 +162,6 @@ def surge(packet):
         packet.accept()
 
 
-def duplicate(packet):
-    """Mode that takes a full duplication"""
-    if affect_packet(packet):
-        map_thread(duplicate_obj.effect, [packet])
-    else:
-        packet.accept()
-
-
 def combination(packet):
     """This performs effects together"""
     packet_loss_obj.effect(packet)
@@ -285,7 +276,6 @@ def parameters():
         bandwidth_obj, \
         order_obj, \
         print_obj, \
-        duplicate_obj, \
         edit_obj, \
         udp_obj, \
         arp_spam_obj
@@ -296,7 +286,6 @@ def parameters():
     bandwidth_obj = None
     order_obj = None
     print_obj = None
-    duplicate_obj = None
     edit_obj = None
     udp_obj = None
     arp_spam_obj = None
@@ -339,11 +328,6 @@ def parameters():
                         type=int)
 
     effect.add_argument('--surge', Parameter.cmd_throttle,
-                        action='store',
-                        help=argparse.SUPPRESS,
-                        type=int)
-
-    effect.add_argument('--duplicate', Parameter.cmd_duplicate,
                         action='store',
                         help=argparse.SUPPRESS,
                         type=int)
@@ -440,14 +424,6 @@ def parameters():
         throttle_obj = Surge(period=args.surge)
         throttle_obj.start_purge_monitor()
         mode = surge
-
-    elif args.duplicate:
-        duplicate_obj = Duplicate(int(args.duplicate),
-                                  graphing=graph_active,
-                                  graph_type_num=graph_type_num)
-
-        print_force('[*] Packet duplication set. Factor is: {}'.format(args.duplicate))
-        mode = duplicate
 
     elif args.combination:
         latency_obj = Latency(latency_value=args.combination[0], accept_packets=False, show_output=False)

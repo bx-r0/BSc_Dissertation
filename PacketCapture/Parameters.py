@@ -6,7 +6,6 @@ cmd_target_packet = '-tp'
 cmd_print = '-p'
 cmd_bandwidth = '-b'
 cmd_throttle = '-t'
-cmd_duplicate = '-d'
 cmd_simulate = '-s'
 cmd_ratelimit = '-rl'
 cmd_combination = '-c'
@@ -38,9 +37,6 @@ def Usage():
 
 --surge, -t      <delay_ms> 
     * Creates a packet surge on connection by the given delay 
-    
---duplicate, -d     <factor>                 
-    * Duplicates a packet by the specified factor
 
 --simulate, -s      <connection_name>        
     * Simulates real world connections

@@ -144,12 +144,6 @@ class PacketCaptureGTK:
         if self.validation(value, 1, 10000):
             self.run_packet_capture('{} {}'.format(Parameter.cmd_ratelimit, str(value)))
 
-    def duplicate_Clicked(self, button):
-        value = self.textBoxes['TextBox_Duplicate'].get_text()
-
-        if self.validation(value, 1, 100):
-            self.run_packet_capture('{} {}'.format(Parameter.cmd_duplicate, str(value)))
-
     def simulate_Clicked(self, button):
         value = self.textBoxes['TextBox_Simulate'].get_text()
 
