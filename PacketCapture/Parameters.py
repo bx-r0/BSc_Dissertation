@@ -26,6 +26,10 @@ def Usage():
 --print, -p                                  
     * Prints all the packets
     
+--ignore, -i
+    * Does nothing to the packets. Used to show how much overhead there
+    by default
+    
 --display-bandwidth, -b                     
     * Displays information on the transfer rate
       

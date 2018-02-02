@@ -129,6 +129,12 @@ def print_packet(packet):
         packet.accept()
 
 
+def ignore_packet(packet):
+    """Used to test the overhead of moving packets through the NFQUEUE"""
+
+    packet.accept()
+
+
 def edit_packet(packet):
     """This function will be used to edit sections of a packet, this is currently incomplete"""
 
@@ -317,6 +323,11 @@ def parameters():
                         action='store_true',
                         help=argparse.SUPPRESS)
 
+    effect.add_argument('--ignore', '-i',
+                        action='store_true',
+                        dest='ignore',
+                        help=argparse.SUPPRESS)
+
     effect.add_argument('--latency', Parameter.cmd_latency,
                         action='store',
                         help=argparse.SUPPRESS,
@@ -407,6 +418,9 @@ def parameters():
         print_obj = Print(graphing=graph_active,
                           graph_type_num=graph_type_num)
         mode = print_packet
+
+    elif args.ignore:
+        mode = ignore_packet
 
     elif args.latency:
         latency_obj = Latency(latency_value=args.latency,
