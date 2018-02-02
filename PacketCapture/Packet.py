@@ -17,7 +17,7 @@ import Common_Connections
 
 from netfilterqueue import NetfilterQueue
 from scapy.all import *
-from multiprocessing.dummy import Pool
+from multiprocessing.pool import ThreadPool as Pool
 import keyboard
 
 # Module imports
@@ -38,7 +38,7 @@ from Plotting import Graph
 #endregion
 
 # Defines how many threads are in the pool
-pool = Pool(1000)
+pool = Pool(2000)
 
 logo = """
 ==============================================================
@@ -82,9 +82,8 @@ def map_thread(method, args):
     # If this try is caught, it occurs for every thread active so anything in the
     # except is triggered for all active threads
     try:
-        pool.apply(method, args)
-    except ValueError and AssertionError:
-        # Stops the program from exploding when he pool is terminated
+        pool.apply_async(method, args)
+    except:
         pass
 
 

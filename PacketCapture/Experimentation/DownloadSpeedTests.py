@@ -9,6 +9,14 @@ import speedtest as speed
 import subprocess
 import time
 import sys
+import csv
+
+# Translates parameter to effect and unit
+Parameter_values = \
+    [
+        ["-l", "Latency", "ms"],
+        ["-pl", "Packet Loss", "%"]
+    ]
 
 
 def clean_close(signum, frame):
@@ -24,7 +32,6 @@ def clean_close(signum, frame):
 def run_degradation_script(parameters):
     """This runs the packets script with custom parameters in the background
     while the speed test is performed"""
-
 
     global PROCESS
     PROCESS = None
@@ -55,7 +62,6 @@ def run_degradation_script(parameters):
 
     # Speed code
     grab_speeds()
-    clean_close('', '')
 
     end_time = time.time()
 
@@ -85,11 +91,17 @@ def print_speeds():
     print("[!] Download: {:.2f}Mbps - Upload: {:.2f}Mbps".format(DOWNLOAD, UPLOAD))
 
 
-def save_csv(x_data, y_data):
-    pass
+def save_csv():
+
+    # Saves the data
+    with open('data.csv', 'w') as csvfile:
+        writer = csv.writer(csvfile, delimiter=',')
+
+        writer.writerow(effect_values)
+        writer.writerow(download_values)
+        writer.writerow(upload_values)
 
 
-# TODO: This method needs validation
 def get_parameters():
     # Grabs all the parameters
     # Note: No validation
@@ -128,15 +140,27 @@ def get_parameters():
 
 
 def multiple_tests(parameters):
-    download_values = []
-    upload_vlaues = []
-    script_parameter = []
+
+    global download_values, upload_values, effect_values, effect_parameter_flag
+
+    effect_parameter_flag = parameters[0]
+    download_values = ["Download"]
+    upload_values = ["Upload"]
+    effect_values = []
+
+    # Translates parameters into units and names dynamically
+    effect_name = ''
+    effect_unit = ''
+    for x in Parameter_values:
+        if x[0] == effect_parameter_flag:
+            effect_name = x[1]
+            effect_unit = x[2]
+    effect_values.insert(0, effect_name)
 
     range_of_values = parameters[-1]
     print('[*] Tests will be performed on this range: \'{}\''.format(range_of_values))
 
     for value in range_of_values:
-
         test = [parameters[0], str(value)]
 
         print('\n[!] New test - Type: \'{}\' - Effect level: \'{}\''.format(test[0], test[1]))
@@ -144,34 +168,41 @@ def multiple_tests(parameters):
         run_degradation_script(test)
 
         # Saves data to a series of lists
-        script_parameter.append(test)
-        download_values.append(DOWNLOAD)
-        upload_vlaues.append(UPLOAD)
+        effect_values.append(str(value) + " " + effect_unit)
+        download_values.append(str(round(DOWNLOAD, 5)))
+        upload_values.append(str(round(UPLOAD, 5)))
 
+        print('[!] Data saved!')
+        save_csv()
         print_speeds()
 
-    print(download_values)
-    print(upload_vlaues)
+        # Saves and closes the previous script
+        clean_close('', '')
 
 
 try:
-
-    # TODO: Add a way for the script to test multiple different parameters and save the values to a .csv
-
     parameters = get_parameters()
     del sys.argv[1:]  # Stop other scripts from grabbing already used parameters
 
-    # Checks if the output is range
-    if isinstance(parameters[-1], range):
-        print('[!] Multiple test mode activated!')
-        multiple_tests(parameters)
+    if parameters is not None:
 
-    elif parameters is not None:
-        run_degradation_script(parameters)
+        # Range parameters
+        if isinstance(parameters[-1], range):
+            print('[!] Multiple test mode activated!')
+            multiple_tests(parameters)
 
-        time.sleep(0.5)
+        # If the parameters are regular
+        else:
+            run_degradation_script(parameters)
+
+            time.sleep(0.5)
+            print_speeds()
+
+    # No parameters
+    else:
+        grab_speeds()
         print_speeds()
 
 
 except Exception as e:
-    print('Error', e)
+    print('Error:', e)
