@@ -180,29 +180,24 @@ def multiple_tests(parameters):
         clean_close('', '')
 
 
-try:
-    parameters = get_parameters()
-    del sys.argv[1:]  # Stop other scripts from grabbing already used parameters
+parameters = get_parameters()
+del sys.argv[1:]  # Stop other scripts from grabbing already used parameters
 
-    if parameters is not None:
+if parameters is not None:
 
-        # Range parameters
-        if isinstance(parameters[-1], range):
-            print('[!] Multiple test mode activated!')
-            multiple_tests(parameters)
+    # Range parameters
+    if isinstance(parameters[-1], range):
+        print('[!] Multiple test mode activated!')
+        multiple_tests(parameters)
 
-        # If the parameters are regular
-        else:
-            run_degradation_script(parameters)
-
-            time.sleep(0.5)
-            print_speeds()
-
-    # No parameters
+    # If the parameters are regular
     else:
-        grab_speeds()
+        run_degradation_script(parameters)
+
+        time.sleep(0.5)
         print_speeds()
 
-
-except Exception as e:
-    print('Error:', e)
+# No parameters
+else:
+    grab_speeds()
+    print_speeds()

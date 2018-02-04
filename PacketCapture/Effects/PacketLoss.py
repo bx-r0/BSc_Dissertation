@@ -76,11 +76,6 @@ class PacketLoss(Effect):
             self.graph.set_x_axis_label('Time (s)')
             self.graph.set_y_axis_label('Individual Packets Lost (No Of Packets)')
 
-        # Total Retransmissions over time
-        elif self.graph_type_num is 3:
-            self.graph.set_x_axis_label('Time (s)')
-            self.graph.set_y_axis_label('No of TCP Retransmission (Estimation)')
-
     def graphing_effect(self, packet):
         """Performs the data collecting for the graph"""
 
@@ -92,10 +87,6 @@ class PacketLoss(Effect):
         elif self.graph_type_num is 2:
             self.graph.add_points(self.get_elapsed_time(), self.dropped_packets)
 
-        # Total Retransmissions over time
-        elif self.graph_type_num is 3:
-            self.graph.add_points(self.get_elapsed_time(), self.retransmission)
-
     def show_custom_graph(self):
         """Shows the custom graphs for the packet loss effect"""
 
@@ -106,10 +97,6 @@ class PacketLoss(Effect):
         # Total packets lost over time
         elif self.graph_type_num is 2:
             self.graph.plot('y,-')
-
-        # Total Retransmissions over time
-        elif self.graph_type_num is 3:
-            self.graph.plot('b,-')
 
     def increase_effect(self):
         """Called when the 'e' key is pressed"""
@@ -126,8 +113,3 @@ class PacketLoss(Effect):
         # Validation - Checks if result would be non negative
         if (self.packet_loss_percentage - decrement_value) > 0:
             self.packet_loss_percentage -= decrement_value
-
-
-
-
-

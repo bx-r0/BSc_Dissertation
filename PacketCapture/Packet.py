@@ -1,7 +1,7 @@
 #region Imports
 # Import graphing
 import matplotlib as mpl
-mpl.use('Agg')
+#mpl.use('Agg')
 
 # Suppresses the Scapy WARNING Message
 import logging
@@ -118,6 +118,13 @@ def check_packet_type(packet, target_packet):
         return True
     else:
         return False
+
+
+def external(packet):
+    """This method is used to run the effect of a script
+    from another script"""
+
+    map_thread(external_obj.effect, [packet])
 
 
 def print_packet(packet):
@@ -237,6 +244,15 @@ def setup_packet_save(filename):
     pktdump = PcapWriter(filename + '.pcap', append=False, sync=True)
 
 
+def run_packet_manipulation_external(external_object):
+    global mode, external_obj
+
+    external_obj = external_object
+    mode = external
+
+    run_packet_manipulation()
+
+
 def run_packet_manipulation():
     """The main method here, will issue a iptables command and construct the NFQUEUE"""
 
@@ -283,7 +299,8 @@ def parameters():
         print_obj, \
         edit_obj, \
         udp_obj, \
-        arp_spam_obj
+        arp_spam_obj, \
+        external_obj
 
     latency_obj = None
     throttle_obj = None
@@ -665,5 +682,6 @@ def print_seperator():
     print('[*]', '=' * (int(terminal_width) - 5))
 
 
-print_seperator()
-parameters()
+if __name__ == "__main__":
+    print_seperator()
+    parameters()

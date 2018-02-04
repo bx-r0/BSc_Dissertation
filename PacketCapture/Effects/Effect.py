@@ -120,6 +120,10 @@ class Effect:
             elif self.graph_type_num is 10:
                 self.graph.add_points(self.get_elapsed_time(), self.total_packets)
 
+            # Total Retransmissions over time
+            elif self.graph_type_num is 100:
+                self.graph.add_points(self.get_elapsed_time(), self.retransmission)
+
             # Each effects custom graphing
             else:
                 self.graphing_effect(packet)
@@ -136,6 +140,12 @@ class Effect:
             elif self.graph_type_num is 10:
                 self.graph.set_x_axis_label('Time (s)')
                 self.graph.set_y_axis_label('Total Packets')
+
+                # Total Retransmissions over time
+            elif self.graph_type_num is 100:
+                self.graph.set_x_axis_label('Time (s)')
+                self.graph.set_y_axis_label('No of TCP Retransmission (Estimation)')
+
             else:
                 self.graphing_setup()
 
@@ -147,6 +157,10 @@ class Effect:
         # Graph that processes total number of packets over time
         elif self.graph_type_num is 10:
             self.graph.plot('g,-')
+
+            # Total Retransmissions over time
+        elif self.graph_type_num is 100:
+            self.graph.plot('b,-')
 
         else:
             self.show_custom_graph()
@@ -281,7 +295,7 @@ class TcpSession:
 
                     self.retransmissions += 1
 
-                    # print('[R]', packet, self.retransmissions)
+                    #print('[R]', packet, self.retransmissions)
 
                     # Only adds if
                     add = False
@@ -355,7 +369,7 @@ class TcpPacket:
         CWR = 0x80
 
         pkt = IP(packet.get_payload())
-        flags = pkt['TCP'].flags
+        flags = pkt.flags
 
         # Saves the flags
         active_flags = ['***'] * 8
