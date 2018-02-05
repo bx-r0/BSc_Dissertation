@@ -6,10 +6,12 @@ import threading
 import time
 sys.path.insert(1, os.path.join(sys.path[0], '..'))
 from Effects.PacketLoss import PacketLoss
+from Effects.Print import Print
 import Packet
 from Terminal import Terminal
 import urllib.request as ul
 import csv
+from functools import partial
 #endregion
 
 
@@ -22,12 +24,6 @@ def printing(printing_on):
         sys.stdout = sys.__stdout__
     else:
         sys.stdout = open(os.devnull, 'w')
-
-
-def terminate_script():
-    Terminal.clear_line()
-    print('[!] Script terminated')
-    pool.close()
 
 
 def save_csv(test):
@@ -47,14 +43,14 @@ def save_csv(test):
     print('[X]')
 
 
-def run_packet_script(obj):
-    pool.apply_async(Packet.run_packet_manipulation_external, [obj])
+def run_packet_script(obj, target_type):
+    func = partial(Packet.run_packet_manipulation_external, obj, target_type)
+    pool.apply_async(func, [])
 
 
 def request_webpage():
-    req = ul.Request('http://www.google.com')
+    req = ul.Request('https://coinmarketcap.com/')
     response = ul.urlopen(req)
-    the_page = response.read()
 
 
 def run_test(packet_loss):
@@ -66,25 +62,23 @@ def run_test(packet_loss):
     try:
         printing(False)
         packetLoss = PacketLoss(packet_loss)
-        run_packet_script(packetLoss)
+        run_packet_script(packetLoss, 'TCP')
 
-        for x in range(1, 2):
-            pool.apply_async(request_webpage, [])
+        pool.apply_async(request_webpage)
 
         time.sleep(TEST_TIME)
-        terminate_script()
         printing(True)
 
-        return packetLoss.retransmission
+        return packetLoss
     except Exception as e:
         print('Error:', e)
 
 
 TESTS = []
-TEST_PER_VALUE = 2
-MAX_PERCENTAGE_VALUE = 1
+TEST_PER_VALUE = 3
+MAX_PERCENTAGE_VALUE = 100
 PERCENTAGE_STEP = 1
-TEST_TIME = 5  # Seconds
+TEST_TIME = 15  # Seconds
 
 # Calculates total time
 total_time = (MAX_PERCENTAGE_VALUE / float(PERCENTAGE_STEP)) * TEST_PER_VALUE * TEST_TIME
@@ -107,18 +101,29 @@ with open('test.csv', 'w'):
 for packet_loss in range(1, MAX_PERCENTAGE_VALUE + 1, PERCENTAGE_STEP):
     print('\n## Packet loss now: {}%'.format(packet_loss))
 
-    test = [packet_loss]
-
     # Repeats for that percentage values
     for x in range(0, TEST_PER_VALUE):
 
+        test = []
+        test = [packet_loss]
+
         print('## Starting test {}'.format(x))
-        value = run_test(packet_loss)
-        print('## Output: {}'.format(value))
-        test.append(value)
+        packetLoss_obj = run_test(packet_loss)
+
+        retransmissions = packetLoss_obj.retransmission
+        total_packets = packetLoss_obj.total_packets
+        ratio = (retransmissions / total_packets) * 100
+
+        print('## Output: R:{} T:{} Ratio: {}'.format(retransmissions, total_packets, ratio))
+
+        test.append(retransmissions)
+        test.append(total_packets)
+        test.append(ratio)
+
+        pool.terminate()
 
         # Save after every test
-        save_csv([packet_loss, value])
+        save_csv(test)
 
     TESTS.append(test)
 

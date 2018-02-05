@@ -125,7 +125,10 @@ def check_packet_type(packet, target_packet):
 def external(packet):
     """This method is used to run the effect of a script
     from another script"""
-    map_thread(external_obj.effect, [packet])
+    if affect_packet(packet):
+        map_thread(external_obj.effect, [packet])
+    else:
+        packet.accept()
 
 
 def print_packet(packet):
@@ -245,11 +248,18 @@ def setup_packet_save(filename):
     pktdump = PcapWriter(filename + '.pcap', append=False, sync=True)
 
 
-def run_packet_manipulation_external(external_object):
+def run_packet_manipulation_external(external_object, target_packet='ALL'):
     """This method allows the script to be run from another script
     it skips the parameter checking and allows for a custom object to be passed and run"""
 
-    global mode, external_obj
+    global mode, external_obj, target_packet_type, arp_active, save_active, NFQUEUE_Active
+
+    print('TEST', target_packet)
+
+    # Sets the target packet
+    target_packet_type = target_packet
+    save_active = False
+    NFQUEUE_Active = True
 
     external_obj = external_object
     mode = external
