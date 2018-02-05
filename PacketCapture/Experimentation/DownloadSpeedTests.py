@@ -59,7 +59,7 @@ def run_degradation_script(parameters):
     for x in parameters:
         cmd.append(x)
 
-    PROCESS = subprocess.Popen(cmd, stdout=open('log.txt', 'w'))
+    PROCESS = subprocess.Popen(cmd, stdout=open(os.devnull, 'w'))
 
     # Speed code
     grab_speeds()

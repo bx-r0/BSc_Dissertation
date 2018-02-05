@@ -125,11 +125,7 @@ def check_packet_type(packet, target_packet):
 def external(packet):
     """This method is used to run the effect of a script
     from another script"""
-
-    #external_obj.effect(packet)
-
-    # TODO: Effect doesn't work if mapped to a pool?
-    #map_thread(external_obj.effect, [packet])
+    map_thread(external_obj.effect, [packet])
 
 
 def print_packet(packet):
