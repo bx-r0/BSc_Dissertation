@@ -1,7 +1,8 @@
 #region Imports
 # Import graphing
 import matplotlib as mpl
-#mpl.use('Agg')
+if __name__ == "__main__":
+    mpl.use('Agg')
 
 # Suppresses the Scapy WARNING Message
 import logging
@@ -14,6 +15,7 @@ import time
 import threading
 import textwrap
 import Common_Connections
+from Terminal import Terminal
 
 from netfilterqueue import NetfilterQueue
 from scapy.all import *
@@ -83,8 +85,8 @@ def map_thread(method, args):
     # except is triggered for all active threads
     try:
         pool.apply_async(method, args)
-    except:
-        pass
+    except Exception as e:
+        print(e)
 
 
 def print_force(message):
@@ -124,7 +126,10 @@ def external(packet):
     """This method is used to run the effect of a script
     from another script"""
 
-    map_thread(external_obj.effect, [packet])
+    #external_obj.effect(packet)
+
+    # TODO: Effect doesn't work if mapped to a pool?
+    #map_thread(external_obj.effect, [packet])
 
 
 def print_packet(packet):
@@ -245,6 +250,9 @@ def setup_packet_save(filename):
 
 
 def run_packet_manipulation_external(external_object):
+    """This method allows the script to be run from another script
+    it skips the parameter checking and allows for a custom object to be passed and run"""
+
     global mode, external_obj
 
     external_obj = external_object
@@ -276,7 +284,7 @@ def run_packet_manipulation():
             print_force("[!] Queue already created")
 
         # Shows the start waiting message
-        print_seperator()
+        print_separator()
         print_force("[*] Waiting ")
         nfqueue.run()
 
@@ -566,27 +574,29 @@ def parameters():
 def affect_all_objects(method):
     """This method attempts to stop an object, and
     catches the exception if it doesn't need closing"""
+    try:
+        # TODO: Dynamic way to grab these?
+        objects = [latency_obj, packet_loss_obj, throttle_obj, bandwidth_obj, order_obj, print_obj, udp_obj]
 
-    # TODO: Dynamic way to grab these?
-    objects = [latency_obj, packet_loss_obj, throttle_obj, bandwidth_obj, order_obj, print_obj, udp_obj]
+        for x in objects:
 
-    for x in objects:
-        try:
-            # Add more functionality to this list
-            if method is 'stop':
-                x.stop()
-            elif method is 'graph':
-                x.show_graph()
-            elif method is 'graph_no_show':
-                x.save_graph()
-            elif method is 'increase':
-                x.increase_effect()
-            elif method is 'decrease':
-                x.decrease_effect()
-            else:
-                Exception('Invalid entry into affect_all_objects()')
-        except AttributeError:
-            pass
+                # Add more functionality to this list
+                if method is 'stop':
+                    x.stop()
+                elif method is 'graph':
+                    x.show_graph()
+                elif method is 'graph_no_show':
+                    x.save_graph()
+                elif method is 'increase':
+                    x.increase_effect()
+                elif method is 'decrease':
+                    x.decrease_effect()
+                else:
+                    Exception('Invalid entry into affect_all_objects()')
+    except AttributeError:
+        pass
+    except NameError:
+        pass
 
 
 def user_input_thread(graph_active):
@@ -596,7 +606,7 @@ def user_input_thread(graph_active):
         """Used to stop input from messing up terminal format
         and displays what command was entered"""
 
-        print('\r', ' ' * 70, end='\r', flush=True)
+        Terminal.clear_line()
         print('[{}]'.format(msg), end='\r', flush=True)
 
     while True:
@@ -613,7 +623,7 @@ def user_input_thread(graph_active):
 
                 if graph_active:
                     # Clears any fragments from the screen including the button pressed
-                    print('\r ' + ' ' * 30, end='\r', flush=True)
+                    Terminal.clear_line()
                     affect_all_objects('graph')
                 reset_cursor('Show graph')
 
@@ -644,28 +654,34 @@ def clean_close(signum='', frame=''):
     print_force("[*] ## Close signal recieved ##")
     affect_all_objects('stop')
 
-    if NFQUEUE_Active:
+    try:
+        if NFQUEUE_Active:
 
-        affect_all_objects('graph_no_show')
+            affect_all_objects('graph_no_show')
 
-        pool.close()
-        print_force("[!] Thread pool killed")
+            pool.close()
+            print_force("[!] Thread pool killed")
 
-        # Resets
-        print_force("[!] iptables reverted")
-        os.system("iptables -F")
+            # Resets
+            print_force("[!] iptables reverted")
+            os.system("iptables -F")
 
-        print_force("[!] NFQUEUE unbinded")
-        nfqueue.unbind()
+            print_force("[!] NFQUEUE unbinded")
+            nfqueue.unbind()
 
-        if arp_active:
-            print_force('[!] Arp Spoofing stopped!')
-            arp_process.terminate()
+            if arp_active:
+                print_force('[!] Arp Spoofing stopped!')
+                arp_process.terminate()
 
-        print_force('[!] ## Script Stopped ##')
+            print_force('[!] ## Script Stopped ##')
+    except NameError:
+        pass
 
     os._exit(0)
 
+
+def print_separator():
+    Terminal.print_sequence('=', start='[*]', end='[*]')
 
 # Rebinds the all the close signals to clean_close the script
 signal.signal(signal.SIGINT, clean_close)   # Ctrl + C
@@ -677,11 +693,6 @@ if os.getuid() != 0:
     exit("Error: User needs to be root to run this script")
 
 
-def print_seperator():
-    # -5 Due to the start sequence '[*] '
-    print('[*]', '=' * (int(terminal_width) - 5))
-
-
 if __name__ == "__main__":
-    print_seperator()
+    print_separator()
     parameters()

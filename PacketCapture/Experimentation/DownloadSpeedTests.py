@@ -10,6 +10,7 @@ import subprocess
 import time
 import sys
 import csv
+from Terminal import Terminal
 
 # Translates parameter to effect and unit
 Parameter_values = \
@@ -87,7 +88,7 @@ def grab_speeds():
 
 
 def print_speeds():
-    print(' ' * 50, end='\r')
+    Terminal.clear_line()
     print("[!] Download: {:.2f}Mbps - Upload: {:.2f}Mbps".format(DOWNLOAD, UPLOAD))
 
 

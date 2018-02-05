@@ -2,6 +2,7 @@ import time
 import Parameters
 from Plotting import Graph
 from scapy.all import *
+from Terminal import Terminal
 
 
 class Effect:
@@ -98,7 +99,7 @@ class Effect:
     def print_clear():
         """Method that is used to clear the output line, this is
         so no fragments are left after a stat print refresh"""
-        print(' ' * 70, end='\r', flush=True)
+        Terminal.clear_line()
 
     def accept(self, packet):
         """Center point for accepting packets"""
