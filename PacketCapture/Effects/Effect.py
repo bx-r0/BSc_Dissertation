@@ -44,7 +44,6 @@ class Effect:
         self.start_time = time.time()
         self.total_packets = 0  # Number of total packets processed
 
-        self.tcp_flags = []
         self.tcp_sessions = [TcpSession(1, 1, 1, 1)]
         self.retransmission = 0
 
@@ -103,8 +102,6 @@ class Effect:
 
     def accept(self, packet):
         """Center point for accepting packets"""
-        self.total_packets += 1
-
         if self.accept_packet:
             packet.accept()
 
@@ -247,8 +244,11 @@ class Effect:
         # ACK Number
         ack_num = pkt.ack
 
+        # Window Size
+        window_size = pkt.window
+
         # Creates the session object
-        tcp_packet = TcpPacket(seq_num, ack_num, len(pkt), packet)
+        tcp_packet = TcpPacket(seq_num, ack_num, len(pkt), window_size, packet)
         tcp_session = TcpSession(dst, dst_port, src, src_port)
 
         # Loops round and checks all session
@@ -313,10 +313,11 @@ class TcpSession:
 class TcpPacket:
     """Used to hold values about packets in a session"""
 
-    def __init__(self, seq_num, ack_num, size, packet):
+    def __init__(self, seq_num, ack_num, size, window_size, packet):
         self.ack_num = ack_num
         self.seq_num = seq_num
         self.size = size
+        self.window_size = window_size
         self.packet_flags = self.get_flags(packet)
 
     def __str__(self):

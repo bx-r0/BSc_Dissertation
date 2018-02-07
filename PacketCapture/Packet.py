@@ -133,6 +133,7 @@ def external(packet):
 
 def print_packet(packet):
     """This function just prints the packet"""
+
     if affect_packet(packet):
         map_thread(print_obj.effect, [packet])
     else:
@@ -253,8 +254,6 @@ def run_packet_manipulation_external(external_object, target_packet='ALL'):
     it skips the parameter checking and allows for a custom object to be passed and run"""
 
     global mode, external_obj, target_packet_type, arp_active, save_active, NFQUEUE_Active
-
-    print('TEST', target_packet)
 
     # Sets the target packet
     target_packet_type = target_packet
