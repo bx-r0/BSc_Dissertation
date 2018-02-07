@@ -2,7 +2,7 @@ import wget
 import os
 
 link = 'ftp://speedtest.tele2.net/'
-filename = '5MB.zip'
+filename = '100KB.zip'
 
 wget.download(link + filename)
 

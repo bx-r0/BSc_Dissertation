@@ -1,4 +1,5 @@
 from Base_Test import Base_Test
+from Effects.PacketLoss import PacketLoss
 
 
 class PacketLossWindowSize(Base_Test):
@@ -9,12 +10,13 @@ class PacketLossWindowSize(Base_Test):
                          start_effect_value=1,
                          effect_step=9,
                          repeat_tests=1,
-                         max_test_time=30)
+                         max_test_time=60)
 
     def custom_test_behavior(self, packetLoss_value, data):
         """Custom behavior for the test that is called from the start() method in the super"""
 
-        packetLoss_obj = self.run_test_TCP(packetLoss_value)
+        packetLoss_obj = PacketLoss(packetLoss_value)
+        self.run_test_TCP(packetLoss_obj, 'TCP')
 
         # Grabs the window sizes
         tcp_session = packetLoss_obj.tcp_sessions[0]
@@ -29,6 +31,7 @@ class PacketLossWindowSize(Base_Test):
         data.append(avg_window_size)
 
         return data
+
 
 test = PacketLossWindowSize()
 test.start()

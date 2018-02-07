@@ -249,7 +249,7 @@ class Effect:
 
         # Creates the session object
         tcp_packet = TcpPacket(seq_num, ack_num, len(pkt), window_size, packet)
-        tcp_session = TcpSession(dst, dst_port, src, src_port)
+        #tcp_session = TcpSession(dst, dst_port, src, src_port)
 
         # Loops round and checks all session
         for session_loop in self.tcp_sessions:
@@ -285,6 +285,7 @@ class TcpSession:
     def retransmit(self, packet):
         """Method that checks if the values are from the same connection"""
 
+        retransmissions = 0
         add = True
         for p_packets in self.previous_packets:
 
@@ -294,21 +295,22 @@ class TcpSession:
                 # Not to count RST flags as retransmissions
                 if not p_packets.has_flag('RST'):
 
-                    self.retransmissions += 1
+                    retransmissions += 1
 
                     #print('[R]', packet, self.retransmissions)
 
                     # Only adds if
                     add = False
 
+                    # TODO: Does this make sense being here?
+                    # Do I not need to delete the packet it matched?
+                    break
+
         # Adds the new packet to the list
         if add:
             self.previous_packets.append(packet)
 
-        transmissions = self.retransmissions
-        self.retransmissions = 0
-        return transmissions
-
+        return retransmissions
 
 class TcpPacket:
     """Used to hold values about packets in a session"""

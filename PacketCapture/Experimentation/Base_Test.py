@@ -21,7 +21,7 @@ class Base_Test():
 
     def __init__(self, file_name_id, start_effect_value, max_effect_value, effect_step, repeat_tests, max_test_time):
 
-        self.pool = ThreadPool(100)
+        self.pool = ThreadPool(1000)
         self.time_str = self.grab_time_str()
 
         self.file_name_id = file_name_id
@@ -38,12 +38,13 @@ class Base_Test():
     def start(self):
         # Test with a new packet value
         for effect_value in range(self.START_EFFECT_VALUE, self.MAX_EFFECT_VALUE + 1, self.EFFECT_STEP):
-            print('\n## Packet loss now: {}%'.format(effect_value))
 
             # Repeats for that percentage values
             for x in range(0, self.REPEAT_TESTS):
                 test_data = [effect_value]
-                print('## Starting test {}'.format(x))
+
+                Terminal.clear_line()
+                print('\n## Starting test {}'.format(x))
 
                 # CUSTOM BEHAVIOUR
                 test_data = self.custom_test_behavior(effect_value, test_data)
@@ -137,8 +138,8 @@ class Base_Test():
         link = 'ftp://speedtest.tele2.net/'
 
         #filename = '1KB.zip'
-        filename = '100KB.zip'
-        #filename = '512KB.zip'
+        #filename = '100KB.zip'
+        filename = '512KB.zip'
         #filename = '5MB.zip'
 
         wget.download(link + filename)
@@ -159,14 +160,13 @@ class Base_Test():
         print("## This script will take: {} hours".format(hours))
 
     # --------------------- TEST TYPES
-    def run_test_TCP(self, packet_loss):
+    def run_test_TCP(self, obj, packet_type):
         """This will run packet loss and return values of TCP retransmissions"""
 
-        self.pool = ThreadPool(100)
+        self.pool = ThreadPool(1000)
         self.printing(False)
 
-        packetloss_obj = PacketLoss(packet_loss)
-        self.run_packet_script(packetloss_obj, 'TCP')
+        self.run_packet_script(obj, packet_type)
 
         with self.time_limit(self.MAX_TEST_TIME):
             try:
@@ -178,4 +178,3 @@ class Base_Test():
                 self.force_print('## Timeout occurred! - Accuracy may be compromised')
 
         self.printing(True)
-        return packetloss_obj

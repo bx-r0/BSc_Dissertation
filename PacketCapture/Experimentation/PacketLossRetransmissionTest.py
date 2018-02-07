@@ -1,4 +1,5 @@
 from Base_Test import Base_Test
+from Effects.PacketLoss import PacketLoss
 
 
 class PacketLossRetranTest(Base_Test):
@@ -6,15 +7,16 @@ class PacketLossRetranTest(Base_Test):
     def __init__(self):
         super().__init__('PacketLossRetran',
                          max_effect_value=100,
-                         start_effect_value=70,
-                         effect_step=10,
+                         start_effect_value=0,
+                         effect_step=5,
                          repeat_tests=1,
                          max_test_time=60)
 
     def custom_test_behavior(self, packetLoss_value, data):
         """This is run from the start() method in the Base_Test.py"""
 
-        packetLoss_obj = self.run_test_TCP(packetLoss_value)
+        packetLoss_obj = PacketLoss(packetLoss_value)
+        self.run_test_TCP(packetLoss_obj, 'TCP')
 
         # Grabs data
         retransmissions = packetLoss_obj.retransmission
