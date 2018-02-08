@@ -39,20 +39,22 @@ class Base_Test():
         # Test with a new packet value
         for effect_value in range(self.START_EFFECT_VALUE, self.MAX_EFFECT_VALUE + 1, self.EFFECT_STEP):
 
+            test_data = []
+
             # Repeats for that percentage values
             for x in range(0, self.REPEAT_TESTS):
-                test_data = [effect_value]
 
                 Terminal.clear_line()
                 print('\n## Starting test {}'.format(x))
 
                 # CUSTOM BEHAVIOUR
-                test_data = self.custom_test_behavior(effect_value, test_data)
-
-                if test_data is not None:
-                    self.save_csv(test_data)
+                self.custom_test_behavior(effect_value, test_data)
 
                 self.stop_pool()
+
+            if test_data is not None:
+                test_data.insert(0, effect_value)
+                self.save_csv(test_data)
 
             self.TESTS.append(test_data)
 

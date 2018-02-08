@@ -15,7 +15,6 @@ class LatencyTimeOutTest(Base_Test):
 
     def custom_test_behavior(self, latency_value, data):
 
-        #latency_obj = Print()
         latency_obj = Latency(latency_value)
         self.run_test_TCP(latency_obj, 'TCP')
 

@@ -8,8 +8,8 @@ class PacketLossRetranTest(Base_Test):
         super().__init__('PacketLossRetran',
                          max_effect_value=100,
                          start_effect_value=0,
-                         effect_step=5,
-                         repeat_tests=1,
+                         effect_step=1,
+                         repeat_tests=5,
                          max_test_time=60)
 
     def custom_test_behavior(self, packetLoss_value, data):
