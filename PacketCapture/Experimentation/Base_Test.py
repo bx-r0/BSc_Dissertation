@@ -12,6 +12,7 @@ import signal
 from contextlib import contextmanager
 import wget
 from Effects.PacketLoss import PacketLoss
+import time
 #endregion
 
 
@@ -180,3 +181,9 @@ class Base_Test():
                 self.force_print('## Timeout occurred! - Accuracy may be compromised')
 
         self.printing(True)
+
+    def run_test_basic(self, obj, packet_type):
+        """Just runs the effect"""
+
+        self.pool = ThreadPool(1000)
+        self.run_packet_script(obj, packet_type)

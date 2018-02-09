@@ -28,7 +28,8 @@ import Parameters as Parameter
 from Effects import *
 
 from Effects.Latency import Latency
-from Effects.LimitBandwidth import Bandwidth
+from Effects.Bandwidth.LimitBandwidth import LimitBandwidth
+from Effects.Bandwidth.DisplayBandwidth import DisplayBandwidth
 from Effects.PacketLoss import PacketLoss
 from Effects.Surge import Surge
 from Effects.OutOfOrder import Order
@@ -183,7 +184,7 @@ def combination(packet):
     """This performs effects together"""
     packet_loss_obj.effect(packet)
     latency_obj.effect(packet)
-    bandwidth_obj.limit(packet)
+    bandwidth_obj.effect(packet)
 
 
 def combination_effect(packet):
@@ -220,7 +221,7 @@ def emulate_real_connection_speed(packet):
 def track_bandwidth(packet):
     """This mode allows for the tracking of rate of packets recieved"""
     if affect_packet(packet):
-        bandwidth_obj.display(packet)
+        bandwidth_obj.effect(packet)
     else:
         packet.accept()
 
@@ -228,7 +229,7 @@ def track_bandwidth(packet):
 def limit_bandwidth(packet):
     """This is mode for limiting the rate of transfer"""
     if affect_packet(packet):
-        bandwidth_obj.limit(packet)
+        bandwidth_obj.effect(packet)
     else:
         packet.accept()
 
@@ -470,7 +471,7 @@ def parameters():
 
     elif args.combination:
         latency_obj = Latency(latency_value=args.combination[0], accept_packets=False, show_output=False)
-        bandwidth_obj = Bandwidth(bandwidth=args.combination[2], accept_packets=False, show_output=False)
+        bandwidth_obj = LimitBandwidth(bandwidth=args.combination[2], accept_packets=False, show_output=False)
         packet_loss_obj = PacketLoss(percentage=args.combination[1], accept_packets=True)
         mode = combination_effect
 
@@ -497,18 +498,18 @@ def parameters():
         print_force('[*] ------------------------------------------- [*]')
 
         latency_obj = Latency(latency_value=0, accept_packets=False, gather_stats=False, show_output=False)
-        bandwidth_obj = Bandwidth(bandwidth=0, accept_packets=False, gather_stats=False, show_output=False)
+        bandwidth_obj = LimitBandwidth(bandwidth=0, accept_packets=False, gather_stats=False, show_output=False)
         packet_loss_obj = PacketLoss(percentage=0, accept_packets=True, gather_stats=False, show_output=False)
         mode = emulate_real_connection_speed
 
     elif args.display_bandwidth:
-        bandwidth_obj = Bandwidth(graphing=graph_active,
-                                  graph_type_num=graph_type_num)
+        bandwidth_obj = DisplayBandwidth(graphing=graph_active,
+                                         graph_type_num=graph_type_num)
         mode = track_bandwidth
 
     elif args.rate_limit:
         # Sets the bandwidth object with the specified bandwidth limit
-        bandwidth_obj = Bandwidth(bandwidth=args.rate_limit,
+        bandwidth_obj = LimitBandwidth(bandwidth=args.rate_limit,
                                   graphing=graph_active,
                                   graph_type_num=graph_type_num)
         mode = limit_bandwidth

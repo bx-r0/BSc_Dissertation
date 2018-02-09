@@ -3,6 +3,7 @@ import time
 import threading
 import os
 
+
 # TODO: Add ability to run the parent Effect.effect()
 class Bandwidth(Effect):
     """
@@ -46,30 +47,6 @@ class Bandwidth(Effect):
             self.print('[*] Bandwidth set to: {} B/s'.format(bandwidth), force=True)
 
         self.start_rate_update()
-
-    # -b Option
-    def display(self, packet):
-        """Used to display the bandwidth"""
-
-        self.default_graphing(packet)
-        self.send_packet(packet)
-
-    # -rl Option
-    def limit(self, packet):
-        """Used to limit the bandwidth rate"""
-
-        self.default_graphing(packet)
-
-        # Check if rate is over the limit
-        self.packet_backlog.append(packet)
-
-        while self.rate < self.bandwidth and len(self.packet_backlog) > 0:
-            self.send_packet(self.packet_backlog[0])
-
-            self.calculate_rate_overall_avg()
-
-            # Packet is removed from the list
-            del self.packet_backlog[0]
 
     def print_stats(self):
         """Stat output"""

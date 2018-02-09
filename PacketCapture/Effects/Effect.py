@@ -51,15 +51,18 @@ class Effect:
         """The first method run for all effects - Here custom code will be added
         to collate information"""
 
-        # TCP tracking
-        if self.gather_stats:
-            self.track_TCP_stats(packet)
+        try:
+            # TCP tracking
+            if self.gather_stats:
+                self.track_TCP_stats(packet)
 
-        # Shared functionality between all effects
-        self.print_stats()
-        self.total_packets += 1
-        self.default_graphing(packet)
-        self.custom_effect(packet)
+            # Shared functionality between all effects
+            self.print_stats()
+            self.total_packets += 1
+            self.default_graphing(packet)
+            self.custom_effect(packet)
+        except Exception as e:
+            print('Error in effect(): ', e)
 
     def custom_effect(self, packet):
         """Each effect will need it's own custom effect"""

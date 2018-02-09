@@ -4,6 +4,8 @@ from Effects.Print import Print
 
 
 class LatencyTimeOutTest(Base_Test):
+    """Test that compares Latency with the number of retransmissions, it should at some point have a very
+    large increase in the retransmissions when the latency timeout value is obtained """
 
     def __init__(self):
         super().__init__('LatencyTimeOutTest',

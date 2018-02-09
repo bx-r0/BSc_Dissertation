@@ -3,6 +3,7 @@ from Effects.PacketLoss import PacketLoss
 
 
 class PacketLossRetranTest(Base_Test):
+    """Test that increases the packet loss and obtains the values for retransmissions"""
 
     def __init__(self):
         super().__init__('PacketLossRetran',

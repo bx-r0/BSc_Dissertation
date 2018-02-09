@@ -3,6 +3,7 @@ from Effects.PacketLoss import PacketLoss
 
 
 class PacketLossWindowSize(Base_Test):
+    """Test that compares Packet loss with the windows size of a packet"""
 
     def __init__(self):
         super().__init__('PacketLossWindowSize',
