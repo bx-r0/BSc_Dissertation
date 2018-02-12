@@ -1,9 +1,11 @@
-from Base_PingTest import PingTest
+from BaseClasses.Base_PingTest import PingTest
 from Effects.Bandwidth.LimitBandwidth import LimitBandwidth
 
 
 # TODO: getting replicated verdict errors when running the test??
 class Bandwidth_PingTest(PingTest):
+    """Increases the bandwidth and tests the latency value, this needs to be performed with a high
+    number of packets"""
 
     def __init__(self):
         super().__init__('PingTest',
@@ -13,7 +15,7 @@ class Bandwidth_PingTest(PingTest):
                          repeat_tests=1,
                          max_test_time=10)
 
-        self.NUMBER_OF_PINGS = 3
+        self.NUMBER_OF_PINGS = 15
 
     def custom_test_behavior(self, effect_value, data):
         bandwidth_obj = LimitBandwidth(effect_value)
@@ -22,8 +24,9 @@ class Bandwidth_PingTest(PingTest):
         self.run_test_basic(bandwidth_obj, 'ICMP')
         ping_values = self.grab_ping_value()
         self.printing(True)
-
         print(ping_values)
+
+        # TODO: Save values here
 
 
 test = Bandwidth_PingTest()

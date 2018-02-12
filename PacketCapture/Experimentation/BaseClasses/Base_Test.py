@@ -50,7 +50,6 @@ class Base_Test():
 
                 # CUSTOM BEHAVIOUR
                 self.custom_test_behavior(effect_value, test_data)
-
                 self.stop_pool()
 
             if test_data is not None:

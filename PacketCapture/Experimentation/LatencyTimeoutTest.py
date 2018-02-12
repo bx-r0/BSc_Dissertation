@@ -1,4 +1,4 @@
-from Base_Test import Base_Test
+from BaseClasses.Base_Test import Base_Test
 from Effects.Latency import Latency
 from Effects.Print import Print
 

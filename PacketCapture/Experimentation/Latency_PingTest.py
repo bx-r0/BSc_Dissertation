@@ -1,5 +1,5 @@
 import os
-from Base_PingTest import PingTest
+from BaseClasses.Base_PingTest import PingTest
 from Effects.Latency import Latency
 import subprocess
 
@@ -31,11 +31,14 @@ class LatencyPingTest(PingTest):
         target_value = effect_value
         error = (average_latency / target_value) * 100
         error -= 100
+        difference = average_latency - target_value
 
         data.append(average_latency)
         data.append(error)
+        data.append(difference)
 
-        print('Average: {} - Target: {} - Error: {}%'.format(average_latency, target_value, error))
+        print('Average: {:.2f} - Target: {:.2f} - Diff: {:.2f}ms - Error: {:.2f}%'.
+              format(average_latency, target_value, difference, error))
 
 
 test = LatencyPingTest()

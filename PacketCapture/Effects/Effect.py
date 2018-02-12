@@ -60,6 +60,7 @@ class Effect:
             self.print_stats()
             self.total_packets += 1
             self.default_graphing(packet)
+
             self.custom_effect(packet)
         except Exception as e:
             print('Error in effect(): ', e)

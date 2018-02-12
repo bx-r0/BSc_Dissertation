@@ -1,5 +1,5 @@
 import os
-from Base_Test import Base_Test
+from BaseClasses.Base_Test import Base_Test
 import subprocess
 
 
