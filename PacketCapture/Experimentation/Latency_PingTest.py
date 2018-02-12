@@ -13,6 +13,7 @@ class LatencyPingTest(PingTest):
                          start_effect_value=10,
                          effect_step=100,
                          repeat_tests=1,
+                         data_headers=['Latency value (ms)', 'Average Latency', 'Error', 'Difference'],
                          max_test_time=60)
 
         self.NUMBER_OF_PINGS = 3

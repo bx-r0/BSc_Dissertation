@@ -13,6 +13,7 @@ class Bandwidth_PingTest(PingTest):
                          start_effect_value=1000,
                          effect_step=100,
                          repeat_tests=1,
+                         data_headers=['Bandwidth limit (B/s)', 'Average Latency (ms)'],
                          max_test_time=10)
 
         self.NUMBER_OF_PINGS = 15
@@ -26,7 +27,12 @@ class Bandwidth_PingTest(PingTest):
         self.printing(True)
         print(ping_values)
 
-        # TODO: Save values here
+        average_ping = sum(ping_values) / len(ping_values)
+        data.append(average_ping)
+
+        print('Average ping value: {}'.format(average_ping))
+
+        return data
 
 
 test = Bandwidth_PingTest()

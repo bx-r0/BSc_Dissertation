@@ -11,6 +11,7 @@ class PacketLossRetranTest(Base_Test):
                          start_effect_value=0,
                          effect_step=1,
                          repeat_tests=5,
+                         data_headers=['Packet loss (%)', 'No Retransmissions', 'Total Packets', 'Ratio'],
                          max_test_time=60)
 
     def custom_test_behavior(self, packetLoss_value, data):

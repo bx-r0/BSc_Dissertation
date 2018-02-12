@@ -20,21 +20,30 @@ class Base_Test():
     """This class is used as a base class for test, the child class needs to overwrite the custom_test_behavior() method
     to add what it needs to do per test. The looping and number of tests is handled by the start() method"""
 
-    def __init__(self, file_name_id, start_effect_value, max_effect_value, effect_step, repeat_tests, max_test_time):
+    def __init__(self, file_name_id,
+                 start_effect_value,
+                 max_effect_value,
+                 effect_step,
+                 repeat_tests,
+                 max_test_time,
+                 data_headers,
+                 print_time_estimate=True):
 
         self.pool = ThreadPool(1000)
         self.time_str = self.grab_time_str()
 
         self.file_name_id = file_name_id
 
-        self.TESTS = []
         self.START_EFFECT_VALUE = start_effect_value
         self.MAX_EFFECT_VALUE = max_effect_value
         self.EFFECT_STEP = effect_step
         self.REPEAT_TESTS = repeat_tests
         self.MAX_TEST_TIME = max_test_time
 
-        self.calculate_script_run_time()
+        if print_time_estimate:
+            self.calculate_script_run_time()
+
+        self.add_data_headers(data_headers)
 
     def start(self):
         # Test with a new packet value
@@ -56,8 +65,6 @@ class Base_Test():
                 test_data.insert(0, effect_value)
                 self.save_csv(test_data)
 
-            self.TESTS.append(test_data)
-
         print('## Tests done!')
         Terminal.clear_line()
 
@@ -65,6 +72,11 @@ class Base_Test():
         """[Blueprint] Where the data and values are obtained and returned to the calling start method that will
         save the values and perform a clean-up"""
         return test_data
+
+    def add_data_headers(self, data_headers):
+        """Method used to add headers to the data in the .csv"""
+        list = data_headers[:1] + (data_headers[1:] * self.REPEAT_TESTS)
+        self.save_csv(list)
 
     def stop_pool(self):
         self.pool.terminate()
@@ -179,6 +191,7 @@ class Base_Test():
                 os.system('rm -rf *.tmp')
                 self.force_print('## Timeout occurred! - Accuracy may be compromised')
 
+        Terminal.clear_line()
         self.printing(True)
 
     def run_test_basic(self, obj, packet_type):

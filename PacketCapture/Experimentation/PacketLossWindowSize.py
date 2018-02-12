@@ -11,6 +11,7 @@ class PacketLossWindowSize(Base_Test):
                          start_effect_value=1,
                          effect_step=9,
                          repeat_tests=1,
+                         data_headers=['Packet loss (%)', 'Average window size'],
                          max_test_time=60)
 
     def custom_test_behavior(self, packetLoss_value, data):

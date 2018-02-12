@@ -1,6 +1,5 @@
 from BaseClasses.Base_Test import Base_Test
 from Effects.Latency import Latency
-from Effects.Print import Print
 
 
 class LatencyTimeOutTest(Base_Test):
@@ -13,11 +12,12 @@ class LatencyTimeOutTest(Base_Test):
                          start_effect_value=10,
                          effect_step=100,
                          repeat_tests=1,
+                         data_headers=['Latency value (ms)', 'No Retransmissions', 'Total Packets', 'Ratio'],
                          max_test_time=60)
 
-    def custom_test_behavior(self, latency_value, data):
+    def custom_test_behavior(self, effect_value, data):
 
-        latency_obj = Latency(latency_value)
+        latency_obj = Latency(effect_value)
         self.run_test_TCP(latency_obj, 'TCP')
 
         # Grabs retransmissions
