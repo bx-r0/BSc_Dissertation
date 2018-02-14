@@ -4,20 +4,13 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ClientServer.FTP"
-        mc:Ignorable="d" Height="300.683" Width="523.656" Background="White" Foreground="{x:Null}" Title="FTP">
+        mc:Ignorable="d" Height="430.683" Width="648.656" Background="White" Foreground="{x:Null}" Title="FTP" BorderBrush="Black">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition/>
         </Grid.RowDefinitions>
-        <ListBox x:Name="ListBox_ServerLog" Margin="10,0,177,10" Height="209" VerticalAlignment="Bottom"/>
-        <Label Content="Statistics" Margin="0,52,10,0" FontWeight="Bold" HorizontalAlignment="Right" Width="162" Height="32" VerticalAlignment="Top"/>
-        <StackPanel Margin="0,89,59,10" HorizontalAlignment="Right" Width="113">
-            <Label Content="&lt;Test Stat&gt;"/>
-        </StackPanel>
-        <StackPanel Margin="0,89,10,10" HorizontalAlignment="Right" Width="49">
-            <Label Content="-"/>
-        </StackPanel>
-        <Label Content="FTP" Margin="10,0,0,0" FontWeight="Bold" Foreground="#FFF08010" Height="52" VerticalAlignment="Top" HorizontalAlignment="Left" Width="80" FontSize="24"/>
+        <ListBox x:Name="ListBox_ServerLog" Margin="0,47,0,0" Background="{x:Null}"/>
+        <Label Content="FTP" FontWeight="Bold" Foreground="#FFF08010" FontSize="24" Background="#FF441B1B" Height="47" VerticalAlignment="Top"/>
 
     </Grid>
 </Window>
