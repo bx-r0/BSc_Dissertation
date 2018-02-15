@@ -5,18 +5,25 @@
 # I've changed it slightly to include the method "get_all()" this just returns the value of the download
 # And upload
 import os
+import sys
+sys.path.insert(1, os.path.join(sys.path[0], '..'))
 import speedtest as speed
 import subprocess
 import time
-import sys
 import csv
 from Terminal import Terminal
+
+
+"""The script is run by passing:
+
+        <effect_parameter> <effect_value_start><hyphen><effect_value_end><hyphen><effect_step>"""
 
 # Translates parameter to effect and unit
 Parameter_values = \
     [
         ["-l", "Latency", "ms"],
-        ["-pl", "Packet Loss", "%"]
+        ["-pl", "Packet Loss", "%"],
+        ["-rl", "Bandwidth", "B/s"]
     ]
 
 

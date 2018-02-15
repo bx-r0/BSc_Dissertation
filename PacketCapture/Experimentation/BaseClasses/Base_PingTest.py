@@ -6,14 +6,15 @@ import subprocess
 class PingTest(Base_Test):
     """Test that looks for the accuracy in the simulation of latency"""
 
-    def __init__(self, filename, max_effect_value, start_effect_value, effect_step, repeat_tests, data_headers, max_test_time):
+    def __init__(self, filename, max_effect_value, start_effect_value, effect_step, repeat_tests, data_headers, max_test_time, print_time_estimate):
         super().__init__(filename,
                          max_effect_value=max_effect_value,
                          start_effect_value=start_effect_value,
                          effect_step=effect_step,
                          repeat_tests=repeat_tests,
                          data_headers=data_headers,
-                         max_test_time=max_test_time)
+                         max_test_time=max_test_time,
+                         print_time_estimate=print_time_estimate)
 
         self.NUMBER_OF_PINGS = 10
 

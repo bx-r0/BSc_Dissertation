@@ -152,8 +152,8 @@ class Base_Test():
         link = 'ftp://speedtest.tele2.net/'
 
         #filename = '1KB.zip'
-        #filename = '100KB.zip'
-        filename = '512KB.zip'
+        filename = '100KB.zip'
+        #filename = '512KB.zip'
         #filename = '5MB.zip'
 
         wget.download(link + filename)

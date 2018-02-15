@@ -9,14 +9,15 @@ class LatencyPingTest(PingTest):
 
     def __init__(self):
         super().__init__('PingTest',
-                         max_effect_value=10000,
-                         start_effect_value=10,
-                         effect_step=100,
+                         max_effect_value=5000,
+                         start_effect_value=1,
+                         effect_step=10,
                          repeat_tests=1,
                          data_headers=['Latency value (ms)', 'Average Latency', 'Error', 'Difference'],
-                         max_test_time=60)
+                         max_test_time=60,
+                         print_time_estimate=False)
 
-        self.NUMBER_OF_PINGS = 3
+        self.NUMBER_OF_PINGS = 10
 
     def custom_test_behavior(self, effect_value, data):
 

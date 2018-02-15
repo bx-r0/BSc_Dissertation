@@ -8,11 +8,11 @@ class PacketLossRetranTest(Base_Test):
     def __init__(self):
         super().__init__('PacketLossRetran',
                          max_effect_value=100,
-                         start_effect_value=0,
+                         start_effect_value=1,
                          effect_step=1,
-                         repeat_tests=5,
+                         repeat_tests=1,
                          data_headers=['Packet loss (%)', 'No Retransmissions', 'Total Packets', 'Ratio'],
-                         max_test_time=60)
+                         max_test_time=120)
 
     def custom_test_behavior(self, packetLoss_value, data):
         """This is run from the start() method in the Base_Test.py"""
