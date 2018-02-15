@@ -159,7 +159,7 @@ def edit_packet(packet):
 def packet_latency(packet):
     """This function is used to incur latency on packets"""
     if affect_packet(packet):
-        map_thread(latency_obj.effect, [[packet]])
+        map_thread(latency_obj.effect, [packet])
     else:
         packet.accept()
 
