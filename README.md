@@ -22,8 +22,9 @@ Note: Python 3.6 is required
   ```
 
 # Configuring PI as a router
+https://jacobsalmela.com/2014/05/19/raspberry-pi-and-routing-turning-a-pi-into-a-router/
+https://raspberrypihq.com/how-to-turn-a-raspberry-pi-into-a-wifi-router/
 
-[Guide followed here](https://jacobsalmela.com/2014/05/19/raspberry-pi-and-routing-turning-a-pi-into-a-router/)
 
 # Hostapd Settings
 ```
