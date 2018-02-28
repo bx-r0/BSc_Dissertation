@@ -1,64 +1,14 @@
-\chapter{Aims and Objectives}
-\begin{center}
-"Create a custom simulated network that can demonstrate and visualise network degradation and common DoS attacks, this is so network engineers can identify weak spots and points of strain"
-\end{center}
+\chapter{Aim and Objectives}
+
+\comments{This section should define the overall aim of the project and clearly state the individual, measurable objectives that you have set for the project (objectives should have a deliverable outcome associated with them). In short, this section should clearly identify exactly what it is that you are intending to achieve in the project.}
 
 
-The above aim will be achieved by reaching these targets:
+State the overall aim of your project here. This can carry over on to several lines if you want.
 
-%---------------------- OBJECTTIVE 1 ----------------------- %
-\paragraph{Objective One}
-Develop a fully working clients and servers that communicate using HTTP/1.1 \citep{HTTP} and FTP over the TCP protocol alongside a client and server that use the UDP protocol
+Some text here to indicate that the above aim will be met by the following numbered objectives. Write approximately one sentence to outline what the objective is here. Include as many objectives as you think reasonable but remember that these are not as fine grained as the tasks which will come later.
 
-\begin{itemize}
-\item The client will use HTTP/1.1  over TCP and will need to be able to send PUT and GET requests to the server.
-\item The server will need to be able to deal with HTTP/1.1 requests and act accordingly. This means when the server receives a PUT request it will alter data. A GET request will therefore mean a retrieval of data. 
-\item The client will need to be able to upload and download files using FTP.
-\item The server should be able to have files uploaded to it and send data when a download is requested.
-\item The UDP client will need to send a set number of packets each containing a single value that increments with each packet sent.
-\item The UDP server will display a grid of received and missing packets where the positions are denoted by the packets value, this will give a visual representation of missing packets.
-\end{itemize}  
+\paragraph{Objective Title Goes Here If You Can Think Of One.} 
+Here you should be writing a more detailed description of what this objective is. It should explain how it contributes towards the aim, what the deliverable(s) of the objective is/are, and how you intend to evaluate it.
 
-The functionality above with be contained in one executable that will take parameters to define which client or server will be loaded. For example the parameters '-f c' will load the FTP client.
-
-Note: Authentication for any of these channels is outside the scope of this project
-
-%---------------------- OBJECTTIVE 2 ----------------------- %
-\paragraph{Objective 2}
-Create a program that runs on a Linux based OS that can be used to simulate degradation and attacks. This program will then be run on the router.
-
-\begin{itemize}
-\item Degradation factors will be:
-	\begin{itemize}
-	\item Packet loss
-	\item Latency
-	\item Rate of transfer (Bandwidth)
-	\end{itemize}
-\item Attacks will compose of some small and simple attacks; Possible attacks could be:
-	\begin{itemize}
-	\item UDP Flooding \citep{xiaoming2010denial}, where the network is filled with erroneous packets that will attempt to clog up the network.
-	\item ARP (Address Resolution Protocol) spamming and poison, the network is filled with ever changing ARP requests that cause computers to not be able to correctly resolve the 	valid locations of each other (Whalen, S., 2001).
-	\item TTL (Time to Live) incrementing where packets will eventually end up in loops and cannot die, causing a “packet storm”.
-	\item There may also be space for other attacks if time allows.
-	\end{itemize}
-\end{itemize}
-
-%---------------------- OBJECTTIVE 3 ----------------------- %
-\paragraph{Objective 3}
-Create a working custom router 
-
-\begin{itemize}
-\item This router should be able to act in place of a real commercial router. 
-\end{itemize}
-Note: The speed that the router can handle is not a concern.
-\begin{itemize}
-\item This router will have to be able to deal with internet connections over Ethernet and a wireless connection, with multiple devices connected at the same time.
-\end{itemize}
-Note: The security of the router is also outside of the scope of this project
-
-
-%This section should define the overall aim of the project and clearly state the individual, measurable objectives that you have set for the project (objectives should have a deliverable outcome associated with them). In short, this section should clearly identify exactly what it is that you are intending to achieve in the project.
-
-
-
-
+\paragraph{Objective Title Goes Here If You Can Think Of One.} 
+Do this for each one of your objectives.

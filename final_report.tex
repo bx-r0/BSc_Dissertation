@@ -1,0 +1,56 @@
+\documentclass[a4paper,smallheadings,11pt,oneside,bibliography=totoc]{scrreprt}
+\addtokomafont{disposition}{\rmfamily}
+\usepackage[utf8x]{inputenc}
+\usepackage[english]{babel}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{amsmath}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{graphicx}
+\usepackage{microtype}
+\usepackage{palatino}
+\usepackage[round,colon]{natbib}
+\usepackage[hidelinks]{hyperref}
+\usepackage[titletoc]{appendix}
+\pagestyle{headings}
+\usepackage{parskip}
+\newcommand{\comments}[1]{\textcolor{OliveGreen}{[\emph{#1}]}}
+
+\newcommand{\reporttype}{Final Report}
+
+
+% % Fill out the following information to customize your title page
+\title{Your Project Title}
+\author{Your Name}
+
+% % Uncomment one of the following lines according to your degree title
+\newcommand{\degreetitle}{BSc}
+%\newcommand{\degreetitle}{BSc Ordinary}
+%\newcommand{\degreetitle}{MEng}
+
+% % Fill your degree programme name here
+\newcommand{\progname}{Computer Science}
+
+% % Fill in your word count here
+\newcommand{\wordcount}{X}
+
+
+
+\begin{document}
+
+\input{title_page/page}
+\newpage
+
+\tableofcontents
+
+\input{chapters/introduction}
+\input{chapters/aim_objectives}
+\input{chapters/background}
+\input{chapters/technical_development}
+\input{chapters/evaluation}
+\input{chapters/conclusion}
+
+\bibliographystyle{hull}
+\bibliography{report}
+
+\end{document}
