@@ -1,19 +1,38 @@
 \chapter{Background}
 \section{Problem Context}
-%Problem Context:
-%If your project involves significant work on a non-computing topic that is likely to be unfamiliar to most readers (e.g. linguistics, fluid dynamics) you should describe the important principles, concepts and terminology of that subject area in some detail. You will have had to learn these yourself in getting to grips with this unfamiliar topic and you should summarize what you learnt to enable the reader to understand your subsequent discussion on your project work and how this relates to the wider topic area.
+$Problem Context:
+If your project involves significant work on a non-computing topic that is likely to be unfamiliar to most readers (e.g. linguistics, fluid dynamics) you should describe the important principles, concepts and terminology of that subject area in some detail. You will have had to learn these yourself in getting to grips with this unfamiliar topic and you should summarize what you learnt to enable the reader to understand your subsequent discussion on your project work and how this relates to the wider topic area.
+$
+
+
 
 The main focus of this project is to create a network degradation tool that can be used to simulate imperfect network conditions. To understand the goal better it is important to know what criteria reduce network quality.
 
-Latency, packet loss and bandwidth are the main factors that distinguish between good and bad internet connections. Latency is the delay between sending a message and seeing its result. Packet loss is the percentage of packets that are lost in transmission, the higher the percentage, the more effect it has on the speed and stability of the network. Bandwidth, is the measure of how many bits are being transferred per second, the larger the bandwidth the more data can be transferred in less time, thus making the overall connection faster. A combination of favourable values from these criteria defines a good network connection.
+Latency, packet loss and bandwidth are the main factors that distinguish between good and bad internet connections. Latency is the delay between sending a message and seeing its result. Packet loss is the percentage of packets that are lost in transmission, the higher the percentage, the more effect it has on the speed and stability of the network. Bandwidth, is the measure of how many bits/bytes are being transferred per second, the larger the bandwidth the more data can be transferred in less time, thus making the overall connection faster. A combination of favourable values from these criteria defines a good network connection. One way to visualise the throughput of a network connection is a download and upload and speed test, the result of these is measured in Mbps and can be used to quickly compare the speed of two connections, this will be used later to briefly show the degradation.
 
 It is also necessary to mention the protocols that are to be used in the network simulation section. TCP \citep{TCP} and UDP \citep{UDP} are the transport layer protocols up for discussion. 
 
+Other small signs of poor network conditions is Jitter and Error rate. Jitter is simply the variance in packet delays, this is normally a issue that exists in large packet switched networks, this is however not an issue in TCP/IP based communications because TCP protocol deals with these issues. However, VoIP (Voice over IP) that uses UDP as its transport level protocol is visibly degraded by heavy jitter. Error rate is the number of bit errors that have occurred in a data stream over a period of time. This can again effect UDP based communications heavily but the TCP protocol deals with these issues so remains relatively unaffected.
+
+\comments{Talk about how TCP deals with jitter?}
 \comments{Talk more about Packet Loss/Latency/Packet Loss maybe even about smaller signs of bad connection quality?}
 
 \subsection{Protocols}
 \subsubsection{Transport Control Protocol (TCP)}
-TCP's main design choices are centred around reliability, where it has a few techniques designed to make sure packets arrive correctly. This is done by a series of signals that are used to open up sessions between two computers, and signals to acknowledge when packets have arrived successfully. If a packet is missing, the protocol will resend.
+TCP's main design choices are centred around reliability, where it has a few techniques designed to make sure packets arrive correctly. The connection begins by being initiated with a series of signals where they are abbreviated as ACK (Acknowledgement) and SYN (Synchronise). The first computer begins by sending an packets with the SYN flag set, this starts the synchronization process. Then once the target computer receives this SYN packet it sends back and ACK for that SYN and its own SYN to the initiating computer, so an ACK + SYN packet, where finally the initial computer sends back an ACK packet for the previous SYN packet, this connection has now been initiated and the communication channel has been set up. This process is known as a `handshake'.
+
+For TCP to remain reliable it needs to maintain data on the status of a connection, where a connection is uniquely identified by the pair of sockets that define its two sides. The information retained contains, sequence number and window sizes where these values are used to calculate the expected next packet to therefore calculate if a packet has been retransmitted or if a packet has been send out of its order.
+
+\comments{Add image displaying this process}
+
+
+
+% How does TCP deal with errors?
+% - Numbers packets
+% - Send Ackowlegements per 
+%	- If ACK isn't recieved in the timeout period the packet is reset
+% - Resending of missing packets
+%		- Why Packet loss isn't terrible on performance
 
 \comments{More about TCP, talk about how it detects a missing packet etc}
 
@@ -42,15 +61,9 @@ As mentioned previously the effects will be performed on a custom computer actin
 The Raspberry Pi \citep{upton2014raspberry} has been decided as the choice for the small custom computer. Originally designed to teach children to code on an inexpensive (less than £30) computer, the Pi has found itself involved in a multitude of uses ranging from NAS (Network Attached Server) to robot controllers. This is useful in this project due to its ease to set-up as a router, this is because of the easy access of low level aspects of the operating system due to it running a based OS. The Raspberry Pi will be run with its default Raspbian OS \citep{pi2014raspbian} that is built upon Debian \citep{murdock1994overview}. This is a optimised OS for the internal ARM CPU that allows the Raspberry Pi to run modern stripped down programs on its very limited hardware, where it will have plenty of power to easily handle traffic as a router.
 \comments{Talk more about the structure of the Pi, maybe some tech specs?}
 
-%
-%
-%
-%
-%
-%
 \section{Comparison of Technologies}
-%Comparison of Technologies:
-%If there are several possible technologies that could be used in your project work you should present a comparative analysis and critical appraisal of each of these technologies. You should create a subsection for each of the technologies you discuss and title each subsection with the name of the technology it describes (e.g. object-oriented databases, XML ). Within each subsection you should provide an overview of the technology, its key features and its strengths and weaknesses in relation to your project.
+$Comparison of Technologies:$
+$If there are several possible technologies that could be used in your project work you should present a comparative analysis and critical appraisal of each of these technologies. You should create a subsection for each of the technologies you discuss and title each subsection with the name of the technology it describes (e.g. object-oriented databases, XML ). Within each subsection you should provide an overview of the technology, its key features and its strengths and weaknesses in relation to your project.$
 
 \subsection{Protocol Comparison}
 \subsubsection{TCP Based Protocols}
@@ -93,15 +106,9 @@ Linux was chosen over the other possible alternative; Windows. The Windows OS is
 
 \comments{Talk more about windows}
 
-%
-%
-%
-%
-%
-%
 \section{Alternative Solutions}
-%Alternative Solutions:
-%If others have produced solutions or addressed similar problems to those addressed by your project you should describe those alternative solutions here. Similarly, if several possible approaches suggest themselves as ways of solving the problems inherent in your project you should discuss those here. You should provide a comparative analysis and critical appraisal of each alternative solution approach or existing solution, identifying their key features and their strengths and weaknesses in relation to your project.
+$Alternative Solutions:$
+$If others have produced solutions or addressed similar problems to those addressed by your project you should describe those alternative solutions here. Similarly, if several possible approaches suggest themselves as ways of solving the problems inherent in your project you should discuss those here. You should provide a comparative analysis and critical appraisal of each alternative solution approach or existing solution, identifying their key features and their strengths and weaknesses in relation to your project.$
 
 \comments{For all the solutions I need to be much more critical of the positives and negatives}
 
@@ -123,20 +130,16 @@ This tool provides and easy to use and simple tool, but only affects the traffic
 TMNetSim \footnote{\url{http://www.tmurgent.com/appv/en/87-tools/performance-tools/177-tmnetsim-quick-and-easy-network-simulation-tool}} is another tool that covers aspects of this project. Unlike clumsy TMNetSim is designed to provide degradation that expands over the network. However, to achieve this it has to be set-up on every machine, this is clunky and time consuming. The project being developed can negate this lengthy set-up with the intended inclusion of the ARP Spoofing. Further criticism relates to the ease of use of this application, it has a large number of controls on it's interface and will involve a larger learning curve to master compared to other simpler tools, this however might be the bi-product of more functionality; increased complexity.
 
 This tool includes very complex ways of simulating realistic degradation with Gausian and ``Normal" delay modes, that attempt to provide more accurate representations of real-world delays. This is a great feature that could drastically improve the accuracy in simulating degradation and will need to be considered as an extra inclusion into this project.
-%
-%
-%
-%
-%
-%
-%Comparison of Algotithms
-%%There may be a number of different algorithms which could be applied to the central problems in your project and you have had to choose which of these algorithms are the most appropriate for your implementation. If this is the case then you should provide a comparative analysis and critical appraisal of each of the potentially applicable algorithms, highlighting their key features and their strengths and weaknesses in relation to your project.
 
+$Comparison of Algotithms$
+$There may be a number of different algorithms which could be applied to the central problems in your project and you have had to choose which of these algorithms are the most appropriate for your implementation. If this is the case then you should provide a comparative analysis and critical appraisal of each of the potentially applicable algorithms, highlighting their key features and their strengths and weaknesses in relation to your project.$
 
-%Process and Methodology
-%%If your project is concerned with improving, implementing or evaluating a particular technical process or method of working you should discuss these in detail. We are not expecting you to describe what software development methodology you are following in implementing your project and you certainly do not need to regurgitate textbook descriptions of the Waterfall method here as everyone already knows that model well.
+$Process and Methodology$
+$If your project is concerned with improving, implementing or evaluating a particular technical process or method of working you should discuss these in detail. We are not expecting you to describe what software development methodology you are following in implementing your project and you certainly do not need to regurgitate textbook descriptions of the Waterfall method here as everyone already knows that model well.$
 
-%This is a narrative description of the general context within which your project fits. Depending on your particular project characteristics, you are required to include discussion of any or all of the following – previous related work; the work or objectives of a client; the essential principles of systems or techniques you are using.
-%All this narrative should be properly referenced to source material citations. Remember that a high class project will refer to background sources beyond just those on the Web. 
-%In writing this section you should pay close attention to your audience and their prior knowledge of the subject(s) that you are discussing. You should assume that your reader is a student who has just completed the second year of your degree programme and can therefore assume that the reader is familiar with all topics taught up to the end of the second year. Anything that is needed to understand your project and its context but which has not been taught by the end of the second year of your degree should be discussed in this background section. 
-%This section may include one or more of the following subsections. It is difficult to give prescriptive guidance on which subsections you should include as this depends on the nature of the project you are undertaking – you should discuss this with your supervisor.
+$This is a narrative description of the general context within which your project fits. Depending on your particular project characteristics, you are required to include discussion of any or all of the following – previous related work; the work or objectives of a client; the essential principles of systems or techniques you are using.$
+$All this narrative should be properly referenced to source material citations. Remember that a high class project will refer to background sources beyond just those on the Web. $
+
+$In writing this section you should pay close attention to your audience and their prior knowledge of the subject(s) that you are discussing. You should assume that your reader is a student who has just completed the second year of your degree programme and can therefore assume that the reader is familiar with all topics taught up to the end of the second year. Anything that is needed to understand your project and its context but which has not been taught by the end of the second year of your degree should be discussed in this background section. $
+
+$This section may include one or more of the following subsections. It is difficult to give prescriptive guidance on which subsections you should include as this depends on the nature of the project you are undertaking – you should discuss this with your supervisor.$
