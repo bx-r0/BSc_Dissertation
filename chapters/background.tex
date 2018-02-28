@@ -4,8 +4,6 @@ $Problem Context:
 If your project involves significant work on a non-computing topic that is likely to be unfamiliar to most readers (e.g. linguistics, fluid dynamics) you should describe the important principles, concepts and terminology of that subject area in some detail. You will have had to learn these yourself in getting to grips with this unfamiliar topic and you should summarize what you learnt to enable the reader to understand your subsequent discussion on your project work and how this relates to the wider topic area.
 $
 
-
-
 The main focus of this project is to create a network degradation tool that can be used to simulate imperfect network conditions. To understand the goal better it is important to know what criteria reduce network quality.
 
 Latency, packet loss and bandwidth are the main factors that distinguish between good and bad internet connections. Latency is the delay between sending a message and seeing its result. Packet loss is the percentage of packets that are lost in transmission, the higher the percentage, the more effect it has on the speed and stability of the network. Bandwidth, is the measure of how many bits/bytes are being transferred per second, the larger the bandwidth the more data can be transferred in less time, thus making the overall connection faster. A combination of favourable values from these criteria defines a good network connection. One way to visualise the throughput of a network connection is a download and upload and speed test, the result of these is measured in Mbps and can be used to quickly compare the speed of two connections, this will be used later to briefly show the degradation.
@@ -19,22 +17,29 @@ Other small signs of poor network conditions is Jitter and Error rate. Jitter is
 
 \subsection{Protocols}
 \subsubsection{Transport Control Protocol (TCP)}
-TCP's main design choices are centred around reliability, where it has a few techniques designed to make sure packets arrive correctly. The connection begins by being initiated with a series of signals where they are abbreviated as ACK (Acknowledgement) and SYN (Synchronise). The first computer begins by sending an packets with the SYN flag set, this starts the synchronization process. Then once the target computer receives this SYN packet it sends back and ACK for that SYN and its own SYN to the initiating computer, so an ACK + SYN packet, where finally the initial computer sends back an ACK packet for the previous SYN packet, this connection has now been initiated and the communication channel has been set up. This process is known as a `handshake'.
+TCP's main design choices are centred around reliability, where it has a few techniques designed to make sure packets arrive correctly. 
 
-For TCP to remain reliable it needs to maintain data on the status of a connection, where a connection is uniquely identified by the pair of sockets that define its two sides. The information retained contains, sequence number and window sizes where these values are used to calculate the expected next packet to therefore calculate if a packet has been retransmitted or if a packet has been send out of its order.
+\subsubsection{Initiating a connection}
+The connection begins by being initiated with a series of signals where they are abbreviated as ACK (Acknowledgement) and SYN (Synchronise). The first computer begins by sending an packets with the SYN flag set, this starts the synchronization process. Then once the target computer receives this SYN packet it sends back and ACK for that SYN and its own SYN to the initiating computer, so as a ACK + SYN packet, where finally the initial computer sends back an ACK packet for the previous SYN packet, this connection has now been initiated and the communication channel has been set up. This process is known as a `handshake'.
+
+For TCP to remain reliable it needs to maintain data on the status of a connection, where a connection can be uniquely identified by the pair of sockets that define its two sides of the connection. The information retained contains, sequence number and window sizes where these values are used to calculate the expected next packet to therefore calculate if a packet has been retransmitted or if a packet has been send out of its order.
 
 \comments{Add image displaying this process}
 
+\subsubsection{Sequence Numbers and Acknowledgement Numbers}
+One of the main mechanisms for detecting missing and incorrect packets is the sequence number. The TCP design states that every octet will have a corresponding sequence number, this sequence number is then increased by the length of the data inside the packet, the length of a packet can be calculated by taking the total size and taking away the size of the header. For example, if a packet with a length of 100 was sent it would move the sequence value up by 100, this gives the protocol the information to judge what it should be expecting and what it has received, and if those two values don't add up an error has occurred. 
+
+On the other side the sender needs to know it packets have been received, this is where the acknowledgement number comes in, packets carrying acknowledgements are known as ``ACKs". For a packet with a sequence number of 100 being sent will require a packet to be send back containing the ACK number of 100 to verify that is has been transferred correctly, an ACK packet is signified by the `ACK' flag in the packets header. If the ACK packet isn't received before the the time-out value has been reached the packet is resent, this is how TCP guarantees retransmission of packets and it's also one of the reasons why packet loss doesn't have the same effect it does on UDP with TCP.
+
+In situations where connections are created and recreated quickly in succession or are being re-established after errors often there cannot be sequence numbers that clash with previous segment that may still exist on a network connection, therefore TCP solves this issue by generating using a Initial Sequence Number (ISN) generator that uses a 32 bit clock, this clock has a life cycle of 4.55 hours where this time period is commonly known as the Maximum Segment Lifetime (MSL) and if a ISN is generated within this time is can be guaranteed to be unique.
+
+\subsubsection{Sending\Reciving Window}
+\comments{Talk here about how the sliding window works and how packets can be send back and forth}
 
 
-% How does TCP deal with errors?
-% - Numbers packets
-% - Send Ackowlegements per 
-%	- If ACK isn't recieved in the timeout period the packet is reset
-% - Resending of missing packets
-%		- Why Packet loss isn't terrible on performance
+\subsubsection{Closing a connection}
+\comments{Talk here about the different ways a connection can be closed}
 
-\comments{More about TCP, talk about how it detects a missing packet etc}
 
 \subsubsection{User Data Protocol (UDP)}
 UDP is by design the opposite of TCP and often you'll find the two protocols compared. UDP is often referred to as ``fire and forget" \citep{kempf2011thoughts} this is a short way of describing how UDP deals with packets. When a packet is to be sent UDP sends the packet and moves onto the next. However, this means aside from the checksum in the UDP header (A checksum can be used to check that the UDP data has been transferred correctly) there is zero error checking for the UDP protocol and results in UDP being considered unreliable in comparison to TCP. This lack of error-checking overhead however, greatly improves the speed of UDP protocols. UDP is not used in situations where communication is vital, but does find itself implemented in examples like voice or video chat because errors in these services are not catastrophic to operation and these imperfections can even go unnoticed. 
