@@ -16,41 +16,27 @@
 \usepackage{parskip}
 \newcommand{\comments}[1]{\textcolor{OliveGreen}{[\emph{#1}]}}
 
-\newcommand{\reporttype}{Final Report}
-
-
-% % Fill out the following information to customize your title page
-\title{Your Project Title}
-\author{Your Name}
-
-% % Uncomment one of the following lines according to your degree title
-\newcommand{\degreetitle}{BSc}
-%\newcommand{\degreetitle}{BSc Ordinary}
-%\newcommand{\degreetitle}{MEng}
-
-% % Fill your degree programme name here
-\newcommand{\progname}{Computer Science}
-
-% % Fill in your word count here
-\newcommand{\wordcount}{X}
-
-
+\graphicspath{{images/}}
 
 \begin{document}
 
-\input{title_page/page}
-\newpage
+	%Title Page
+	\title{Compromised and Degraded Network Simulation}
+	\newcommand{\reporttype}{Final Report}
+	\newcommand{\degreetitle}{BSc}
+	\newcommand{\progname}{Computer Science}
+	\author{Aidan Fray}
+	\newcommand{\wordcount}{X}
+	\input{title_page/page}		
 
-\tableofcontents
-
-\input{chapters/introduction}
-\input{chapters/aim_objectives}
-\input{chapters/background}
-\input{chapters/technical_development}
-\input{chapters/evaluation}
-\input{chapters/conclusion}
-
-\bibliographystyle{hull}
-\bibliography{report}
-
+	\newpage
+	\tableofcontents
+	\input{chapters/introduction}
+	\input{chapters/aim_objectives}
+	\input{chapters/background}
+	\input{chapters/technical_development}
+	\input{chapters/evaluation}
+	\input{chapters/conclusion}
+	\bibliographystyle{hull}
+	\bibliography{report}
 \end{document}
