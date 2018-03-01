@@ -23,6 +23,23 @@
 %If you project includes any experiments, including but not limited to user testing, then you can discuss their design here. Note that again this does not exist in a vacuum and should be tied to your research.
 \section{Experiential design}
 
+\subsubsection{Packet Loss and its effect on download speeds}
+
+% Better graph needed
+\begin{center}
+	\includegraphics[scale=0.6]{PL_Download}
+	\begin{figure}[h]
+	 	\caption{Graph displaying effect of packet loss on download speeds}
+	\end{figure}		
+\end{center}
+
+The graph above shows the download speed measured in Mbps against the increasing rate of packet loss, as you can see the download rate only reaches 28\%, this is due to the connection test failing at anything above. The tests were performed by querying the SpeedTest.net \comments{CITE} API. 
+
+My initial hypothesis for the sharp decreases in packet loss from 0\% to 1\% is it's due to the congestion control mechanisms built into TCP. TCP as mentioned in the background section allows for multiple devices to co-exist on a network and dynamically balance network resources through congestion control algorithms, but packet loss in this aspect is assumed as a sign of congestion to the algorithm adapts and reduces its transfer rate each time a packet is lost, this means the transfer rate drastically reduces until it reaches a platform.
+
+\comments{Decide on an experiment to prove this}
+\comments{Also talk about why the transfer fails when the packet loss reaches 28\%}
+
 
 
 %Test design and system testing:
