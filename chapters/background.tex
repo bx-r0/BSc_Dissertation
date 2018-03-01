@@ -19,26 +19,36 @@ Other small signs of poor network conditions is Jitter and Error rate. Jitter is
 \subsubsection{Transport Control Protocol (TCP)}
 TCP's main design choices are centred around reliability, where it has a few techniques designed to make sure packets arrive correctly. 
 
-\subsubsection{Initiating a connection}
-The connection begins by being initiated with a series of signals where they are abbreviated as ACK (Acknowledgement) and SYN (Synchronise). The first computer begins by sending an packets with the SYN flag set, this starts the synchronization process. Then once the target computer receives this SYN packet it sends back and ACK for that SYN and its own SYN to the initiating computer, so as a ACK + SYN packet, where finally the initial computer sends back an ACK packet for the previous SYN packet, this connection has now been initiated and the communication channel has been set up. This process is known as a `handshake'.
+\begin{center}
+	\includegraphics[scale=0.7]{TCP_header}
+	\begin{figure}[h]
+		\caption{TCP Header (RFC 793)}
+	\end{figure}	
+	
+\end{center}
 
-For TCP to remain reliable it needs to maintain data on the status of a connection, where a connection can be uniquely identified by the pair of sockets that define its two sides of the connection. The information retained contains, sequence number and window sizes where these values are used to calculate the expected next packet to therefore calculate if a packet has been retransmitted or if a packet has been send out of its order.
+\subsubsection*{Initiating a connection}
+The connection begins by being initiated with a series of signals where they are abbreviated as ACK (Acknowledgement) and SYN (Synchronise). The first computer begins by sending an packets with the SYN flag set, this starts the synchronization process. Then once the target computer receives this SYN packet it sends back and ACK for that SYN and its own SYN to the initiating computer, so as a ACK + SYN packet, where finally the initial computer sends back an ACK packet for the previous SYN packet, this connection has now been initiated and the communication channel has been set up. This process is known as a `3-way handshake'.
+
+For TCP to remain reliable it needs to maintain data on the status of a connection, where a connection is uniquely identified by the pair of sockets that define its two sides of the connection. The information retained contains, sequence number and window sizes where these values are used to calculate the expected next packet to therefore calculate if a packet has been retransmitted or if a packet has been send out of its order.
 
 \comments{Add image displaying this process}
 
-\subsubsection{Sequence Numbers and Acknowledgement Numbers}
+\subsubsection*{Sequence Numbers and Acknowledgement Numbers}
 One of the main mechanisms for detecting missing and incorrect packets is the sequence number. The TCP design states that every octet will have a corresponding sequence number, this sequence number is then increased by the length of the data inside the packet, the length of a packet can be calculated by taking the total size and taking away the size of the header. For example, if a packet with a length of 100 was sent it would move the sequence value up by 100, this gives the protocol the information to judge what it should be expecting and what it has received, and if those two values don't add up an error has occurred. 
 
 On the other side the sender needs to know it packets have been received, this is where the acknowledgement number comes in, packets carrying acknowledgements are known as ``ACKs". For a packet with a sequence number of 100 being sent will require a packet to be send back containing the ACK number of 100 to verify that is has been transferred correctly, an ACK packet is signified by the `ACK' flag in the packets header. If the ACK packet isn't received before the the time-out value has been reached the packet is resent, this is how TCP guarantees retransmission of packets and it's also one of the reasons why packet loss doesn't have the same effect it does on UDP with TCP.
 
-In situations where connections are created and recreated quickly in succession or are being re-established after errors often there cannot be sequence numbers that clash with previous segment that may still exist on a network connection, therefore TCP solves this issue by generating using a Initial Sequence Number (ISN) generator that uses a 32 bit clock, this clock has a life cycle of 4.55 hours where this time period is commonly known as the Maximum Segment Lifetime (MSL) and if a ISN is generated within this time is can be guaranteed to be unique.
+In situations where connections are created and recreated quickly in succession or are being re-established after errors there cannot be sequence numbers that clash with previous segment that may still exist on a network connection, therefore TCP solves this issue by generating using a Initial Sequence Number (ISN) generator that uses a 32 bit clock, this clock has a life cycle of 4.55 hours where this time period is commonly known as the Maximum Segment Lifetime (MSL) and if a ISN is generated within this time is can be guaranteed to be unique.
 
-\subsubsection{Sending\Reciving Window}
-\comments{Talk here about how the sliding window works and how packets can be send back and forth}
+\subsubsection*{Receiving Window}
+In the TCP header there is a two byte value that represents the receiving window size, this value defines the maximum size of unacknowledged packets the sending end has space for. So if a client sends a packet with a 65535 value it tells the receiving computer not to send more than 65535 Bytes before receiving acknowledgements. This value can also be extended using a value in the area allocated as the `TCP Options' called `windows scaling', this allows the value in the window size to be multiplied by this scale value. So, for example a window size of 65535 with a window scale of 5 would have a total window size of 327675 Bytes. This means that the larger the window the more data can be send before waiting is needed to receive acknowledgements and can normally mean faster transfer speeds. Please note, this exchange of window scaling values is only performed in the handshake and can only be present in the initial exchange of packets.
 
+\subsubsection*{Congestion control}
+When there are situations where multiple clients are connected to one receiver lets say a router for this example, the bandwidth needs to be split between the number of clients and this is performed by congestion controls. The clients send data and keep increasing their transfer rate until they discover packet loss, packet loss in this case is assumed to be a sign of congestion - this is because it thinks the packets are being lost because the router is dropping them due to insufficient packet buffering space. So as the number of clients requesting data from the router is reduced more bandwidth is freed up and available, the congestion algorithm is periodically probing the network to check for available bandwidth by increasing it transfer rate until packet loss is encountered where it then slows down and repeats the process. This results in TCP auto balancing when new clients are introduced and utilizing as much bandwidth as is available. Later this report will discuss the effects of packet loss, latency and other degradation signs on this congestion control.
 
-\subsubsection{Closing a connection}
-\comments{Talk here about the different ways a connection can be closed}
+\subsubsection*{Closing a connection}
+The closing of a TCP connection is very similar to the initial construction of a TCP connection, but in this case the protocol utilises the `FIN' flag defined in the TCP header. In this example it will be a client disconnection from a server. After all the data is transferred the client no longer requires a connection to the server and sends an empty packet with the FIN bit send, the server receives the packet and returns an ACK. The server now sends its own FIN and this is then acknowledged by the client. This middle step with the server sending an ACK and FIN separately is performed in a single packet in live networks. The client and server not know the connection is closed and will free up any resources allocated to that connection.
 
 
 \subsubsection{User Data Protocol (UDP)}
