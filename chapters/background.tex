@@ -1,8 +1,14 @@
+%This is a narrative description of the general context within which your project fits. Depending on your particular project characteristics, you are required to include discussion of any or all of the following – previous related work; the work or objectives of a client; the essential principles of systems or techniques you are using.%
+%All this narrative should be properly referenced to source material citations. Remember that a high class project will refer to background sources beyond just those on the Web. %
+
+%In writing this section you should pay close attention to your audience and their prior knowledge of the subject(s) that you are discussing. You should assume that your reader is a student who has just completed the second year of your degree programme and can therefore assume that the reader is familiar with all topics taught up to the end of the second year. Anything that is needed to understand your project and its context but which has not been taught by the end of the second year of your degree should be discussed in this background section. %
+
+%This section may include one or more of the following subsections. It is difficult to give prescriptive guidance on which subsections you should include as this depends on the nature of the project you are undertaking – you should discuss this with your supervisor.%
 \chapter{Background}
+
+%Problem Context:
+%If your project involves significant work on a non-computing topic that is likely to be unfamiliar to most readers (e.g. linguistics, fluid dynamics) you should describe the important principles, concepts and terminology of that subject area in some detail. You will have had to learn these yourself in getting to grips with this unfamiliar topic and you should summarize what you learnt to enable the reader to understand your subsequent discussion on your project work and how this relates to the wider topic area.
 \section{Problem Context}
-$Problem Context:
-If your project involves significant work on a non-computing topic that is likely to be unfamiliar to most readers (e.g. linguistics, fluid dynamics) you should describe the important principles, concepts and terminology of that subject area in some detail. You will have had to learn these yourself in getting to grips with this unfamiliar topic and you should summarize what you learnt to enable the reader to understand your subsequent discussion on your project work and how this relates to the wider topic area.
-$
 
 The main focus of this project is to create a network degradation tool that can be used to simulate imperfect network conditions. To understand the goal better it is important to know what criteria reduce network quality.
 
@@ -52,13 +58,19 @@ The closing of a TCP connection is very similar to the initial construction of a
 
 
 \subsubsection{User Data Protocol (UDP)}
+\begin{center}
+	\includegraphics[scale=0.7]{udp_header}
+	\begin{figure}[h]
+		\caption{UDP Header (RFC 768)}
+	\end{figure}		
+\end{center}
+
 UDP is by design the opposite of TCP and often you'll find the two protocols compared. UDP is often referred to as ``fire and forget" \citep{kempf2011thoughts} this is a short way of describing how UDP deals with packets. When a packet is to be sent UDP sends the packet and moves onto the next. However, this means aside from the checksum in the UDP header (A checksum can be used to check that the UDP data has been transferred correctly) there is zero error checking for the UDP protocol and results in UDP being considered unreliable in comparison to TCP. This lack of error-checking overhead however, greatly improves the speed of UDP protocols. UDP is not used in situations where communication is vital, but does find itself implemented in examples like voice or video chat because errors in these services are not catastrophic to operation and these imperfections can even go unnoticed. 
-
-\comments{Talk more about UDP, what contained in the header etc}
-
-The tool will be deployed either by having it run on a small custom computer set up to act as a router for the synthetic test network or by jumping between a user and an actual router on a live network. The program will achieve this jumping between a user and the router by utilising a long term vulnerability in the Address Resolution Protocol (ARP) \citep{arp2001}, before this is explained further it is first important to understand the relevant parts of a local network.
+As the very small UDP header shows, it is a very simple protocol and is effectively a thin wrapper on top of the IP layer that allows for very quick transfers but with the cost of not guaranteed reliability, this is why packet loss effects UDP massively and the overall effect will be fully disused later.
 
 \subsubsection{Address Resolution Protocol (ARP)}
+The tool will be deployed either by having it run on a small custom computer set up to act as a router for the synthetic test network or by jumping between a user and an actual router on a live network. The program will achieve this jumping between a user and the router by utilising a long term vulnerability in the Address Resolution Protocol (ARP) \citep{arp2001}, before this is explained further it is first important to understand the relevant parts of a local network.
+
 Each computer on a Local Area Network (LAN) has an IP assigned to it, this is the identifier on the local network, with this each computers wireless card has a MAC address, a MAC address is a unique identifier for a computer and is used to link up this non-unique local address (IP) to a real computer on a network, this combination of IP address and MAC address allow for the reuse of local IP numbers. The ARP protocol is used to find out what MAC address is associated with a local IP address and visa versa. This is achieved via an entire network broadcast where computers that don't match ignore the ARP request, and the one being requested sends back a reply containing it's MAC address, this is achieved without any authentication. Therefore, this means a program can send out fake custom ARP requests to change specific values in the routers ARP table, meaning a computer running this software can appear as the router to the victim, while also appearing as the victim to the router, thus having all the traffic between the two routed through the attacking computer. 
 
 \comments{Talk more about how a network resolves IP address and why ARP is vuln}
@@ -74,11 +86,18 @@ Each computer on a Local Area Network (LAN) has an IP assigned to it, this is th
 \subsubsection{Raspberry Pi}
 As mentioned previously the effects will be performed on a custom computer acting as the router, because the network will be set-up to pass all traffic through this router, it will be able to simulate degradation on the entire networks traffic.
 The Raspberry Pi \citep{upton2014raspberry} has been decided as the choice for the small custom computer. Originally designed to teach children to code on an inexpensive (less than £30) computer, the Pi has found itself involved in a multitude of uses ranging from NAS (Network Attached Server) to robot controllers. This is useful in this project due to its ease to set-up as a router, this is because of the easy access of low level aspects of the operating system due to it running a based OS. The Raspberry Pi will be run with its default Raspbian OS \citep{pi2014raspbian} that is built upon Debian \citep{murdock1994overview}. This is a optimised OS for the internal ARM CPU that allows the Raspberry Pi to run modern stripped down programs on its very limited hardware, where it will have plenty of power to easily handle traffic as a router.
-\comments{Talk more about the structure of the Pi, maybe some tech specs?}
 
+To create the access point, software called Hostapd will be used, this software allows for the configuration of access points to occur with their SSID, password, channel and encryption type to all be set up manually.
+
+\subsubsection{DHCP}
+The protocol used to assign IP address in a network is called DHCP (Dynamic Host Configuration Protocol) and will need to be set up to assign IP addresses to any connecting entity. This protocol also handles the assigning of important addresses like the default gateway and the DNS address. DHCP has two sections; server and client. The server will be hosted on the router in this case but in much larger companies and businesses the DHCP server would be hosted on its own dedicated machine. Each computer that wants to connect to a network runs a DHCP client that sends out a DHCP-Discover request as a broadcast that looks for a DHCP server on the network. All other hosts ignore the request apart from the server that will then return a DHCP-Offer. This client then again accepts the DHCP offer with a DHCP-Request that finally the DHCP server responds with a DHCP-Pack that contains the subnet, default gateway and the assigned IP address along with a period of time the IP has been leased for. This whole process allows for unique allocation of IP addresses
+
+%Use this video
+%%https://www.youtube.com/watch?v=S43CFcpOZSI%
+
+%Comparison of Technologies:
+%If there are several possible technologies that could be used in your project work you should present a comparative analysis and critical appraisal of each of these technologies. You should create a subsection for each of the technologies you discuss and title each subsection with the name of the technology it describes (e.g. object-oriented databases, XML ). Within each subsection you should provide an overview of the technology, its key features and its strengths and weaknesses in relation to your project.
 \section{Comparison of Technologies}
-$Comparison of Technologies:$
-$If there are several possible technologies that could be used in your project work you should present a comparative analysis and critical appraisal of each of these technologies. You should create a subsection for each of the technologies you discuss and title each subsection with the name of the technology it describes (e.g. object-oriented databases, XML ). Within each subsection you should provide an overview of the technology, its key features and its strengths and weaknesses in relation to your project.$
 
 \subsection{Protocol Comparison}
 \subsubsection{TCP Based Protocols}
@@ -121,9 +140,9 @@ Linux was chosen over the other possible alternative; Windows. The Windows OS is
 
 \comments{Talk more about windows}
 
+%Alternative Solutions:
+%If others have produced solutions or addressed similar problems to those addressed by your project you should describe those alternative solutions here. Similarly, if several possible approaches suggest themselves as ways of solving the problems inherent in your project you should discuss those here. You should provide a comparative analysis and critical appraisal of each alternative solution approach or existing solution, identifying their key features and their strengths and weaknesses in relation to your project.
 \section{Alternative Solutions}
-$Alternative Solutions:$
-$If others have produced solutions or addressed similar problems to those addressed by your project you should describe those alternative solutions here. Similarly, if several possible approaches suggest themselves as ways of solving the problems inherent in your project you should discuss those here. You should provide a comparative analysis and critical appraisal of each alternative solution approach or existing solution, identifying their key features and their strengths and weaknesses in relation to your project.$
 
 \comments{For all the solutions I need to be much more critical of the positives and negatives}
 
@@ -146,15 +165,12 @@ TMNetSim \footnote{\url{http://www.tmurgent.com/appv/en/87-tools/performance-too
 
 This tool includes very complex ways of simulating realistic degradation with Gausian and ``Normal" delay modes, that attempt to provide more accurate representations of real-world delays. This is a great feature that could drastically improve the accuracy in simulating degradation and will need to be considered as an extra inclusion into this project.
 
-$Comparison of Algotithms$
-$There may be a number of different algorithms which could be applied to the central problems in your project and you have had to choose which of these algorithms are the most appropriate for your implementation. If this is the case then you should provide a comparative analysis and critical appraisal of each of the potentially applicable algorithms, highlighting their key features and their strengths and weaknesses in relation to your project.$
+%Comparison of Algotithms%
+%There may be a number of different algorithms which could be applied to the central problems in your project and you have had to choose which of these algorithms are the most appropriate for your implementation. If this is the case then you should provide a comparative analysis and critical appraisal of each of the potentially applicable algorithms, highlighting their key features and their strengths and weaknesses in relation to your project.%
+\section{Comparison of Algorithms}
 
-$Process and Methodology$
-$If your project is concerned with improving, implementing or evaluating a particular technical process or method of working you should discuss these in detail. We are not expecting you to describe what software development methodology you are following in implementing your project and you certainly do not need to regurgitate textbook descriptions of the Waterfall method here as everyone already knows that model well.$
 
-$This is a narrative description of the general context within which your project fits. Depending on your particular project characteristics, you are required to include discussion of any or all of the following – previous related work; the work or objectives of a client; the essential principles of systems or techniques you are using.$
-$All this narrative should be properly referenced to source material citations. Remember that a high class project will refer to background sources beyond just those on the Web. $
 
-$In writing this section you should pay close attention to your audience and their prior knowledge of the subject(s) that you are discussing. You should assume that your reader is a student who has just completed the second year of your degree programme and can therefore assume that the reader is familiar with all topics taught up to the end of the second year. Anything that is needed to understand your project and its context but which has not been taught by the end of the second year of your degree should be discussed in this background section. $
-
-$This section may include one or more of the following subsections. It is difficult to give prescriptive guidance on which subsections you should include as this depends on the nature of the project you are undertaking – you should discuss this with your supervisor.$
+%Process and Methodology%
+%If your project is concerned with improving, implementing or evaluating a particular technical process or method of working you should discuss these in detail. We are not expecting you to describe what software development methodology you are following in implementing your project and you certainly do not need to regurgitate textbook descriptions of the Waterfall method here as everyone already knows that model well.%
+\section{Process and Methodology}
