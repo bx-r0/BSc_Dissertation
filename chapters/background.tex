@@ -101,24 +101,27 @@ The ARP protocol contains no form of authentication verification meaning a malic
 As mentioned previously the effects will be performed on a custom computer acting as the router, because the network will be set-up to pass all traffic through this router, it will be able to simulate degradation on the entire networks traffic.
 The Raspberry Pi \citep{upton2014raspberry} has been decided as the choice for the small custom computer. Originally designed to teach children to code on an inexpensive (less than £30) computer, the Pi has found itself involved in a multitude of uses ranging from NAS (Network Attached Server) to robot controllers. This is useful in this project due to its ease to set-up as a router, this is because of the easy access of low level aspects of the operating system due to it running a based OS. The Raspberry Pi will be run with its default Raspbian OS \citep{pi2014raspbian} that is built upon Debian \citep{murdock1994overview}. This is a optimised OS for the internal ARM CPU that allows the Raspberry Pi to run modern stripped down programs on its very limited hardware, where it will have plenty of power to easily handle traffic as a router.
 
-%Use this video
-%%https://www.youtube.com/watch?v=S43CFcpOZSI%
-
 %Comparison of Technologies:
 %If there are several possible technologies that could be used in your project work you should present a comparative analysis and critical appraisal of each of these technologies. You should create a subsection for each of the technologies you discuss and title each subsection with the name of the technology it describes (e.g. object-oriented databases, XML ). Within each subsection you should provide an overview of the technology, its key features and its strengths and weaknesses in relation to your project.
 \section{Comparison of Technologies}
 
 \subsection{Protocol Comparison}
 \subsubsection{TCP Based Protocols}
+
+\subsubsection*{HTTP}
 TCP has various protocols built on top of it. One of the most widely used protocols is HTTP/1.1 \citep{HTTP}. HTTP is a structured language used to transfer data worldwide. Its main use is the movement of web based data, this has been chosen as one of the protocols to be used in the test network to simulate live real-world traffic, this is due to the protocols heavy use in the real world. The protocol will be utilised by a web browser that attempts to access a web page, the degradation will therefore be visible through how quickly the web page loads and how responsive the connection seems.
 
+
+\subsubsection*{FTP}
 Another protocol based on top of TCP is FTP (File Transfer Protocol) \citep{FTP}, and as the broken down acronym suggests is the protocol used to transfer files across a network. This protocol has been selected also due to its integral use in a live network. It also has a quite intuitive way of representing the speed of a network through a download speed that is easy to understand for most users. The protocol will be tested with dummy files ranging from 1MB to 5GB. This size range was chosen to fully cover the normal spectrum of file size where it roughly ranges from a Word document to high quality video.
 
 \subsubsection{Other TCP Considerations}
+
+\subsubsection*{SFTP}
 SFTP (SSH File Transfer Protocol) \citep{SFTP} was a consideration as a protocol to be used for the demonstration purposes. SFTP effectively is a secure version of FTP (but not to be mixed up with the Simple File Transfer Protocol). This was decided not to be used because of its added features such as authentication security does not fit within the scope of the project, and does not relate to network degradation. 
 
-\comments{More considered protocols}
-
+\subsubsection*{Mail based protocols}
+Another widely used set of protocols are the email based family of protocols. SMTP (Simple Mail Transfer Protocol) is involved in the sending of mail, while examples like IMAP/POP are used for receiving mail. These protocols use TCP as their transport layer protocols. These protocols are fundamental to email functioning on the internet but visualisation into their degradation would be not different to that of bare TCP, the implementation of an email client would add unnecessary complexity while offering almost zero added value to the demonstrative purposes of this project.
 
 \subsubsection{UDP Based Protocols}
 UDP due to its speed but inherent unreliability, UDP is hugely affected by packet loss. Therefore, the effects on UDP has decided to be visualised by a program that simulates image transfer by assigning an individual UDP packet a number that corresponds to a single pixel, this packet is then sent. Once the server receives the packet, it reads the pixel number stored in the packet and changes that specific pixel to green. This creates a matrix of red (lost) and green(received) pixels. This therefore, gives a simple but effective visualisation of packet loss. 
@@ -130,10 +133,11 @@ UDP due to its speed but inherent unreliability, UDP is hugely affected by packe
 	\end{figure}
 \end{center}
 
-UDP could have been utilised through real world applications like voice/video chat or an on-line game, but the added complexity to implement these compared to the simpler pixel based approach would've provided no added value to visualising the effects of the degradation on the connection.
+Other effects can also be performed on UDP to measure the degradation, latency and the arrival order of the packets are big signs of hostile transfer conditions. The monitoring of the latency and order can be performed by the UDP interface and could provide a much more detailed overview of the current health of the connection.
 
-\comments{More UDP protocols}
-\comments{Different transfer level considerations here}
+\subsection*{Other UDP based protocols}
+UDP is used for situations where speed is required but reliability is not. Media streaming is a common example, lots of data need to arrive to the client quickly where missed frames when not too large can go unnoticed. This kind of implementation would be a huge overhead and even if a 3rd party application was used set-up and debugging would utilise time while providing not much more insight into what is happening to the protocol when degradation is high. This is why UDP had been left as bare boned as possible and the protocol has been left relatively exposed to allow an effective way to visualise the effects.
+
 
 \subsection{Operating Systems}
 
@@ -142,12 +146,59 @@ Linux is the broad definition of a family of computer operating systems. The def
 
 Linux was chosen for this project for its open source element that allows easy access to low-level features in the kernel. The section of the kernel that deals with the filtration of packets for uses like firewalls and packet sniffers is referred to as the ``NetFilter". This acts as an API of sorts where packets can be routed to the net-filter queue to await a verdict (accept or drop) before being moved on. This is the basis for the functionality of the program, it will run on the Raspberry Pi and route all packets that enter the box to the queue where the program will perform its effects on the packets. Latency for example is one of the simplest effect to simulate, the packet will be routed into the queue, taken out and stored and the delay between storing and accepting will be the set latency value and therefore simulating the effect of latency on that packet.
 
-\comments{Get deeper into the Netfilter kernal area. Even start talking about other tools like iptables}
-
 \subsubsection{Windows}
-Linux was chosen over the other possible alternative; Windows. The Windows OS is distributed as closed source software under proprietary licences meaning to understand what is happening under the hood is far more difficult. The operating system is documented well and there is support for this form of functionality but due to the transparency of Linux, Linux was chosen as a more suitable alternative.   
+Linux was chosen over the other possible alternative; Windows. The Windows OS is distributed as closed source software under proprietary licences meaning to understand what is happening under the hood is far more difficult. The operating system is documented well and there is support for this form of functionality but due to the transparency of Linux, Linux was chosen as a 
+more suitable alternative.   
 
-\comments{Talk more about windows}
+Windows does however provide a solution to the packet filtering in the same way that NetFilter does, it's called Windows Filtering Platform (WFP) and it is a an API that allows access to the systems services in order to provide to create packet filtering application. Its functionality is very similar to that of NetFilter.
+
+Windows however was not used because of the size of the Windows OS, below is the minimum system requirements for Windows 10 \footnote{\url{https://www.microsoft.com/en-US/windows/windows-10-specifications}}
+
+%Windows Min System Requirements Table
+
+\vspace{5mm} 
+\begin{center}
+\begin{tabular}{| l | l |}
+	\hline
+	Processor & 1 gigahertz (GHz) or faster processor or SoC \\
+	RAM & 1 gigabyte (GB) for 32-bit or 2 GB for 64-bit \\
+	Hard Disk Space & 16 GB for 32-bit OS 20 GB for 64-bit OS \\
+	\hline
+\end{tabular}
+\vspace{5mm} 
+\end{center}
+
+
+This compared with the full Debian \footnote{\url{https://www.debian.org/releases/stable/i386/ch03s04.html.en}} OS that the striped down version of the Raspberry Pi's OS is based off:
+
+
+\begin{center}
+No Desktop\\
+\vspace{1mm} 
+\begin{tabular}{| l | l |}
+	\hline
+	Processor & 1GHZ Pentium 4 \\
+	RAM & 128 MB \\
+	Hard Disk Space & 2 GB \\
+	\hline
+\end{tabular}
+
+\vspace{2.5mm}
+With Desktop\\
+\vspace{1mm}
+\begin{tabular}{| l | l |}
+	\hline
+	Processor & 1GHZ Pentium 4 \\
+	RAM & 512 MB \\
+	Hard Disk Space & 10 GB \\
+	\hline
+\end{tabular}
+\vspace{5mm}
+\end{center}
+
+The Raspberry Pi in this instance will be run without a monitor and on the command line so it will be without a desktop.
+
+As you can see from the comparison above the Linux based OS has a much smaller set of requirements where RAM usage for example is 8 times smaller and therefore makes it more suited for this purpose.
 
 %Alternative Solutions:
 %If others have produced solutions or addressed similar problems to those addressed by your project you should describe those alternative solutions here. Similarly, if several possible approaches suggest themselves as ways of solving the problems inherent in your project you should discuss those here. You should provide a comparative analysis and critical appraisal of each alternative solution approach or existing solution, identifying their key features and their strengths and weaknesses in relation to your project.
