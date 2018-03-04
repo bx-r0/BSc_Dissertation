@@ -37,9 +37,25 @@ The graph above shows the download speed measured in Mbps against the increasing
 
 My initial hypothesis for the sharp decreases in packet loss from 0\% to 1\% is it's due to the congestion control mechanisms built into TCP. TCP as mentioned in the background section allows for multiple devices to co-exist on a network and dynamically balance network resources through congestion control algorithms, but packet loss in this aspect is assumed as a sign of congestion to the algorithm adapts and reduces its transfer rate each time a packet is lost, this means the transfer rate drastically reduces until it reaches a platform.
 
+%The test for this will check the transfer rate over a period of time where it will drop a packet every 10 seconds and hopefully will see a dip in transfer rate when each packet is dropped
+
 \comments{Decide on an experiment to prove this}
 \comments{Also talk about why the transfer fails when the packet loss reaches 28\%}
 
+\subsubsection{Latency and retransmission}
+
+\comments{Graph here showing linear retransmission against increasing latency value}
+The expected result from this graph was a large peak at the time out period where all the packets send would flag up as retransmissions. This graph is flat due to the dynamic way that TCP works out its RTO (Retransmission Timeout) value that includes the Round trip time (i.e) and this test that created the graph above has the latency affecting the entire time to the dynamic value of the RTO was using the latency value to calculate it and therefore meant that changing the value of latency had no effect 
+
+% ## Reading
+% https://tools.ietf.org/html/rfc6298
+% https://sgros.blogspot.co.uk/2012/02/calculating-tcp-rto.html
+% https://blog.catchpoint.com/2014/04/29/understanding-rtt-impact-on-tcp-retransmissions/
+
+% Maybe a test where the handshake has not latency on it?
+% Then the latency is increased to a cetain value 
+
+\comments{Changing value of latency won't ever stop a TCP connection??}
 
 
 %Test design and system testing:
