@@ -10,7 +10,7 @@ class LatencyTimeOutTest(Base_Test):
         super().__init__('LatencyTimeOutTest',
                          max_effect_value=10000,
                          start_effect_value=10,
-                         effect_step=100,
+                         effect_step=1000,
                          repeat_tests=1,
                          data_headers=['Latency value (ms)', 'No Retransmissions', 'Total Packets', 'Ratio'],
                          max_test_time=60)
