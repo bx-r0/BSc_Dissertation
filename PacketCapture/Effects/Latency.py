@@ -33,7 +33,6 @@ class Latency(Effect):
         # In seconds
         self.latency_max = 1
 
-
     def print_stats(self):
         self.print('[*] Latency: {:.0f}ms - Total Packets effected: {} '.
                    format((self.latency_value * 1000), self.total_packets), end='\r')
@@ -42,6 +41,7 @@ class Latency(Effect):
         """Thread functionality"""
 
         time.sleep(self.latency_value)
+
         self.accept(packet)
 
     def alter_latency_value(self, new_value):

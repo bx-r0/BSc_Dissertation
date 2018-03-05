@@ -13,6 +13,7 @@ from contextlib import contextmanager
 import wget
 from Effects.PacketLoss import PacketLoss
 import time
+import subprocess
 #endregion
 
 
@@ -152,8 +153,8 @@ class Base_Test():
         link = 'ftp://speedtest.tele2.net/'
 
         #filename = '1KB.zip'
-        filename = '100KB.zip'
-        #filename = '512KB.zip'
+        #filename = '100KB.zip'
+        filename = '512KB.zip'
         #filename = '5MB.zip'
 
         wget.download(link + filename)
@@ -190,6 +191,18 @@ class Base_Test():
                 # If the request timed out
                 os.system('rm -rf *.tmp')
                 self.force_print('## Timeout occurred! - Accuracy may be compromised')
+
+        Terminal.clear_line()
+        self.printing(True)
+
+    def run_iperf_local(self, obj, packet_type):
+        self.pool = ThreadPool(1000)
+        self.printing(False)
+
+        self.run_packet_script(obj, packet_type)
+
+        cmd = "sudo iperf -c 127.0.0.1"
+        os.system(cmd)
 
         Terminal.clear_line()
         self.printing(True)

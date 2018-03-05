@@ -13,6 +13,8 @@ import time
 import csv
 from Terminal import Terminal
 
+FILE_NAME = 'LatencyDownloadSpeed.csv'
+
 
 """The script is run by passing:
 
@@ -67,6 +69,7 @@ def run_degradation_script(parameters):
         cmd.append(x)
 
     PROCESS = subprocess.Popen(cmd, stdout=open(os.devnull, 'w'))
+    print("PROCESS PID: ", PROCESS.pid)
 
     # Speed code
     grab_speeds()
@@ -76,6 +79,7 @@ def run_degradation_script(parameters):
     elapsed_time = end_time - start_time
 
     print('[!] Test complete - Elapsed Time: {:.2f} seconds'.format(elapsed_time))
+    PROCESS.terminate()
 
 
 def grab_speeds():
@@ -102,7 +106,7 @@ def print_speeds():
 def save_csv():
 
     # Saves the data
-    with open('data.csv', 'w') as csvfile:
+    with open(FILE_NAME, 'w') as csvfile:
         writer = csv.writer(csvfile, delimiter=',')
 
         writer.writerow(effect_values)
@@ -168,6 +172,16 @@ def multiple_tests(parameters):
     range_of_values = parameters[-1]
     print('[*] Tests will be performed on this range: \'{}\''.format(range_of_values))
 
+    # Zero effect value
+    # Grabs zero effect value
+    grab_speeds()
+    print_speeds()
+
+    # Saves data to a series of lists
+    effect_values.append(str(0) + " " + effect_unit)
+    download_values.append(str(round(DOWNLOAD, 5)))
+    upload_values.append(str(round(UPLOAD, 5)))
+
     for value in range_of_values:
         test = [parameters[0], str(value)]
 
@@ -193,19 +207,22 @@ del sys.argv[1:]  # Stop other scripts from grabbing already used parameters
 
 if parameters is not None:
 
-    # Range parameters
-    if isinstance(parameters[-1], range):
-        print('[!] Multiple test mode activated!')
-        multiple_tests(parameters)
+    try:
+        # Range parameters
+        if isinstance(parameters[-1], range):
+            print('[!] Multiple test mode activated!')
+            multiple_tests(parameters)
 
-    # If the parameters are regular
-    else:
-        run_degradation_script(parameters)
+        # If the parameters are regular
+        else:
+            run_degradation_script(parameters)
 
-        time.sleep(0.5)
-        print_speeds()
+            time.sleep(0.5)
+            print_speeds()
+    except:
+        if PROCESS is not None:
+            PROCESS.terminate()
 
-# No parameters
 else:
     grab_speeds()
     print_speeds()

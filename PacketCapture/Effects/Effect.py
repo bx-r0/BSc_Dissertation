@@ -21,13 +21,15 @@ class Effect:
                  show_output=True,
                  graphing=False,
                  gather_stats=True,
-                 graph_type_num=0):
+                 graph_type_num=0,
+                 slimline=False):
 
         self.accept_packet = accept_packets
         self.show_output = show_output
         self.graphing = graphing
         self.gather_stats = gather_stats
         self.graph_type_num = graph_type_num
+        self.slimline = slimline
 
         if self.graphing:
 
@@ -52,14 +54,16 @@ class Effect:
         to collate information"""
 
         try:
-            # TCP tracking
-            if self.gather_stats:
-                self.track_TCP_stats(packet)
 
-            # Shared functionality between all effects
-            self.print_stats()
-            self.total_packets += 1
-            self.default_graphing(packet)
+            if True:
+                # TCP tracking
+                if self.gather_stats:
+                    self.track_TCP_stats(packet)
+
+                # Shared functionality between all effects
+                self.print_stats()
+                self.total_packets += 1
+                self.default_graphing(packet)
 
             self.custom_effect(packet)
         except Exception as e:
@@ -173,7 +177,7 @@ class Effect:
 
     def save_graph(self):
         """Will just save the graph to file"""
-        self.graph.save()
+        self.show_default_graphs()
 
     def graphing_setup(self):
         """[Blueprint] - Custom code for each effects graph setup"""
@@ -252,7 +256,7 @@ class Effect:
         window_size = pkt.window
 
         # Creates the session object
-        tcp_packet = TcpPacket(seq_num, ack_num, len(pkt), window_size, packet)
+        tcp_packet = TcpPacket(src, src_port, dst, dst_port, seq_num, ack_num, len(pkt), window_size, packet)
         #tcp_session = TcpSession(dst, dst_port, src, src_port)
 
         # Loops round and checks all session
@@ -260,7 +264,6 @@ class Effect:
 
             # Checks for transmission and adds it to the list
             self.retransmission += session_loop.retransmit(tcp_packet)
-
 
 class TcpSession:
     """Used to hold a potential TCP session between two clients
@@ -301,8 +304,6 @@ class TcpSession:
 
                     retransmissions += 1
 
-                    #print('[R]', packet, self.retransmissions)
-
                     # Only adds if
                     add = False
 
@@ -316,10 +317,17 @@ class TcpSession:
 
         return retransmissions
 
+
 class TcpPacket:
     """Used to hold values about packets in a session"""
 
-    def __init__(self, seq_num, ack_num, size, window_size, packet):
+    def __init__(self, src, src_port, dst, dst_port, seq_num, ack_num, size, window_size, packet):
+        self.src = src
+        self.src_port = src_port
+
+        self.dst = dst
+        self.dst_port = dst_port
+
         self.ack_num = ack_num
         self.seq_num = seq_num
         self.size = size

@@ -1,5 +1,6 @@
 from Effects.Effect import Effect
 import random
+from scapy.all import *
 
 
 class PacketLoss(Effect):
@@ -25,6 +26,10 @@ class PacketLoss(Effect):
         self.dropped_packets = 0
         self.dropped_percentage = 0
 
+
+        #TODO REMOVE ME
+        self.total_target_packets = 0
+
     def print_stats(self):
         if not self.total_packets == 0:
             self.dropped_percentage = (self.dropped_packets / self.total_packets) * 100
@@ -49,16 +54,26 @@ class PacketLoss(Effect):
         """This function will issue packet loss,
            a percentage is defined and anything
            lower is dropped and anything higher is accepted"""
+        #
+        # if self.total_target_packets % 500 == 0:
+        #     packet.drop()
+        # else:
+        #     self.accept(packet)
+        #
 
-        # random value from 0 to 100
-        random_value = random.uniform(0, 100)
+        if self.packet_loss_percentage != 0:
 
-        # If the generated value is smaller than the percentage discard
-        if self.packet_loss_percentage > random_value:
-            self.dropped_packets += 1
-            packet.drop()
+            # random value from 0 to 100
+            random_value = random.uniform(0, 100)
 
-        # Accept the packet
+            # If the generated value is smaller than the percentage discard
+            if self.packet_loss_percentage > random_value:
+                self.dropped_packets += 1
+                packet.drop()
+
+            # Accept the packet
+            else:
+                self.accept(packet)
         else:
             self.accept(packet)
 

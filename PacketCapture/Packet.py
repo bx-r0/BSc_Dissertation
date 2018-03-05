@@ -275,6 +275,7 @@ def run_packet_manipulation():
 
         # Packets for this machine
         os.system("iptables -A INPUT -j NFQUEUE")
+        os.system("iptables -A OUTPUT -j NFQUEUE")
 
         # Packets for forwarding or other routes
         os.system("iptables -t nat -A PREROUTING -j NFQUEUE")
