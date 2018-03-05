@@ -12,11 +12,11 @@
 
 The main focus of this project is to create a network degradation tool that can be used to simulate imperfect network conditions. To understand the goal better it is important to know what criteria reduce network quality.
 
-Latency, packet loss and bandwidth are the main factors that distinguish between good and bad internet connections. Latency is the delay between sending a message and seeing its result. Packet loss is the percentage of packets that are lost in transmission, the higher the percentage, the more effect it has on the speed and stability of the network. Bandwidth, is the measure of how many bits/bytes are being transferred per second, the larger the bandwidth the more data can be transferred in less time, thus making the overall connection faster. A combination of favourable values from these criteria defines a good network connection. One way to visualise the throughput of a network connection is a download and upload and speed test, the result of these is measured in Mbps and can be used to quickly compare the speed of two connections, this will be used later to briefly show the degradation.
-
-It is also necessary to mention the protocols that are to be used in the network simulation section. TCP \citep{TCP} and UDP \citep{UDP} are the transport layer protocols up for discussion. 
+Latency, packet loss and bandwidth are the main factors that distinguish between good and bad internet connections. Latency is the delay between sending a message and seeing its result. Packet loss is the percentage of packets that are lost in a transmission, the higher the percentage, the more effect it has on the speed and stability of the network. Bandwidth, is the measure of how many bits/bytes are being transferred per second, the larger the bandwidth the more data can be transferred in less time, thus making the overall connection faster. A combination of favourable values from these criteria defines a good network connection. One way to visualise the throughput of a network connection is a download and upload and speed test, the result of these is measured in Mbps and can be used to quickly compare the speed of two connections, this will be used later to briefly show the degradation.
 
 Other small signs of poor network conditions is Jitter and Error rate. Jitter is simply the variance in packet delays, this is normally a issue that exists in large packet switched networks, this is however not an issue in TCP/IP based communications because TCP protocol deals with these issues. However, VoIP (Voice over IP) that uses UDP as its transport level protocol is visibly degraded by heavy jitter. Error rate is the number of bit errors that have occurred in a data stream over a period of time. This can again effect UDP based communications heavily but the TCP protocol deals with these issues so remains relatively unaffected.
+
+It is also necessary to mention the protocols that are to be used in the network simulation section. TCP \citep{TCP} and UDP \citep{UDP} are the transport layer protocols up for discussion. 
 
 \comments{Talk about how TCP deals with jitter?}
 \comments{Talk more about Packet Loss/Latency/Packet Loss maybe even about smaller signs of bad connection quality?}
@@ -34,9 +34,9 @@ TCP's main design choices are centred around reliability, where it has a few tec
 \end{center}
 
 \subsubsection*{Initiating a connection}
-The connection begins by being initiated with a series of signals where they are abbreviated as ACK (Acknowledgement) and SYN (Synchronise). The first computer begins by sending an packets with the SYN flag set, this starts the synchronization process. Then once the target computer receives this SYN packet it sends back and ACK for that SYN and its own SYN to the initiating computer, so as a ACK + SYN packet, where finally the initial computer sends back an ACK packet for the previous SYN packet, this connection has now been initiated and the communication channel has been set up. This process is known as a `3-way handshake'.
+The connection begins by being initiated with a series of signals where they are abbreviated as ACK (Acknowledgement) and SYN (Synchronise). The initiating party begins by sending an empty packet with the SYN flag set, this starts the synchronization process. Then once the target computer receives this SYN packet it sends back and ACK and its own SYN to the initiating computer (This is normally send a single ACK + SYN packet). Where finally the initial computer sends back an ACK packet for the previous SYN packet, this connection has now been initiated and the communication channel has been set up. This process is known as a `3-way handshake'.
 
-For TCP to remain reliable it needs to maintain data on the status of a connection, where a connection is uniquely identified by the pair of sockets that define its two sides of the connection. The information retained contains, sequence number and window sizes where these values are used to calculate the expected next packet to therefore calculate if a packet has been retransmitted or if a packet has been send out of its order.
+For TCP to remain reliable it needs to maintain data on the status of a connection. A connection is uniquely identified by the pair of sockets that define the two end points of the connection. The information retained for each connection is: sequence number, acknowledgement numbers and window sizes. These values are used to calculate the expected next packet to therefore detect if errors have occurred in transmission.
 
 \begin{center}
 	\includegraphics[scale=0.8]{SYN-ACK}
@@ -47,20 +47,20 @@ For TCP to remain reliable it needs to maintain data on the status of a connecti
 
 
 \subsubsection*{Sequence Numbers and Acknowledgement Numbers}
-One of the main mechanisms for detecting missing and incorrect packets is the sequence and acknowledgement numbers. The TCP design states that every octet (byte) will have a corresponding sequence number, this sequence number is then increased by the length of the data inside the packet, the length of a packet can be calculated by taking the total size of the packet and taking away the size of the header. For example, if a packet with a length of 100 was sent it would move the sequence value up by 100, this gives the protocol the information to judge what it should be expecting and what it has received, and if those two values don't add up an error has occurred. 
+One of the main mechanisms for detecting missing and incorrect packets is the sequence and acknowledgement numbers. The TCP design states that every octet (byte) will have a corresponding sequence number, this sequence number is then increased by the size of every transmitted packet, the length of a packet can be calculated by taking the total size of the packet and taking away the size of the header. For example, if a packet with a length of 100 was sent it would move the sequence value up by 100, this gives the protocol the information to judge what it should be expecting and what it has received, and if those two values don't add up an error has occurred. 
 
-On the other side the sender needs to know it packets have been received, this is where the acknowledgement number comes in, packets carrying acknowledgements are known as ``ACKs". For a packet with a sequence number of 100 being sent will require a packet to be send back containing the ACK number of 100 to verify that is has been transferred correctly, an ACK packet is signified by the `ACK' flag in the packets header. If the ACK packet isn't received before the the time-out value has been reached the packet is resent, this is how TCP guarantees retransmission of packets and it's also one of the reasons why packet loss doesn't have the same effect it does on UDP with TCP.
+The guarantee arrival the sender needs to know its packets have been received, this is where the acknowledgement number comes in, packets carrying acknowledgements are known as ``ACKs". For a packet with a sequence number of 100 being sent will require a packet to be send back containing the ACK number of 100 to verify that is has been transferred correctly, an ACK packet is signified by the `ACK' flag in the packets header. If the ACK packet isn't received before the the time-out value has been reached the packet is resent, this is how TCP guarantees retransmission of packets and it's also one of the reasons why packet loss doesn't have the same effect it does on UDP with TCP.
 
-In situations where connections are created and recreated quickly in succession or are being re-established after errors there cannot be sequence numbers that clash with previous segment that may still exist on a network connection, therefore TCP solves this issue by generating new initial sequence numbers using a Initial Sequence Number (ISN) generator that uses a 32 bit clock, this clock has a life cycle of 4.55 hours where this time period is commonly known as the Maximum Segment Lifetime (MSL) and if a ISN is generated within this time is can be guaranteed to be unique.
+In situations where connections are created and recreated quickly in succession or are being quickly re-established after errors there cannot be sequence numbers that clash with previous segment that may still exist on a network connection, therefore TCP solves this issue by generating new initial sequence numbers using a Initial Sequence Number (ISN) generator that uses a 32 bit clock, this clock has a life cycle of 4.55 hours where this time period is commonly known as the Maximum Segment Lifetime (MSL) and if a ISN is generated within this time is can be guaranteed to be unique.
 
 \subsubsection*{Receiving Window}
-In the TCP header there is a two byte value that represents the receiving window size, this value defines the maximum size of unacknowledged packets the receiving end has space for. So if a client sends a packet with a 65535 window size value it tells the receiving computer not to send more than 65535 bytes before receiving corresponding acknowledgements. This value can also be extended using a value in the area allocated as the `TCP Options' called `windows scaling', this allows the value in the window size to be multiplied by this scale value. So, for example a window size of 65535 with a window scale of 5 would have a total window size of 327675 Bytes. This means that the larger the window the more data can be send before waiting is needed and can normally mean faster transfer speeds. Please note, this exchange of window scaling values is only performed in the handshake and can only be present in the initial exchange of packets.
+In the TCP header there is a two byte value that represents the receiving window size, this value defines the maximum size of unacknowledged packets the receiving end has space for. So if a client sends a packet with a 65535 window size value it tells the receiving computer not to send more than 65535 bytes before receiving corresponding acknowledgements. This value can also be extended using a value in the area allocated in the `TCP Options' called `windows scaling', this allows the value in the window size to be multiplied by this scale value. So, for example a window size of 65535 with a window scale of 5 would have a total window size of 327675 Bytes. This means that the larger the window the more data can be send before the protocol needs to wait and can normally mean faster transfer speeds. Please note, this exchange of window scaling values is only performed in the handshake and can only be present in the initial exchange of packets.
 
 \subsubsection*{Flow Control}
-Flow controls is a mechanism used by the protocol to ensure that the receiving party does not become overwhelmed by the incoming transmission of packets. TCP has two types of buffers the `send' and `receive', where the send collects what data is going out and the receive collects what is coming in. This goal of the flow control is to prevent the sending of packets that will not fit in the destination receive buffer and therefore will prevent these packets from being dropped. The protocol achieves this by allowing each party to advertise its available receive buffer space through a this window size section in the header that was discussed previously. (This is included in each ACK packet). Once the receive buffer is full the receiving party will advertise what is known as a 'zero window' where it sets the Window size to `0' and transfer will stop until there is free space in the receive buffer.
+Flow controls is a mechanism used by the protocol to ensure that the receiving party does not become overwhelmed by the incoming transmission of packets. TCP has two types of buffers the `send' and `receive', where the send buffer collects what data is going out and the receive buffer collects what is coming in. This goal of the flow control is to prevent the sending of packets that will not fit in the destination receive buffer and therefore will prevent these packets from being dropped. The protocol achieves this by allowing each party to advertise its available receive buffer space through a this window size section in the header that was discussed previously. (This is included in each ACK packet). Once the receive buffer is full the receiving party will advertise what is known as a 'zero window' where it sets the window size to `0' and transfer will stop until there is free space in the receive buffer.
 
 \subsubsection*{Sliding Window}
-To control the number of packets the protocol has in flight it utilises the `Sliding window. The size of the sliding window is altered by two factors: The size of the send buffer and the size of the destinations receive buffer, therefore the maximum amount of data the protocol can send is the smallest of the two previous values. The sliding window then dynamically works out how many packets it can send by working out the maximum data it can send while keeping track of the number of packets in flight (unacknowledged) and the current window size. This whole process gives the protocol the ability to dynamically adapt to changing conditions and prevent buffers from being overfilled the receiving end.
+To control the number of packets the protocol has in flight at any one time the protocol utilises the `sliding window. The size of the sliding window is altered by two factors: The size of the send buffer and the size of the destinations receive buffer, therefore the maximum amount of data the protocol can send is the smallest of the two previous values. The sliding window then dynamically works out how many packets it can send by working out the maximum data it can send while keeping track of the number of packets in flight (unacknowledged) and the current window size. This whole process gives the protocol the ability to dynamically adapt to changing conditions and prevent buffers from being overfilled the receiving end.
 
 
 \subsubsection*{Congestion control}
@@ -69,7 +69,7 @@ When there are situations where multiple clients are connected to one receiver l
 \subsubsection*{Closing a connection}
 The closing of a TCP connection is very similar to the initial construction of a TCP connection, but in this case the protocol utilises the `FIN' flag defined in the TCP header. In this example it will be a client disconnection from a server. After all the data is transferred the client no longer requires a connection to the server and sends an empty packet with the FIN bit send, the server receives the packet and returns an ACK. The server now sends its own FIN and this is then acknowledged by the client. This middle step with the server sending an ACK and FIN separately is performed in a single packet in live networks. The client and server not know the connection is closed and will free up any resources allocated to that connection.
 
-
+\clearpage
 \subsubsection{User Data Protocol (UDP)}
 \begin{center}
 	\includegraphics[scale=0.7]{udp_header}
@@ -78,9 +78,15 @@ The closing of a TCP connection is very similar to the initial construction of a
 	\end{figure}		
 \end{center}
 
-UDP is by design the opposite of TCP and often you'll find the two protocols compared. UDP is often referred to as ``fire and forget" \citep{kempf2011thoughts} this is a short way of describing how UDP deals with packets. When a packet is to be sent UDP sends the packet and moves onto the next. However, this means aside from the checksum in the UDP header (A checksum can be used to check that the UDP data has been transferred correctly) there is zero error checking for the UDP protocol and results in UDP being considered unreliable in comparison to TCP. This lack of error-checking overhead however, greatly improves the speed of UDP protocols. UDP is not used in situations where communication is vital, but does find itself implemented in examples like voice or video chat because errors in these services are not catastrophic to operation and these imperfections can even go unnoticed. 
-As the very small UDP header shows, it is a very simple protocol and is effectively a thin wrapper on top of the IP layer that allows for very quick transfers but with the cost of not guaranteed reliability, this is why packet loss effects UDP massively and the overall effect will be fully disused later.
+UDP is by design the opposite of TCP and often you'll find the two protocols compared. UDP is often referred to as ``fire and forget" \citep{kempf2011thoughts} this is a short way of describing how UDP deals with packets. When a packet is to be sent UDP sends the packet and moves onto the next. However, this means aside from the checksum in the UDP header (A checksum can be used to check that the UDP data has been transferred correctly) there is zero error checking for the UDP protocol and results in UDP being considered unreliable in comparison to TCP. 
 
+This lack of error-checking overhead however, greatly improves the speed of UDP protocols. UDP is not used in situations where communication is vital, but does find itself implemented in examples like voice or video chat because errors in these services are not catastrophic to operation and these imperfections can even go unnoticed.
+
+\comments{Speed comparison between UDP and TCP}
+
+As the very small UDP header shows, it is a very simple protocol and is effectively a thin wrapper on top of the IP layer that allows for very quick transfers but with the cost of un-guaranteed reliability, this is why packet loss effects UDP massively and this overall effect will be fully disused later.
+
+\clearpage
 \subsubsection{Address Resolution Protocol (ARP)}
 The tool will be deployed either by having it run on a small custom computer set up to act as a router for the synthetic test network or by jumping between a user and an actual router on a live network. The program will achieve this jumping between a user and the router by utilising a long term vulnerability in the Address Resolution Protocol (ARP) \citep{arp2001}, before this is explained further it is first important to understand the relevant parts of a local network.
 
@@ -97,9 +103,19 @@ The ARP protocol contains no form of authentication verification meaning a malic
 	\end{figure}
 \end{center}
 
-\subsubsection{Raspberry Pi}
+\subsubsection{Custom Router - Raspberry Pi}
 As mentioned previously the effects will be performed on a custom computer acting as the router, because the network will be set-up to pass all traffic through this router, it will be able to simulate degradation on the entire networks traffic.
 The Raspberry Pi \citep{upton2014raspberry} has been decided as the choice for the small custom computer. Originally designed to teach children to code on an inexpensive (less than £30) computer, the Pi has found itself involved in a multitude of uses ranging from NAS (Network Attached Server) to robot controllers. This is useful in this project due to its ease to set-up as a router, this is because of the easy access of low level aspects of the operating system due to it running a based OS. The Raspberry Pi will be run with its default Raspbian OS \citep{pi2014raspbian} that is built upon Debian \citep{murdock1994overview}. This is a optimised OS for the internal ARM CPU that allows the Raspberry Pi to run modern stripped down programs on its very limited hardware, where it will have plenty of power to easily handle traffic as a router.
+
+\subsubsection{Router alternatives}
+
+\subsubsection*{MinnowBoard}
+MinnowBoard \footnote{\url{https://minnowboard.org/}} is a company specialising in open source custom made processing units designed to remain compact while still being able to perform relatively heavy computation. Even their basic options have more RAM and processing speeds compared to that of the Raspberry Pi, but this comes at a higher cost the basic model retails in at £110 more than 3 times to price of the Raspberry Pi. The increased processing speed would be the total bandwidth the router could handle would be increased and could even allow the GUI as an alternative to the command line, but this extra cost and increased processing speed don't add any extra value to the goal of the project and therefore the option was discarded.
+
+\subsubsection*{Commercial router}
+A commercial out-of-the-box router could be used with a custom version of OpenWrt \footnote{\url{https://openwrt.org/}}. OpenWrt is a custom version of Linux that is designed for embedded devices. To install this version of Linux on a router would require `flashing' the software, flashing is the process of overwriting the embedded EEPROM or other type of embedded memory with the firmware of your choice, this process is lengthy and has no guarantee of working. This process however would provided me with a device that could run the degradation script that is fully designed to function within a network, this could possibly mean faster processing speeds and a smoother experience. However due to the uncertain set-up time compared to that of the Raspberry Pi this option was decided against, this however could be an aspect to implement in the long term improvements, this will be further discussed later in the report.
+
+\comments{Talk here about alternatives to the raspberry pi}
 
 %Comparison of Technologies:
 %If there are several possible technologies that could be used in your project work you should present a comparative analysis and critical appraisal of each of these technologies. You should create a subsection for each of the technologies you discuss and title each subsection with the name of the technology it describes (e.g. object-oriented databases, XML ). Within each subsection you should provide an overview of the technology, its key features and its strengths and weaknesses in relation to your project.
@@ -138,7 +154,6 @@ Other effects can also be performed on UDP to measure the degradation, latency a
 \subsection*{Other UDP based protocols}
 UDP is used for situations where speed is required but reliability is not. Media streaming is a common example, lots of data need to arrive to the client quickly where missed frames when not too large can go unnoticed. This kind of implementation would be a huge overhead and even if a 3rd party application was used set-up and debugging would utilise time while providing not much more insight into what is happening to the protocol when degradation is high. This is why UDP had been left as bare boned as possible and the protocol has been left relatively exposed to allow an effective way to visualise the effects.
 
-
 \subsection{Operating Systems}
 
 \subsubsection{Linux}
@@ -147,12 +162,9 @@ Linux is the broad definition of a family of computer operating systems. The def
 Linux was chosen for this project for its open source element that allows easy access to low-level features in the kernel. The section of the kernel that deals with the filtration of packets for uses like firewalls and packet sniffers is referred to as the ``NetFilter". This acts as an API of sorts where packets can be routed to the net-filter queue to await a verdict (accept or drop) before being moved on. This is the basis for the functionality of the program, it will run on the Raspberry Pi and route all packets that enter the box to the queue where the program will perform its effects on the packets. Latency for example is one of the simplest effect to simulate, the packet will be routed into the queue, taken out and stored and the delay between storing and accepting will be the set latency value and therefore simulating the effect of latency on that packet.
 
 \subsubsection{Windows}
-Linux was chosen over the other possible alternative; Windows. The Windows OS is distributed as closed source software under proprietary licences meaning to understand what is happening under the hood is far more difficult. The operating system is documented well and there is support for this form of functionality but due to the transparency of Linux, Linux was chosen as a 
-more suitable alternative.   
+Linux was chosen over the other possible alternative; Windows. The Windows OS is distributed as closed source software under proprietary licences meaning to understand what is happening under the hood is far more difficult. The operating system is documented well and there is support for this form of functionality. Windows does provide a solution to the packet filtering in the same way that NetFilter does, it's called Windows Filtering Platform (WFP) and it is a an API that allows access to the systems services in order to provide to create packet filtering application. Its functionality is very similar to that of NetFilter.
 
-Windows does however provide a solution to the packet filtering in the same way that NetFilter does, it's called Windows Filtering Platform (WFP) and it is a an API that allows access to the systems services in order to provide to create packet filtering application. Its functionality is very similar to that of NetFilter.
-
-Windows however was not used because of the size of the Windows OS, below is the minimum system requirements for Windows 10 \footnote{\url{https://www.microsoft.com/en-US/windows/windows-10-specifications}}
+Windows however was not used because of the size of the Windows OS. Below is the minimum system requirements for Windows 10 \footnote{\url{https://www.microsoft.com/en-US/windows/windows-10-specifications}}
 
 %Windows Min System Requirements Table
 
@@ -168,9 +180,7 @@ Windows however was not used because of the size of the Windows OS, below is the
 \vspace{5mm} 
 \end{center}
 
-
 This compared with the full Debian \footnote{\url{https://www.debian.org/releases/stable/i386/ch03s04.html.en}} OS that the striped down version of the Raspberry Pi's OS is based off:
-
 
 \begin{center}
 No Desktop\\
@@ -196,9 +206,9 @@ With Desktop\\
 \vspace{5mm}
 \end{center}
 
-The Raspberry Pi in this instance will be run without a monitor and on the command line so it will be without a desktop.
+The Raspberry Pi in this instance will be run with no desktop.
 
-As you can see from the comparison above the Linux based OS has a much smaller set of requirements where RAM usage for example is 8 times smaller and therefore makes it more suited for this purpose.
+As you can see from the comparison above the Linux based OS has a much smaller set of requirements where RAM usage for example is 8 times smaller and therefore due to Linux's transparency and overall efficiency the OS is far more suited for us in conjunction with the Raspberry Pi.
 
 %Alternative Solutions:
 %If others have produced solutions or addressed similar problems to those addressed by your project you should describe those alternative solutions here. Similarly, if several possible approaches suggest themselves as ways of solving the problems inherent in your project you should discuss those here. You should provide a comparative analysis and critical appraisal of each alternative solution approach or existing solution, identifying their key features and their strengths and weaknesses in relation to your project.
@@ -218,10 +228,10 @@ A more modern application of network degradation is clumsy 0.2 \footnote{\url{ht
 
 The tool provides a way to affect network conditions. It solves issues involved with simulating harsh network conditions on a network. It does allow for filtering and has a couple of filter pre-sets, it however doesn't provide options to simulate live traffic and options to capture or visualise traffic is not part of the main package.
 
-This tool provides and easy to use and simple tool, but only affects the traffic on the local machine, this is good for testing tools in the development stage of an application but cannot be used to simulate degradation across a simulated network.
+This tool provides and easy to use and simple tool, but only affects the traffic on the local machine, this is good for testing tools in the development stage of an application but cannot easily be used to simulate degradation across a simulated network.
 
 \subsection{TMNetSim}
-TMNetSim \footnote{\url{http://www.tmurgent.com/appv/en/87-tools/performance-tools/177-tmnetsim-quick-and-easy-network-simulation-tool}} is another tool that covers aspects of this project. Unlike clumsy TMNetSim is designed to provide degradation that expands over the network. However, to achieve this it has to be set-up on every machine, this is clunky and time consuming. The project being developed can negate this lengthy set-up with the intended inclusion of the ARP Spoofing. Further criticism relates to the ease of use of this application, it has a large number of controls on it's interface and will involve a larger learning curve to master compared to other simpler tools, this however might be the bi-product of more functionality; increased complexity.
+TMNetSim \footnote{\url{http://www.tmurgent.com/appv/en/87-tools/performance-tools/177-tmnetsim-quick-and-easy-network-simulation-tool}} is another tool that covers aspects of this project. Unlike clumsy TMNetSim is designed to provide degradation that expands over the network. However, to achieve this it has to be set-up on every machine, this is clunky and time consuming. The project being developed can negate this lengthy set-up with the intended inclusion of the ARP Spoofing that will allow rapid deployment of the script between target and router  Further criticism relating to the ease of use of this application, it has a large number of controls on it's interface and will involve a larger learning curve to master compared to other simpler tools, this however might be the bi-product of more functionality; increased complexity.
 
 This tool includes very complex ways of simulating realistic degradation with Gausian and ``Normal" delay modes, that attempt to provide more accurate representations of real-world delays. This is a great feature that could drastically improve the accuracy in simulating degradation and will need to be considered as an extra inclusion into this project.
 
