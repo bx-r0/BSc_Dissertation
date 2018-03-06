@@ -14,11 +14,16 @@
 \usepackage[titletoc]{appendix}
 \pagestyle{headings}
 \usepackage{parskip}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta}
 \newcommand{\comments}[1]{\textcolor{OliveGreen}{[\emph{#1}]}}
 
 \graphicspath{{images/}}
 \setcounter{secnumdepth}{3} 
 \setcounter{tocdepth}{3}
+
+% Custom fonts
+\newenvironment{console_font}{\fontfamily{pcr}\selectfont}{\par}
 
 \begin{document}
 

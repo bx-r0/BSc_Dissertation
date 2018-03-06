@@ -3,6 +3,49 @@
 %Again, it is difficult to give prescriptive guidance on the subsection structure you might adopt, as this will depend on the nature and content of your project.  However, you will probably want at least to consider sections addressing issues of System Design; Implementation; Testing.  If there is a lot to cover in any of these areas, it may warrant presentation as a full chapter rather than a section.
 \chapter{Technical Development}
 
+\section{Overview}
+
+\subsubsection{Script Design}
+The script utilises a section in the Linux kernel refereed to as the ``NFQUEUE''. This is as the name suggests a queue that is stored in kernel memory that will store up packets until the user provides one of the two verdicts: `Drop' or `Accept'. The packets are pushed into this queue by the use of `iptable' rules, iptabales is a tool designed to filter packets by criteria. Below is a flow diagram for the path a packet might take, each table can have filtering rules embedded into to it:
+
+% Diagram
+\input{diagrams/iptables}
+
+If there was a case where all packets entering the machine need filtering, an iptable rule would be added to the "Pre-Routing" section of the table to catch all packets leaving the machine. 
+
+So for example to move all packets entering from the network card into the NFQUEUE the iptable rule would be added like so:
+\begin{center}
+	\begin{console_font}
+		\large{iptables -A INPUT -j NFQUEUE}
+	\end{console_font} 
+\end{center}
+Where `-a' tells to add a rule to the `INPUT' table and `-j' is the rule that affects the packet, in this case pushing it into the default queue.
+
+This forms the main component of the functionality of the script, a series of iptable rules that filter packets into the NFQUEUE and allow to script to perform verdicts on each packet separately allows for effects to be easily applied to packets entering and leaving the machine.
+
+\subsubsection{Degradation Effects}
+The script contains the functionality to simulate a plethora of effects each one and its functionality will be described below:
+
+\subsubsection*{Latency}
+Latency as described in the background section is the delay in initiating a task and seeing its results. Latency is simulated by using a timing mechanisms where the arrival time of the packet is saved. The packet is then pushed into the NFQUEUE that triggers a single thread that will hold the packet for a set amount of time, the holding time is calculated by taking the amount of time the packet has already been in the script away from the target time. The packet is then marked as `ACCEPTED' and pushed out of the queue.
+
+\subsubsection*{Packet Loss}
+
+
+\subsubsection*{Bandwidth}
+
+\subsubsection*{Out-of-order}
+
+\subsubsection*{Connection Simulation}
+
+\subsubsection*{Surge}
+
+
+\subsubsection{Network Monitoring}
+
+\subsubsection{Network Attacks}
+
+
 
 
 %System design:

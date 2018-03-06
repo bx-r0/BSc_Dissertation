@@ -1,0 +1,45 @@
+%Variables
+\newcommand{\nodefont}{\rmfamily}
+\newcommand{\normalWidth}{3cm}
+
+%----------------------------------------%
+%  IPtables Diagram						 %
+%----------------------------------------%
+\tikzset{%
+  >={Latex[width=2mm,length=2mm]},
+  % Specifications for style of nodes:
+            base/.style = {rectangle, rounded corners, draw=black,
+                           minimum width=4cm, minimum height=1cm,
+                           text centered, font=\sffamily}, 
+            process/.style = {base, minimum width=\normalWidth, fill=orange!15,
+                           font=\nodefont},
+            network/.style = {base, fill=blue!15},
+            local/.style = {base, fill=red!15}}
+\vspace{0.25cm}                
+\begin{center}
+\begin{tikzpicture}[node distance=1.5cm, every node/.style={fill=white, font=\sffamily}, align=center]
+    	\node(NetworkCard)[network]{Network Card};
+        \node(NetworkCardOut)[network, right of=NetworkCard, xshift=6cm]{Network Card};
+        
+    	\node(PreRouting)[process, below of=NetworkCard]{Pre-Routing};
+    	\node(Forward)[process, right of=PreRouting, xshift=2.5cm, yshift=-1.75cm]{Forward};
+    	\node(Input)[process, below of=PreRouting, yshift=-2cm]{Input};
+        \node(PostRouting)[process, right of=PreRouting, xshift=6cm]{Post-Routing};
+    	\node(Output)[process, right of=Input, xshift=6cm]{Output};
+        
+        \node(LocalProcessIn)[local, below of=Input]{Local Process};
+        \node(LocalProcessOut)[local, below of=Output]{Local Process};
+        
+        %In Arrows
+        \draw[->] (NetworkCard)--(PreRouting);
+        \draw[->] (PreRouting)|-(Forward);
+        \draw[->] (PreRouting)--(Input);
+        \draw[->] (Input)--(LocalProcessIn);
+        
+        %Out Arrows
+        \draw[->] (LocalProcessOut)--(Output);
+        \draw[->] (Output)--(PostRouting);
+        \draw[->] (Forward)-|(PostRouting);
+        \draw[->] (PostRouting)--(NetworkCardOut);        
+\end{tikzpicture}
+\end{center}   
