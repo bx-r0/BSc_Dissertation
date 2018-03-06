@@ -97,7 +97,7 @@ An ARP packet is a very simple message format that contains an operation code th
 The ARP protocol contains no form of authentication verification meaning a malicious computer can send out faked custom ARP requests to change specific values in the routers ARP table, meaning a computer running this software can appear as the router to the victim, while also appearing as the victim to the router, thus having all the traffic between the two routed through the attacking computer. 
 
 \begin{center}
-\includegraphics[scale=0.7]{mitm}
+\input{diagrams/arp_diagram_basic}
 	\begin{figure}[h]
 		\caption{Photo depicting a MITM attack}
 	\end{figure}

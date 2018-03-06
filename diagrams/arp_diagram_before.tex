@@ -1,5 +1,5 @@
-\newcommand{\cisco}{cisco_images}
-\newcommand{\scale}{0.7}
+
+
 
 % Gateway
 \newcommand{\GatewayLabel}{
@@ -37,14 +37,14 @@ ARP Cache\\
     diagram item,
     label=above:\GatewayLabel,
     yshift=-2cm
-] {\includegraphics[scale=\scale]{\cisco/router}};
+] {\includegraphics[scale=\ciscoImageScale]{\cisco/router}};
 
 \node (Victim)[
 	diagram item,
 	label=above:\VictimLabel,
 	right of=Router,
 	xshift=7cm
-] {\includegraphics[scale=\scale]{\cisco/workstation}};
+] {\includegraphics[scale=\ciscoImageScale]{\cisco/workstation}};
 
 
 \draw[-] (Router)--(Victim);

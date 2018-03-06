@@ -60,9 +60,17 @@ Note after the 3rd device connects to the network, both devices gain a record of
 After both spoofed packets have been send out the ARP cache for each receiving end gets updated, the text in red shows the changes caused by the spoofed ARP packets. Now when either end wants to talk to each other it will resolve the MAC address and send it with the new MAC address in the table, this will therefore get routed through the attacking PC and will allow the script to receive all the traffic between the two parties.
 
 \subsection{Network Attacks}
+A couple of network attacks were implemented into the script, these served the purpose of providing very heavy artificial traffic designed to create heavy loads or mess with integral protocols. Not many attacks were added as they don't provide much purpose apart from stress testing and they're on the edge of the scope of this project. There will also be a brief discussion into possible techniques to mitigate the effects. 
 
+\subsubsection{UDP Flooding}
+UDP flooding is a very simple attack, lots and lots of UDP packets are created and send over a network stream very quickly. This attack is designed to `flood' the buffers in the receiving machine and slow down or event prevent internet connection. The script creates 10 or so threads that create and send packet concurrently, this amount of threads easily reaches the max throughput of the test machines NIC card and massively reduces internet connection of the receiving end.
 
+The attack could be detected and prevented by a script that monitors the network transfers rates, this attack will create a huge spike in the transfer rate that can be detected and all traffic would be blocked from the sending party.
 
+\subsubsection{ARP Spamming}
+This attack works by once again exploiting the lack of authentication of the ARP protocol. In the entire network mode the script starts by detecting all active hosts on a network, it then starts sending out falsified ARP reply packets with randomly generated MAC addresses inside. This results in all computer on the networking having incorrect ARP cache values and resulting in computers incorrectly resolving IP and MAC address combinations and traffic not being allowed through.
+
+This attack is relatively easy to execute but can simply be prevented by issuing static ARP tables for each machine, this prevents unsolicited ARP replies from changing IP and MAC address combinations and also prevents ARP Spoofing from occurring on that network.
 
 %System design:
 %This can include UML diagrams such as class diagrams, use case diagrams, activity diagrams, etc.

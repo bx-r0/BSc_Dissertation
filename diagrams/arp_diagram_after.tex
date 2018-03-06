@@ -47,21 +47,21 @@ Attacker\\
     diagram item,
     label=above:\GatewayLabelAfter,
     yshift=-2cm
-] {\includegraphics[scale=\scale]{\cisco/router}};
+] {\includegraphics[scale=\ciscoImageScale]{\cisco/router}};
 
 \node (Victim)[
 	diagram item,
 	label=above:\VictimLabelAfter,
 	right of=Router,
 	xshift=7cm
-] {\includegraphics[scale=\scale]{\cisco/workstation}};
+] {\includegraphics[scale=\ciscoImageScale]{\cisco/workstation}};
 
 \node (Attacker)[
 	label=below:\AttackerLabel,
 	below of=Victim,
 	xshift=-3.5cm,
 	yshift=-3.5cm
-] {\includegraphics[scale=\scale]{\cisco/laptop}};
+] {\includegraphics[scale=\ciscoImageScale]{\cisco/laptop}};
 
 \draw[red, very thick] (Router)--(Attacker);
 \draw[red, very thick] (Attacker)--(Victim);
