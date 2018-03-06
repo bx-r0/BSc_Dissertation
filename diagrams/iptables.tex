@@ -1,6 +1,8 @@
 %Variables
 \newcommand{\nodefont}{\rmfamily}
 \newcommand{\normalWidth}{3cm}
+\newcommand{\localProcessText}{\bf{Local Process }}
+\newcommand{\networkCardText}{\bf{Network Card }}
 
 %----------------------------------------%
 %  IPtables Diagram						 %
@@ -16,10 +18,11 @@
             network/.style = {base, fill=blue!15},
             local/.style = {base, fill=red!15}}
 \vspace{0.25cm}                
+
 \begin{center}
 \begin{tikzpicture}[node distance=1.5cm, every node/.style={fill=white, font=\sffamily}, align=center]
-    	\node(NetworkCard)[network]{Network Card};
-        \node(NetworkCardOut)[network, right of=NetworkCard, xshift=6cm]{Network Card};
+    	\node(NetworkCard)[network]{\networkCardText In};
+        \node(NetworkCardOut)[network, right of=NetworkCard, xshift=6cm]{\networkCardText Out};
         
     	\node(PreRouting)[process, below of=NetworkCard]{Pre-Routing};
     	\node(Forward)[process, right of=PreRouting, xshift=2.5cm, yshift=-1.75cm]{Forward};
@@ -27,8 +30,8 @@
         \node(PostRouting)[process, right of=PreRouting, xshift=6cm]{Post-Routing};
     	\node(Output)[process, right of=Input, xshift=6cm]{Output};
         
-        \node(LocalProcessIn)[local, below of=Input]{Local Process};
-        \node(LocalProcessOut)[local, below of=Output]{Local Process};
+        \node(LocalProcessIn)[local, below of=Input]{\localProcessText In};
+        \node(LocalProcessOut)[local, below of=Output]{\localProcessText Out};
         
         %In Arrows
         \draw[->] (NetworkCard)--(PreRouting);

@@ -5,7 +5,7 @@
 
 \section{Overview}
 
-\subsubsection{Script Design}
+\subsection{Script Design}
 The script utilises a section in the Linux kernel refereed to as the ``NFQUEUE''. This is as the name suggests a queue that is stored in kernel memory that will store up packets until the user provides one of the two verdicts: `Drop' or `Accept'. The packets are pushed into this queue by the use of `iptable' rules, iptabales is a tool designed to filter packets by criteria. Below is a flow diagram for the path a packet might take, each table can have filtering rules embedded into to it:
 
 % Diagram
@@ -19,31 +19,47 @@ So for example to move all packets entering from the network card into the NFQUE
 		\large{iptables -A INPUT -j NFQUEUE}
 	\end{console_font} 
 \end{center}
-Where `-a' tells to add a rule to the `INPUT' table and `-j' is the rule that affects the packet, in this case pushing it into the default queue.
+Where `-a' tells to append a rule onto the `INPUT' table and `-j' is the rule that affects the packet, in this case pushing it into the default queue.
 
 This forms the main component of the functionality of the script, a series of iptable rules that filter packets into the NFQUEUE and allow to script to perform verdicts on each packet separately allows for effects to be easily applied to packets entering and leaving the machine.
 
-\subsubsection{Degradation Effects}
-The script contains the functionality to simulate a plethora of effects each one and its functionality will be described below:
+\subsection{Degradation Effects}
+The script contains the functionality to simulate a plethora of effects each one and its functionality will be described below. Please not any of these effects can be chained together in any order.
 
 \subsubsection*{Latency}
 Latency as described in the background section is the delay in initiating a task and seeing its results. Latency is simulated by using a timing mechanisms where the arrival time of the packet is saved. The packet is then pushed into the NFQUEUE that triggers a single thread that will hold the packet for a set amount of time, the holding time is calculated by taking the amount of time the packet has already been in the script away from the target time. The packet is then marked as `ACCEPTED' and pushed out of the queue.
 
 \subsubsection*{Packet Loss}
-
+Packet loss is simulated by first assigning a target value, lets say for this example 10\%. For each packet the script randomly generates a number between 1 and 100, if that value is less than the target value the packet is dropped, and if the value is larger the packet is accepted. This therefore creates the effect of packet loss. It does however require a fair amount of packets to balance out statistically and reach the percentage target.
 
 \subsubsection*{Bandwidth}
+There are two modes created for bandwidth; rate limiting and a simple display. Rate limiting allows the script to limit the rate of bandwidth flowing through the machine and calculates the rate transferred over a period of 5 seconds, if the rate is higher it waits until the rate drops below the target. This gives it the ability to adjust quickly and allows the script to be run for a long period of time without the overall average of the bandwidth affecting future changes. Displaying the bandwidth work exactly the same but without the limit check, this is useful when checking the current download speeds or the max transfer rate.
 
 \subsubsection*{Out-of-order}
+This effect changes the order of packets coming into the script, this can be used to check its effect on UDP and TCP and can test how quickly these issue can be rectified. It works by queuing up every packet into a list, then a single thread randomly picks an index of that list, accepts the packet and allows it to leave this means at its most extreme the order can be last in, first out and therefore going against normal operation.
 
 \subsubsection*{Connection Simulation}
+Connection simulation isn't quite a degradation effect but its intent is to simulate the effect of degradation on a common connection like `WiFi` or a 3G connection to see how these connections are effected by said degradation. This can be useful in some situations where for example testing a mobile applications performance over 3G with heavy latency, the mobile would connect to the script and the script would effect any traffic entering or leaving the handset.
 
-\subsubsection*{Surge}
+\subsubsection*{Jitter}
+Jitter mode clumps and separates packets in their transmission, with some it waits a small period of time other it will clump up delay as a total and then send them all at once. This is to test how the protocol deals with jitter in the connection. Jitter as explained in the background is the intra-packet latency i.e. the difference in time between arrivals of packets.
 
+\subsection{ARP Spoofing}
+The script also supports an ARP spoofing mode that allows it to sit between a gateway and a specified target. This means the script can perform all its functions on a single target with a very quick deployment time. As touched on in the background the ARP protocol performs no authentication on any changes to the ARP cache meaning that you can perform a man in the middle attack and route traffic through a machine of your choice.
 
-\subsubsection{Network Monitoring}
+The script begins by grabbing the MAC addresses connected to the provided gateway and target IP addresses. Two ARP reply packets (denote by the `2' opcode) are sent out: One telling the victim that the current machines MAC address maps to the gateway, and the other telling the gateway that the victims IP maps to the current machines MAC address.
 
-\subsubsection{Network Attacks}
+Below is the process visualised:
+
+\input{diagrams/arp_diagram_before}
+As you can see both ends are connected and have gone through the process to resolve the IP addresses to MAC addresses, you can see above each device their corresponding IP, MAC and ARP Cache. The ARP cache as mentioned previously is a record linking IP addresses to MAC addresses.
+
+\input{diagrams/arp_diagram_after}
+Note after the 3rd device connects to the network, both devices gain a record of its IP and MAC address in their ARP cache. 
+
+After both spoofed packets have been send out the ARP cache for each receiving end gets updated, the text in red shows the changes caused by the spoofed ARP packets. Now when either end wants to talk to each other it will resolve the MAC address and send it with the new MAC address in the table, this will therefore get routed through the attacking PC and will allow the script to receive all the traffic between the two parties.
+
+\subsection{Network Attacks}
 
 
 
