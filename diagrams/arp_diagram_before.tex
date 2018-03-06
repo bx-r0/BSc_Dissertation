@@ -1,0 +1,54 @@
+\newcommand{\cisco}{cisco_images}
+\newcommand{\scale}{0.7}
+
+% Gateway
+\newcommand{\GatewayLabel}{
+\begin{tabular}{l l}
+Gateway\\
+\hline
+\vspace{0.1cm}
+\bf{192.168.1.1} & \bf{C8:49:BD:82:47:4D}\\
+ARP Cache\\
+\hline
+192.168.1.2 & 46:41:73:EC:70:E3
+\end{tabular}
+}
+
+%Victim
+\newcommand{\VictimLabel}{
+\begin{tabular}{l l}
+Victim\\
+\hline
+\vspace{0.1cm}
+\bf{192.168.1.2} & \bf{46:41:73:EC:70:E3}\\
+ARP Cache\\
+\hline
+192.168.1.1 & C8:49:BD:82:47:4D
+\end{tabular}
+}
+
+\begin{center}
+\begin{tikzpicture}[
+    diagram item/.style={},
+    align=left
+]         
+
+\node (Router)[
+    diagram item,
+    label=above:\GatewayLabel,
+    yshift=-2cm
+] {\includegraphics[scale=\scale]{\cisco/router}};
+
+\node (Victim)[
+	diagram item,
+	label=above:\VictimLabel,
+	right of=Router,
+	xshift=7cm
+] {\includegraphics[scale=\scale]{\cisco/workstation}};
+
+
+\draw[-] (Router)--(Victim);
+
+\end{tikzpicture} 
+\end{center}
+
