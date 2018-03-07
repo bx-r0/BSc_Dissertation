@@ -24,10 +24,9 @@ class LatencyTimeOutTest(Base_Test):
     def custom_test_behavior(self, effect_value, data):
 
         latency_obj = Latency(effect_value)
-        self.run_test_TCP(latency_obj, 'TCP')
+        retransmissions = self.run_iperf_local(latency_obj, 'TCP')
 
         # Grabs retransmissions
-        retransmissions = latency_obj.retransmission
         total_packets = latency_obj.total_packets
         ratio = (retransmissions / total_packets) * 100
 
@@ -36,12 +35,8 @@ class LatencyTimeOutTest(Base_Test):
         data.append(total_packets)
         data.append(ratio)
 
-        for x in latency_obj.retransmissions_historical:
-            data.append(x)
-
-        print("Done")
         # Displays data
-        # print('## Output: R:{} T:{} Ratio: {}'.format(retransmissions, total_packets, ratio))
+        print('## Output: R:{} T:{} Ratio: {}'.format(retransmissions, total_packets, ratio))
 
         return data
 

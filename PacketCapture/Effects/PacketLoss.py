@@ -38,13 +38,11 @@ class PacketLoss(Effect):
 
         self.print("[*] Total Packets: {} - "
                    "Target Loss {:.0f}% - "
-                   "Actual Loss {:.2f}% - "
-                   "Retransmission: {}"
+                   "Actual Loss {:.2f}%"
 
             .format(self.total_packets,
                     self.packet_loss_percentage,
-                    self.dropped_percentage,
-                    self.retransmission), end='\r')
+                    self.dropped_percentage), end='\r')
 
     def alter_percentage(self, new_value):
         self.print('Packet loss: {}% -- '.format(new_value), end='')

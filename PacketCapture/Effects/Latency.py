@@ -40,25 +40,22 @@ class Latency(Effect):
     def custom_effect(self, packet):
         """Thread functionality"""
 
-        time.sleep(self.latency_value)
-        self.accept(packet)
+        if type(packet) is list:
+            packetObj = packet[0]
+            startTime = packet[1]
 
-        # if type(packet) is list:
-        #     packetObj = packet[0]
-        #     startTime = packet[1]
-        #
-        #     elapsed = time.time() - startTime
-        #     wait_time = self.latency_value - elapsed
-        #
-        #     if wait_time < 0:
-        #         pass
-        #     else:
-        #         time.sleep(wait_time)
-        #
-        #     self.accept(packetObj)
-        # else:
-        #     time.sleep(self.latency_value)
-        #     self.accept(packet)
+            elapsed = time.time() - startTime
+            wait_time = self.latency_value - elapsed
+
+            if wait_time < 0:
+                pass
+            else:
+                time.sleep(wait_time)
+
+            self.accept(packetObj)
+        else:
+            time.sleep(self.latency_value)
+            self.accept(packet)
 
     def alter_latency_value(self, new_value):
         """This is useful if latency isn't static and can be obtained from a range"""

@@ -8,6 +8,8 @@ sys.path.insert(1, os.path.join(sys.path[0], '..'))
 from multiprocessing.pool import ThreadPool
 import Packet
 import subprocess
+import re
+
 from Terminal import Terminal
 from functools import partial
 from datetime import datetime
@@ -174,7 +176,13 @@ class Base_Test():
 
     # --------------------- TEST TYPES
     def run_test_TCP(self, obj, packet_type):
-        """This will run packet loss and return values of TCP retransmissions"""
+        """
+                TODO
+                This will run packet loss and return values of TCP retransmissions
+                :param obj:
+                :param packet_type:
+                :return:
+                """
 
         self.pool = ThreadPool(1000)
         self.printing(True)
@@ -193,19 +201,69 @@ class Base_Test():
         Terminal.clear_line()
         self.printing(True)
 
+    # TODO: Use the output to get the transfer rate
     def run_iperf_local(self, obj, packet_type):
+        """
+        TODO
+        :param obj:
+        :param packet_type:
+        :return:
+        """
+
         self.pool = ThreadPool(1000)
+
+        start_retransmission = self.get_current_retransmission_value()
 
         self.printing(False)
         self.run_packet_script(obj, packet_type)
+
         cmd = "sudo iperf -c 127.0.0.1"
-        subprocess.check_output(cmd, shell=True)
+
+        with self.time_limit(self.MAX_TEST_TIME):
+            try:
+                subprocess.run(cmd.split(' '), stdout=subprocess.DEVNULL)
+            except Exception as e:
+                self.force_print("## Error: " + e)
+                self.force_print('## Timeout occurred! - Accuracy may be compromised')
+
+        end_retransmission = self.get_current_retransmission_value()
+        total_retransmission = end_retransmission - start_retransmission
 
         self.printing(True)
         Terminal.clear_line()
 
+        return total_retransmission
+
     def run_test_basic(self, obj, packet_type):
+        """
+        TODO
+        :param obj:
+        :param packet_type:
+        :return:
+        """
+
         """Just runs the effect"""
 
         self.pool = ThreadPool(1000)
         self.run_packet_script(obj, packet_type)
+
+    @staticmethod
+    def get_current_retransmission_value():
+        """
+        Grabs the current retransmission value by querying netstat
+        :return: Current retransmission value
+        """
+        # Runs the command
+        cmd = "netstat -s | grep -i ret"
+        retr = subprocess.check_output(cmd, shell=True).decode("utf-8")
+
+        # Finds all the values in the string
+        value = map(int, re.findall(r'\d+', retr))
+
+        # Adds up all the values
+        total = 0
+        for x in value:
+            total += x
+
+        return total
+
