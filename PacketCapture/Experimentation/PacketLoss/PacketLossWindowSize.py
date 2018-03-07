@@ -1,6 +1,12 @@
+#region Imports
+import os
+import sys
+sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
+sys.path.append(os.path.join(os.path.dirname(__file__), "..", ".."))
 from BaseClasses.Base_Test import Base_Test
 from Effects.PacketLoss import PacketLoss
-from Effects.Latency import Latency
+#endregion Imports
+
 
 class PacketLossWindowSize(Base_Test):
     """Test that compares Packet loss with the windows size of a packet"""

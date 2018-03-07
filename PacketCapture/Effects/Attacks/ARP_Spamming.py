@@ -3,7 +3,6 @@ from scapy.all import *
 import LocalNetworkScan as Scan
 
 
-# TODO: Attack seems to have no effect
 class ARP_Spamming:
     """Attack that attempts to change the ARP tables for all the machines to cause issues connecting"""
 

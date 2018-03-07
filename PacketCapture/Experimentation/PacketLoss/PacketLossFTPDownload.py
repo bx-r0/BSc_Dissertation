@@ -1,6 +1,12 @@
+    #region Imports
+import os
+import sys
 import time
+sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
+sys.path.append(os.path.join(os.path.dirname(__file__), "..", ".."))
 from BaseClasses.Base_Test import Base_Test
 from Effects.PacketLoss import PacketLoss
+#endregion Imports
 
 
 class PacketLossFTPDownload(Base_Test):

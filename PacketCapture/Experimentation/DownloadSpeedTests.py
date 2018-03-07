@@ -13,7 +13,7 @@ import time
 import csv
 from Terminal import Terminal
 
-FILE_NAME = 'LatencyDownloadSpeed.csv'
+FILE_NAME = 'DOWNLOAD_SPEED_TEST.csv'
 
 
 """The script is run by passing:

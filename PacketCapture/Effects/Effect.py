@@ -46,8 +46,7 @@ class Effect:
         self.start_time = time.time()
         self.total_packets = 0  # Number of total packets processed
 
-        self.tcp_sessions = [TcpSession(1, 1, 1, 1)]
-        self.retransmission = 0
+        self.previous_packets = []
 
     def effect(self, packet):
         """The first method run for all effects - Here custom code will be added
@@ -55,16 +54,16 @@ class Effect:
 
         try:
 
-            if True:
+            if False:
                 # TCP tracking
                 if self.gather_stats:
                     self.track_TCP_stats(packet)
 
                 # Shared functionality between all effects
-                self.print_stats()
-                self.total_packets += 1
                 self.default_graphing(packet)
 
+            self.total_packets += 1
+            self.print_stats()
             self.custom_effect(packet)
         except Exception as e:
             print('Error in effect(): ', e)
@@ -217,22 +216,19 @@ class Effect:
         else:
             return False
 
-    # TODO: Make this section better
-    #       at the moment it just storing the TCP packets into a list
-    #       and searching through them for any exact matches, this is inefficient and needs to be improved
     def track_TCP_stats(self, packet):
         """Method that tracks characteristics of the TCP packets """
 
         try:
             if self.check_packet_type(packet, 'TCP'):
-                self.check_for_retransmissions(packet)
+                self.log_packets(packet)
 
         except AttributeError:
             pass
         except Exception as e:
             print('Error:', e)
 
-    def check_for_retransmissions(self, packet):
+    def log_packets(self, packet):
         """This method checks for any TCP packets that
         have been retransmitted"""
 
@@ -257,65 +253,7 @@ class Effect:
 
         # Creates the session object
         tcp_packet = TcpPacket(src, src_port, dst, dst_port, seq_num, ack_num, len(pkt), window_size, packet)
-        #tcp_session = TcpSession(dst, dst_port, src, src_port)
-
-        # Loops round and checks all session
-        for session_loop in self.tcp_sessions:
-
-            # Checks for transmission and adds it to the list
-            self.retransmission += session_loop.retransmit(tcp_packet)
-
-class TcpSession:
-    """Used to hold a potential TCP session between two clients
-    It uses the destination/source ip address and the destination/source port to
-    identify different sessions"""
-
-    def __init__(self, dst_ip, dst_port, src_ip, src_port):
-        self.dst_ip = dst_ip
-        self.dst_port = dst_port
-
-        self.src_ip = src_ip
-        self.src_port = src_port
-
-        self.previous_packets = []
-
-        self.retransmissions = 0
-
-    def compare(self, s):
-        """Used to compare the parent session and a new session together"""
-        if (s.dst_ip == self.dst_ip) and (s.src_ip == self.src_ip) and (s.dst_port == self.dst_port) and \
-            (s.src_port == self.src_port):
-            return True
-        else:
-            return False
-
-    def retransmit(self, packet):
-        """Method that checks if the values are from the same connection"""
-
-        retransmissions = 0
-        add = True
-        for p_packets in self.previous_packets:
-
-            # If there is another packet the same
-            if p_packets.compare(packet):
-
-                # Not to count RST flags as retransmissions
-                if not p_packets.has_flag('RST'):
-
-                    retransmissions += 1
-
-                    # Only adds if
-                    add = False
-
-                    # TODO: Does this make sense being here?
-                    # Do I not need to delete the packet it matched?
-                    break
-
-        # Adds the new packet to the list
-        if add:
-            self.previous_packets.append(packet)
-
-        return retransmissions
+        self.previous_packets.append(tcp_packet)
 
 
 class TcpPacket:

@@ -1,7 +1,12 @@
+#region Imports
 import os
+import sys
+sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
+sys.path.append(os.path.join(os.path.dirname(__file__), "..", ".."))
+
 from BaseClasses.Base_PingTest import PingTest
 from Effects.Latency import Latency
-import subprocess
+#endregion Imports
 
 
 class LatencyPingTest(PingTest):
@@ -9,11 +14,11 @@ class LatencyPingTest(PingTest):
 
     def __init__(self):
         super().__init__('PingTest',
-                         max_effect_value=5000,
+                         max_effect_value=1000,
                          start_effect_value=1,
                          effect_step=10,
                          repeat_tests=1,
-                         data_headers=['Latency value (ms)', 'Average Latency', 'Error', 'Difference'],
+                         data_headers=['Latency value (ms)', 'Average Latency', 'Error', 'Difference', 'Raw Values'],
                          max_test_time=60,
                          print_time_estimate=False)
 
@@ -38,6 +43,10 @@ class LatencyPingTest(PingTest):
         data.append(average_latency)
         data.append(error)
         data.append(difference)
+
+        # Adds raw values
+        for x in ping_values:
+            data.append(x)
 
         print('Average: {:.2f} - Target: {:.2f} - Diff: {:.2f}ms - Error: {:.2f}%'.
               format(average_latency, target_value, difference, error))

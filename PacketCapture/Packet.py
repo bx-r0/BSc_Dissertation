@@ -41,7 +41,7 @@ from Plotting import Graph
 #endregion
 
 # Defines how many threads are in the pool
-pool = Pool(2000)
+pool = Pool(100)
 
 logo = """
 ==============================================================
@@ -85,7 +85,7 @@ def map_thread(method, args):
     # If this try is caught, it occurs for every thread active so anything in the
     # except is triggered for all active threads
     try:
-        pool.apply_async(method, args)
+        pool.map_async(method, args)
     except Exception as e:
         print(e)
 
@@ -159,7 +159,7 @@ def edit_packet(packet):
 def packet_latency(packet):
     """This function is used to incur latency on packets"""
     if affect_packet(packet):
-        map_thread(latency_obj.effect, [packet])
+        map_thread(latency_obj.effect, [[packet, time.time()]])
     else:
         packet.accept()
 
@@ -275,6 +275,8 @@ def run_packet_manipulation():
 
         # Packets for this machine
         os.system("iptables -A INPUT -j NFQUEUE")
+
+        #TODO: Need to collect packets coming from the out section
         os.system("iptables -A OUTPUT -j NFQUEUE")
 
         # Packets for forwarding or other routes
@@ -689,6 +691,7 @@ def clean_close(signum='', frame=''):
 
 def print_separator():
     Terminal.print_sequence('=', start='[*]', end='[*]')
+
 
 # Rebinds the all the close signals to clean_close the script
 signal.signal(signal.SIGINT, clean_close)   # Ctrl + C

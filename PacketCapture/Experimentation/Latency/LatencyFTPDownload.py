@@ -1,6 +1,12 @@
+#region Imports
+import os
+import sys
 import time
+sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
+sys.path.append(os.path.join(os.path.dirname(__file__), "..", ".."))
 from BaseClasses.Base_Test import Base_Test
 from Effects.Latency import Latency
+#endregion Imports
 
 
 class LatencyFTPDownload(Base_Test):
@@ -13,7 +19,7 @@ class LatencyFTPDownload(Base_Test):
                          max_effect_value=3000,
                          start_effect_value=10,
                          effect_step=100,
-                         repeat_tests=2,
+                         repeat_tests=1,
                          max_test_time=250,
                          data_headers=['Latency value (ms)', 'File download time (s)'],
                          print_time_estimate=False)

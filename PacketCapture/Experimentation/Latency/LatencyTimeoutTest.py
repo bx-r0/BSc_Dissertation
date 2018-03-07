@@ -1,5 +1,11 @@
+#region Imports
+import os
+import sys
+sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
+sys.path.append(os.path.join(os.path.dirname(__file__), "..", ".."))
 from BaseClasses.Base_Test import Base_Test
 from Effects.Latency import Latency
+#endregion Imports
 
 
 class LatencyTimeOutTest(Base_Test):
@@ -25,13 +31,17 @@ class LatencyTimeOutTest(Base_Test):
         total_packets = latency_obj.total_packets
         ratio = (retransmissions / total_packets) * 100
 
-        # Saves data
+        #Saves data
         data.append(retransmissions)
         data.append(total_packets)
         data.append(ratio)
 
+        for x in latency_obj.retransmissions_historical:
+            data.append(x)
+
+        print("Done")
         # Displays data
-        print('## Output: R:{} T:{} Ratio: {}'.format(retransmissions, total_packets, ratio))
+        # print('## Output: R:{} T:{} Ratio: {}'.format(retransmissions, total_packets, ratio))
 
         return data
 

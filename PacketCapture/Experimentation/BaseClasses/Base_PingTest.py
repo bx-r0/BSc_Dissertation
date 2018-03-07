@@ -16,7 +16,8 @@ class PingTest(Base_Test):
                          max_test_time=max_test_time,
                          print_time_estimate=print_time_estimate)
 
-        self.NUMBER_OF_PINGS = 10
+        self.NUMBER_OF_PINGS = 50
+        self.INTERVAL = 0.2  # Min is 0.2
 
     def custom_test_behavior(self, effect_value, data):
         """To be overidden"""
@@ -29,7 +30,7 @@ class PingTest(Base_Test):
 
             try:
                 response = subprocess.check_output(
-                                ['ping', '-c', str(self.NUMBER_OF_PINGS), '127.0.0.1'],
+                                ['ping', '-c', str(self.NUMBER_OF_PINGS), '127.0.0.1', '-i', str(self.INTERVAL)],
                                 stderr=NULL,
                                 universal_newlines=True)
             except subprocess.CalledProcessError as e:

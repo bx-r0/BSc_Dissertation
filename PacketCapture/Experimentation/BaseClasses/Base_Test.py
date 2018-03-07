@@ -1,19 +1,17 @@
 #region Imports
 import os
 import sys
-from multiprocessing.pool import ThreadPool
-sys.path.insert(1, os.path.join(sys.path[0], '..'))
-import Packet
-from Terminal import Terminal
+import signal
 import csv
+import wget
+sys.path.insert(1, os.path.join(sys.path[0], '..'))
+from multiprocessing.pool import ThreadPool
+import Packet
+import subprocess
+from Terminal import Terminal
 from functools import partial
 from datetime import datetime
-import signal
 from contextlib import contextmanager
-import wget
-from Effects.PacketLoss import PacketLoss
-import time
-import subprocess
 #endregion
 
 
@@ -88,7 +86,7 @@ class Base_Test():
         print('## Saving.....', end='')
 
         # Saves the data
-        with open('CSV/{}_{}.csv'.format(self.file_name_id, self.time_str), 'a') as csvfile:
+        with open('../CSV/{}_{}.csv'.format(self.file_name_id, self.time_str), 'a') as csvfile:
             writer = csv.writer(csvfile, delimiter=',')
             writer.writerow(data)
 
@@ -154,8 +152,8 @@ class Base_Test():
 
         #filename = '1KB.zip'
         #filename = '100KB.zip'
-        filename = '512KB.zip'
-        #filename = '5MB.zip'
+        #filename = '512KB.zip'
+        filename = '5MB.zip'
 
         wget.download(link + filename)
 
@@ -179,7 +177,7 @@ class Base_Test():
         """This will run packet loss and return values of TCP retransmissions"""
 
         self.pool = ThreadPool(1000)
-        self.printing(False)
+        self.printing(True)
 
         self.run_packet_script(obj, packet_type)
 
@@ -197,15 +195,14 @@ class Base_Test():
 
     def run_iperf_local(self, obj, packet_type):
         self.pool = ThreadPool(1000)
+
         self.printing(False)
-
         self.run_packet_script(obj, packet_type)
-
         cmd = "sudo iperf -c 127.0.0.1"
-        os.system(cmd)
+        subprocess.check_output(cmd, shell=True)
 
-        Terminal.clear_line()
         self.printing(True)
+        Terminal.clear_line()
 
     def run_test_basic(self, obj, packet_type):
         """Just runs the effect"""
