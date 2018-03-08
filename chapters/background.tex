@@ -1,4 +1,5 @@
 %This is a narrative description of the general context within which your project fits. Depending on your particular project characteristics, you are required to include discussion of any or all of the following – previous related work; the work or objectives of a client; the essential principles of systems or techniques you are using.%
+
 %All this narrative should be properly referenced to source material citations. Remember that a high class project will refer to background sources beyond just those on the Web. %
 
 %In writing this section you should pay close attention to your audience and their prior knowledge of the subject(s) that you are discussing. You should assume that your reader is a student who has just completed the second year of your degree programme and can therefore assume that the reader is familiar with all topics taught up to the end of the second year. Anything that is needed to understand your project and its context but which has not been taught by the end of the second year of your degree should be discussed in this background section. %
@@ -66,6 +67,10 @@ To control the number of packets the protocol has in flight at any one time the 
 \subsubsection*{Congestion control}
 When there are situations where multiple clients are connected to one receiver lets say a router for this example, the bandwidth needs to be split between the number of clients and this is performed by congestion controls. The clients send data and keep increasing their transfer rate until they discover packet loss, packet loss in this case is assumed to be a sign of congestion - this is because it thinks the packets are being lost because the router is dropping them due to insufficient packet buffering space. So as the number of clients requesting data from the router is reduced more bandwidth is freed up and available, the congestion algorithm is periodically probing the network to check for available bandwidth by increasing it transfer rate until packet loss is encountered where it then slows down and repeats the process. This results in TCP auto balancing when new clients are introduced and utilizing as much bandwidth as is available. Later this report will discuss the effects of packet loss, latency and other degradation signs on this congestion control.
 
+\subsubsection*{Congestion Algorithms}
+%TODO Talk here about common congesting algorithms and how they work - This will be great to talk later in the experiementation section
+
+
 \subsubsection*{Closing a connection}
 The closing of a TCP connection is very similar to the initial construction of a TCP connection, but in this case the protocol utilises the `FIN' flag defined in the TCP header. In this example it will be a client disconnection from a server. After all the data is transferred the client no longer requires a connection to the server and sends an empty packet with the FIN bit send, the server receives the packet and returns an ACK. The server now sends its own FIN and this is then acknowledged by the client. This middle step with the server sending an ACK and FIN separately is performed in a single packet in live networks. The client and server not know the connection is closed and will free up any resources allocated to that connection.
 
@@ -97,7 +102,7 @@ An ARP packet is a very simple message format that contains an operation code th
 The ARP protocol contains no form of authentication verification meaning a malicious computer can send out faked custom ARP requests to change specific values in the routers ARP table, meaning a computer running this software can appear as the router to the victim, while also appearing as the victim to the router, thus having all the traffic between the two routed through the attacking computer. 
 
 \begin{center}
-\input{diagrams/arp_diagram_basic}
+\input{diagrams/ARP/arp_diagram_basic}
 	\begin{figure}[h]
 		\caption{Photo depicting a MITM attack}
 	\end{figure}
@@ -236,6 +241,8 @@ This tool provides and easy to use and simple tool that requires no extra downlo
 TMNetSim \footnote{\url{http://www.tmurgent.com/appv/en/87-tools/performance-tools/177-tmnetsim-quick-and-easy-network-simulation-tool}} is another tool that covers aspects of this project. Unlike clumsy TMNetSim is designed to provide degradation that expands over the network. However, to achieve this it has to be set-up on every machine, this is clunky and time consuming. The degradation script can negate this lengthy set-up with the intended inclusion of the ARP Spoofing that will allow rapid deployment of the script between target and router. Further criticism relating to the ease of use of this application, it has a large number of controls on it's interface and will involve a larger learning curve to master compared to other simpler tools, this however might be the bi-product of more functionality; increased complexity.
 
 This tool includes very complex ways of simulating realistic degradation with ``Gausian" and ``Normal" delay modes, that attempt to provide more accurate representations of real-world delays. This is a great feature that could drastically improve the accuracy in simulating degradation and will need to be considered as an extra inclusion into this project.
+
+%TODO - Added some more alternative solutions there should be at least two more
 
 %Comparison of Algotithms%
 %There may be a number of different algorithms which could be applied to the central problems in your project and you have had to choose which of these algorithms are the most appropriate for your implementation. If this is the case then you should provide a comparative analysis and critical appraisal of each of the potentially applicable algorithms, highlighting their key features and their strengths and weaknesses in relation to your project.%

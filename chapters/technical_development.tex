@@ -51,10 +51,10 @@ The script begins by grabbing the MAC addresses connected to the provided gatewa
 
 Below is the process visualised:
 
-\input{diagrams/arp_diagram_before}
+\input{diagrams/ARP/arp_diagram_before}
 As you can see both ends are connected and have gone through the process to resolve the IP addresses to MAC addresses, you can see above each device their corresponding IP, MAC and ARP Cache. The ARP cache as mentioned previously is a record linking IP addresses to MAC addresses.
 
-\input{diagrams/arp_diagram_after}
+\input{diagrams/ARP/arp_diagram_after}
 Note after the 3rd device connects to the network, both devices gain a record of its IP and MAC address in their ARP cache. 
 
 After both spoofed packets have been send out the ARP cache for each receiving end gets updated, the text in red shows the changes caused by the spoofed ARP packets. Now when either end wants to talk to each other it will resolve the MAC address and send it with the new MAC address in the table, this will therefore get routed through the attacking PC and will allow the script to receive all the traffic between the two parties.
@@ -123,6 +123,9 @@ The expected result from this graph was a large peak at the time out period wher
 % Then the latency is increased to a cetain value 
 
 \comments{Changing value of latency won't ever stop a TCP connection??}
+
+
+%TODO - Add here Latency accuracy improvement when switching from static to dynamic timing
 
 
 %Test design and system testing:
