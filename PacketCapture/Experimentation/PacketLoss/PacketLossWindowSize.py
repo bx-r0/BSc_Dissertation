@@ -18,7 +18,8 @@ class PacketLossWindowSize(Base_Test):
                          effect_step=10,
                          repeat_tests=1,
                          data_headers=['Packet loss (%)'],
-                         max_test_time=120)
+                         max_test_time=120,
+                         print_time_estimate=False)
 
     def custom_test_behavior(self, packetLoss_value, data):
         """Custom behavior for the test that is called from the start() method in the super"""
