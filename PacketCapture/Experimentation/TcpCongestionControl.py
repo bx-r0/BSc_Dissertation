@@ -29,7 +29,7 @@ class TcpCongestionControl:
         if not avaliable.__contains__(name):
             print("Error: Invalid algorithm name: \'{}\'".format(name))
         else:
-            os.system('echo {} > /proc/sys/net/ipv4/tcp_congestion_control')
+            os.system('echo {} > /proc/sys/net/ipv4/tcp_congestion_control'.format(name))
             print("Congestion algorithm changed to \'{}\'!".format(name))
 
     @staticmethod

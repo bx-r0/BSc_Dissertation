@@ -204,6 +204,7 @@ class Base_Test():
         """
         Runs a iperf test on the localhost. Iperf sends a huge amount of TCP packets and measures
         transfer rate
+        :param update_interval: The amount of updates the iperf script gives per time, default 0 is off
         :param obj: - The script object
         :param packet_type: - The target packet
         :return:
@@ -215,7 +216,29 @@ class Base_Test():
         self.run_packet_script(obj, packet_type)
 
         result = TestResult()
-        result.run_test()
+        result.run_single_test()
+
+        Terminal.clear_line()
+        self.printing(True)
+
+        return result
+
+    def run_iperf_multi(self, obj, packet_type, update_interval):
+        """
+        TODO
+        :param obj:
+        :param packet_type:
+        :param update_interval:
+        :return:
+        """
+
+        self.pool = ThreadPool(1000)
+
+        self.printing(True)
+        self.run_packet_script(obj, packet_type)
+
+        result = TestResult(update_interval=update_interval)
+        result.run_multi_test()
 
         Terminal.clear_line()
         self.printing(True)
