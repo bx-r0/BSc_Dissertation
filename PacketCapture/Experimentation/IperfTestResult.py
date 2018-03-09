@@ -14,13 +14,16 @@ class TestResult:
         :param test_time: - Length of the test (default: 10)
         """
 
-        self.CMD = "sudo iperf -c 127.0.0.1 -t {} -f m -i {}".format(test_time, update_interval)
+        self.CMD = "sudo iperf -c 127.0.0.1 -t {} -f m".format(test_time)
+
+        if update_interval > 0:
+            self.CMD += ' -i {}'.format(update_interval)
 
         self.retransmissions = None
         self.bandwidth = None
         self.total_transferred = None
 
-        self.multi_results_list = []
+        self.results_dict = {}
 
     def run_test(self):
         """
@@ -50,10 +53,15 @@ class TestResult:
         :return:
         """
 
-        result = self.extract_stats_update(self.run_test())
+        self.extract_stats_update(self.run_test())
 
-        if result is not None:
-            self.multi_results_list.append(result)
+    def add_value_to_dictionary(self, key, value):
+        if key not in self.results_dict:
+            self.results_dict[key] = [value]
+        else:
+            value_list = self.results_dict[key]
+            value_list.append(value)
+            self.results_dict[key] = value_list
 
     @staticmethod
     def extract_stats(output):
@@ -71,23 +79,23 @@ class TestResult:
 
         return float(bandwidth), float(transfer)
 
-    @staticmethod
-    def extract_stats_update(output):
+    def extract_stats_update(self, output):
+        results = []
         lines = bytes(output).decode('utf-8').split('\n')
 
-        #TODO: Can't seem to delete last element of the list??
-
         # Removes the first 6 lines and the final line
-        for i in range(0, 6):
-            del lines[0]
+        for i in range(0, len(lines) - 1):
+            if i < 6:
+                del lines[0]
 
-        results = []
+        lines = [row for row in lines if not row.startswith('[ ID]') and not row == '']
 
         # Extracts values from all the lines
         for x in range(0, len(lines) - 2):
-            results.append(TestResult.extract_stats_line(lines[x]))
+            line_values = (TestResult.extract_stats_line(lines[x]))
 
-        return results
+            for values in line_values:
+                self.add_value_to_dictionary(values[0], values[1])
 
     @staticmethod
     def extract_stats_line(output):
@@ -99,27 +107,86 @@ class TestResult:
         :param output:
         :return:
         """
-
         float_regex = r'\d+\.\d+'
 
-        parts = str(output).split('  ')
+        # Removes the front section
+        output = re.sub(r'\[.*\]', '', str(output)).strip()
 
-        if len(parts) > 4:
-            interval_part = parts[2]
+        # Splits by gaps
+        parts = re.split(r'( ){2,}', output)
+
+        # Removes blank values
+        parts = [x for x in parts if x.strip() is not '']
+
+        # # Regular mode
+        # -------------------------------------------------#
+        # [ ID] Interval       Transfer     Bandwidth
+        # '0.0- 0.6 sec', '29.0 MBytes', '405 Mbits/sec'
+        # -------------------------------------------------#
+        if len(parts) is 3:
+            interval_part = parts[0]
             time_range = re.findall(float_regex, interval_part)
 
-            transfer_part = parts[3]
+            transfer_part = parts[1]
             transferred = re.findall(float_regex, transfer_part)[0]
 
-            bandwidth_part = parts[4]
-
+            bandwidth_part = parts[2]
             bandwidth = re.findall(r'\d+', bandwidth_part)[0]
+
+            # time_range returns the end time
+            return \
+            [
+                ['Interval', time_range[1]],
+                ['Transfer', transferred],
+                ['Bandwidth', bandwidth]
+            ]
+
+        # # Precise mode
+        # -------------------------------------------------------------------------------- #
+        # [ ID] Interval        Transfer    Bandwidth       Write/Err  Rtry    Cwnd/RTT
+        # ['0.00-0.40 sec', '19.0 MBytes', '398 Mbits/sec', '152/0',   '45', '831K/8272 us']
+        # -------------------------------------------------------------------------------- #
+        elif len(parts) is 6:
+            interval_part = parts[0]
+            time_range = re.findall(float_regex, interval_part)
+
+            transfer_part = parts[1]
+            transferred = re.findall(float_regex, transfer_part)[0]
+
+            bandwidth_part = parts[2]
+            bandwidth = re.findall(r'\d+', bandwidth_part)[0]
+
+            write_error_part = parts[3]
+            write_error_split = write_error_part.split('/')
+            write = write_error_split[0]
+            error = write_error_split[1]
+
+            retry_part = parts[4]
+
+            cwnd_rtt_part = parts[5]
+            cwnd_rtt_split = cwnd_rtt_part.split('/')
+
+            congestion_window = cwnd_rtt_split[0]
+            congestion_window = re.sub(r'K', '', congestion_window)
+            round_trip_time = cwnd_rtt_split[1]
+
+            return \
+            [
+                ['Interval', time_range[1]],
+                ['Transfer', transferred],
+                ['Bandwidth', bandwidth],
+                ['Write', write],
+                ['Err', error],
+                ['Rtry', retry_part],
+                ['Cwnd', congestion_window],
+                ['RTT', round_trip_time]
+            ]
         else:
+            print('Error: extract_stats_line() invalid line format' )
             return None
 
         # Returns:
         #   End Time, Transferred and Bandwidth
-        return [time_range[1], transferred, bandwidth]
 
     @staticmethod
     def get_current_retransmission_value():

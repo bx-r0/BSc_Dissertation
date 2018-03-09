@@ -4,7 +4,7 @@ from Effects.Effect import Effect
 
 class PacketLossTimeDrop(Effect):
 
-    def __init__(self, percentage,
+    def __init__(self,
                  accept_packets=True,
                  show_output=True,
                  graphing=False,
@@ -17,14 +17,11 @@ class PacketLossTimeDrop(Effect):
                          gather_stats=gather_stats,
                          graph_type_num=graph_type_num)
 
-        self.packet_loss_percentage = int(percentage)
-        self.print('[*] Packet loss set to: {}%'.format(percentage), force=True)
-
         # Stats
         self.total_packets = 0
         self.time_since_last_drop = -1
 
-        self.DROP_INTERVAL_SECONDS = 5
+        self.DROP_INTERVAL_SECONDS = 1
 
     def custom_effect(self, packet):
         """This function will issue packet loss,
@@ -39,7 +36,11 @@ class PacketLossTimeDrop(Effect):
             elapsed = time.time() - self.time_since_last_drop
 
             if elapsed > self.DROP_INTERVAL_SECONDS:
-                packet.drop()
                 self.time_since_last_drop = time.time()
+                packet.drop()
+                print('DROP')
             else:
                 self.accept(packet)
+
+    def print_stats(self):
+        print("[*] " + str(self.total_packets), end='\r')
