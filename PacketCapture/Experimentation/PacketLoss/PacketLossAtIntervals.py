@@ -16,20 +16,21 @@ class PacketLossTransferRateTestOverTime(Base_Test):
 
     def __init__(self):
         super().__init__('PacketLossTransferRateOverTime',
-                         max_effect_value=5,
+                         max_effect_value=0,
                          start_effect_value=0,
                          effect_step=1,
                          repeat_tests=1,
-                         data_headers=['Packet loss (%)'],
+                         data_headers=[],
                          max_test_time=120,
                          print_time_estimate=False)
 
         # Time gap between intervals
         # Note: Anything below: 0.5 pushes the output into a different format
-        self.UPDATE_INTERVAL = 0.3
+        self.UPDATE_INTERVAL = 0.05
+        self.PACKET_LOSS_INTERVAL = 1
         self.TEST_TIME = 10
 
-        self.CONGESTION_ALGO = 'reno'
+        self.CONGESTION_ALGO = 'cubic'
 
     # Dictionary Options
     # ------------------
@@ -50,25 +51,36 @@ class PacketLossTransferRateTestOverTime(Base_Test):
         :return: Returns the altered data to be used in the .csv
         """
 
+        # NOTE: Command is needed to stop tcp from saving session stats
+        os.system('sysctl -w net.ipv4.tcp_no_metrics_save=0')
+
         TcpCongestionControl.set_algorithm(self.CONGESTION_ALGO)
 
-        packet_loss_obj = PacketLossTimeDrop()
+        packet_loss_obj = PacketLossTimeDrop(self.PACKET_LOSS_INTERVAL,
+                                             gather_stats=False,
+                                             show_output=False)
 
         IperfResult = self.run_iperf_multi(packet_loss_obj,
                                            'TCP',
-                                           update_interval=self.UPDATE_INTERVAL)
+                                           update_interval=self.UPDATE_INTERVAL,
+                                           test_time=self.TEST_TIME)
 
-        data.append('Interval')
-        for x in IperfResult.results_dict['Interval']:
-            data.append(x)
+        requested_info = ['Interval', 'Cwnd', 'Transfer', 'Bandwidth', 'Write', 'Err', 'Rtry', 'RTT']
 
-        data.append('Cwnd')
-        for x in IperfResult.results_dict['Cwnd']:
-            data.append(x)
+        for x in requested_info:
+            self.add_data(IperfResult, x)
+
+        print('Actual Retransmissions {}'.format(IperfResult.retransmissions))
 
         TcpCongestionControl.reset()
 
         return data
+
+    def add_data(self, IperfResult, key):
+        cwnd_list = [key]
+        for i in IperfResult.results_dict[key]:
+            cwnd_list.append(i)
+        self.save_csv(cwnd_list)
 
 
 test = PacketLossTransferRateTestOverTime()

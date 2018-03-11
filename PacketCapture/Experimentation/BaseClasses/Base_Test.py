@@ -223,7 +223,7 @@ class Base_Test():
 
         return result
 
-    def run_iperf_multi(self, obj, packet_type, update_interval):
+    def run_iperf_multi(self, obj, packet_type, update_interval, test_time):
         """
         TODO
         :param obj:
@@ -235,9 +235,11 @@ class Base_Test():
         self.pool = ThreadPool(1000)
 
         self.printing(True)
-        self.run_packet_script(obj, packet_type)
 
-        result = TestResult(update_interval=update_interval)
+        if obj is not None:
+            self.run_packet_script(obj, packet_type)
+
+        result = TestResult(update_interval=update_interval, test_time=test_time)
         result.run_multi_test()
 
         Terminal.clear_line()

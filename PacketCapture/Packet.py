@@ -41,7 +41,7 @@ from Plotting import Graph
 #endregion
 
 # Defines how many threads are in the pool
-pool = Pool(100)
+pool = Pool(2000)
 
 logo = """
 ==============================================================
@@ -277,10 +277,10 @@ def run_packet_manipulation():
         os.system("iptables -A INPUT -j NFQUEUE")
 
         #TODO: Need to collect packets coming from the out section
-        os.system("iptables -A OUTPUT -j NFQUEUE")
+        #os.system("iptables -A OUTPUT -j NFQUEUE")
 
         # Packets for forwarding or other routes
-        os.system("iptables -t nat -A PREROUTING -j NFQUEUE")
+        #os.system("iptables -t nat -A PREROUTING -j NFQUEUE")
 
         print_force("[*] Mode is: " + mode.__name__)
 

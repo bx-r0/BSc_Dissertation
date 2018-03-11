@@ -80,6 +80,7 @@ class TestResult:
         return float(bandwidth), float(transfer)
 
     def extract_stats_update(self, output):
+
         results = []
         lines = bytes(output).decode('utf-8').split('\n')
 
@@ -127,6 +128,7 @@ class TestResult:
             interval_part = parts[0]
             time_range = re.findall(float_regex, interval_part)
 
+
             transfer_part = parts[1]
             transferred = re.findall(float_regex, transfer_part)[0]
 
@@ -136,7 +138,7 @@ class TestResult:
             # time_range returns the end time
             return \
             [
-                ['Interval', time_range[1]],
+                ['Interval', time_range[0]],
                 ['Transfer', transferred],
                 ['Bandwidth', bandwidth]
             ]
@@ -150,8 +152,19 @@ class TestResult:
             interval_part = parts[0]
             time_range = re.findall(float_regex, interval_part)
 
-            transfer_part = parts[1]
-            transferred = re.findall(float_regex, transfer_part)[0]
+            # TODO: Errors occurring here when transfer is too high
+            transferred = None
+            try:
+                transfer_part = parts[1]
+                transferred_parts = re.findall(float_regex, transfer_part)
+
+                if transfer_part is None:
+                    transferred = re.findall(r'\d+', transfer_part)[0]
+                else:
+                    transferred = transferred_parts[0]
+
+            except:
+                print('Error: ', transfer_part)
 
             bandwidth_part = parts[2]
             bandwidth = re.findall(r'\d+', bandwidth_part)[0]
@@ -172,7 +185,7 @@ class TestResult:
 
             return \
             [
-                ['Interval', time_range[1]],
+                ['Interval', time_range[0]],
                 ['Transfer', transferred],
                 ['Bandwidth', bandwidth],
                 ['Write', write],

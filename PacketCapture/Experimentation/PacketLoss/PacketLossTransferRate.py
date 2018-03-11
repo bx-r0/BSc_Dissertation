@@ -33,7 +33,7 @@ class PacketLossTransferRateTest(Base_Test):
 
         TcpCongestionControl.set_algorithm('reno')
 
-        packet_loss_obj = PacketLoss(packet_loss_value)
+        packet_loss_obj = PacketLoss(packet_loss_value, gather_stats=False, show_output=False)
         IperfResult = self.run_iperf_local(packet_loss_obj, 'TCP')
 
         bandwidth = IperfResult.bandwidth
