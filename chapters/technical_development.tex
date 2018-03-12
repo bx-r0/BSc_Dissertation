@@ -80,6 +80,8 @@ This attack is relatively easy to execute but can simply be prevented by issuing
 
 
 
+
+
 %UI design:%
 %If your software includes user interaction then you could also include a discussion (supported by diagrams) of decisions that you have made regarding the user interface.%
 \section{UI design}
@@ -90,24 +92,12 @@ This attack is relatively easy to execute but can simply be prevented by issuing
 %If you project includes any experiments, including but not limited to user testing, then you can discuss their design here. Note that again this does not exist in a vacuum and should be tied to your research.
 \section{Experiential design}
 
-\subsubsection{Packet Loss and its effect on download speeds}
+\subsubsection{Experimental Tools}
+%TODO - Add here what tools were used
+%TODO - IPERF
+%TODO - Tcp No Save metrics
 
-% Better graph needed
-\begin{center}
-	\includegraphics[scale=0.6]{PL_Download}
-	\begin{figure}[h]
-	 	\caption{Graph displaying effect of packet loss on download speeds}
-	\end{figure}		
-\end{center}
-
-The graph above shows the download speed measured in Mbps against the increasing rate of packet loss, as you can see the download rate only reaches 28\%, this is due to the connection test failing at anything above. The tests were performed by querying the SpeedTest.net \comments{CITE} API. 
-
-My initial hypothesis for the sharp decreases in packet loss from 0\% to 1\% is it's due to the congestion control mechanisms built into TCP. TCP as mentioned in the background section allows for multiple devices to co-exist on a network and dynamically balance network resources through congestion control algorithms, but packet loss in this aspect is assumed as a sign of congestion to the algorithm adapts and reduces its transfer rate each time a packet is lost, this means the transfer rate drastically reduces until it reaches a platform.
-
-%The test for this will check the transfer rate over a period of time where it will drop a packet every 10 seconds and hopefully will see a dip in transfer rate when each packet is dropped
-
-\comments{Decide on an experiment to prove this}
-\comments{Also talk about why the transfer fails when the packet loss reaches 28\%}
+\input{experiments/packetloss_downloadspeed}
 
 \subsubsection{Latency and retransmission}
 
@@ -118,14 +108,6 @@ The expected result from this graph was a large peak at the time out period wher
 % https://tools.ietf.org/html/rfc6298
 % https://sgros.blogspot.co.uk/2012/02/calculating-tcp-rto.html
 % https://blog.catchpoint.com/2014/04/29/understanding-rtt-impact-on-tcp-retransmissions/
-
-% Maybe a test where the handshake has not latency on it?
-% Then the latency is increased to a cetain value 
-
-\comments{Changing value of latency won't ever stop a TCP connection??}
-
-
-%TODO - Add here Latency accuracy improvement when switching from static to dynamic timing
 
 
 %Test design and system testing:
