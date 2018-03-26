@@ -1,10 +1,11 @@
 %In this section you will discuss the Technical Development related to your project.
 %In one or more chapters you must describe fully the design and development strategies you have adopted and the results achieved.  You may refer to appropriate User and System documentation presented as appendices to avoid repeating extensive detail, so you can focus here instead on a discussion of your reasons for adopting the techniques and strategies you have followed.
+
 %Again, it is difficult to give prescriptive guidance on the subsection structure you might adopt, as this will depend on the nature and content of your project.  However, you will probably want at least to consider sections addressing issues of System Design; Implementation; Testing.  If there is a lot to cover in any of these areas, it may warrant presentation as a full chapter rather than a section.
+
 \chapter{Technical Development}
 
 \section{Overview}
-
 \subsection{Script Design}
 The script utilises a section in the Linux kernel refereed to as the ``NFQUEUE''. This is as the name suggests a queue that is stored in kernel memory that will store up packets until the user provides one of the two verdicts: `Drop' or `Accept'. The packets are pushed into this queue by the use of `iptable' rules, iptabales is a tool designed to filter packets by criteria. Below is a flow diagram for the path a packet might take, each table can have filtering rules embedded into to it:
 
@@ -47,6 +48,9 @@ Jitter mode clumps and separates packets in their transmission, with some it wai
 \subsection{ARP Spoofing}
 The script also supports an ARP spoofing mode that allows it to sit between a gateway and a specified target. This means the script can perform all its functions on a single target with a very quick deployment time. As touched on in the background the ARP protocol performs no authentication on any changes to the ARP cache meaning that you can perform a man in the middle attack and route traffic through a machine of your choice.
 
+
+%TODO - Does this section need to be in the background [# 1]
+%<1>
 The script begins by grabbing the MAC addresses connected to the provided gateway and target IP addresses. Two ARP reply packets (denote by the `2' opcode) are sent out: One telling the victim that the current machines MAC address maps to the gateway, and the other telling the gateway that the victims IP maps to the current machines MAC address.
 
 Below is the process visualised:
@@ -58,9 +62,10 @@ As you can see both ends are connected and have gone through the process to reso
 Note after the 3rd device connects to the network, both devices gain a record of its IP and MAC address in their ARP cache. 
 
 After both spoofed packets have been send out the ARP cache for each receiving end gets updated, the text in red shows the changes caused by the spoofed ARP packets. Now when either end wants to talk to each other it will resolve the MAC address and send it with the new MAC address in the table, this will therefore get routed through the attacking PC and will allow the script to receive all the traffic between the two parties.
+%</1>
 
 \subsection{Network Attacks}
-A couple of network attacks were implemented into the script, these served the purpose of providing very heavy artificial traffic designed to create heavy loads or mess with integral protocols. Not many attacks were added as they don't provide much purpose apart from stress testing and they're on the edge of the scope of this project. There will also be a brief discussion into possible techniques to mitigate the effects. 
+A couple of network attacks were implemented into the script, these served the purpose of providing very heavy artificial traffic designed to create heavy loads or mess with integral protocols. Not many attacks were added as they don't provide much purpose apart from stress testing and they reside on the edge of the scope of this project. There will also be a brief discussion into possible techniques to mitigate the effects. 
 
 \subsubsection{UDP Flooding}
 UDP flooding is a very simple attack, lots and lots of UDP packets are created and send over a network stream very quickly. This attack is designed to `flood' the buffers in the receiving machine and slow down or event prevent internet connection. The script creates 10 or so threads that create and send packet concurrently, this amount of threads easily reaches the max throughput of the test machines NIC card and massively reduces internet connection of the receiving end.
@@ -78,46 +83,124 @@ This attack is relatively easy to execute but can simply be prevented by issuing
 %This should not just be a list of unexplained diagrams, but should rather include discussions of the most interesting parts of your design, tying them to your background and objectives.
 \section{System design}
 
+\subsection{Class Structure}
+\subsubsection{Effect Class Diagram}
 
+\begin{center}
+	\includegraphics[scale=0.7]{Effect_Class_Design}
+	\begin{figure}[h]
+		\caption{UML Class diagram for producing degradation effects}
+	\end{figure}
+\end{center}
 
+The above design is for the various effects that will be implemented into the program. They will be self contained within separate modules encased in an object. This was chosen so each effect is modular and self contained from one another, this will improve the potential readability and maintainability of the code base, it will also make the code base much more scalable where effects can be added with high speed because of the lack repeated code.  Each effect will inherit from the base class ``Effect", where it will obtain method and properties used for functionality, boolean variables for allowing printing and accepting packets, these are both necessary when `chaining' effects together, where a packet can only be accepted once and a single print will be required.
 
+%TODO - Other class diagrams needed?
+
+\subsubsection{Degradation effect Activity Diagram}
+
+\begin{center}
+	\includegraphics[scale=0.6]{Packet_Activity_Diagram}
+	\begin{figure}[h]
+		\caption{Activity Diagram for the degradation script}
+	\end{figure}
+\end{center}
+
+Above is the activity diagram for the packet script that will implement the effect classes above, this script will be utilised directly from the command line or run by the GUI. The decision of having a single script that is controlled from multiple ways allow for one central point of functionality and means code can be shared throughout the project. The activity diagram shows the design choices for the direct control on the script. SIGINT is mentioned in the centre of the diagram, SIGINT is a built in signal in the Linux operating system that represents an interrupt signal, where it is triggered by pressing ``Control + C", this is the most common/clean way of stopping a script. The other alternatives to closing the script ``Control + Z" (SIGTSTP) and ``Control + /" (SIGQUIT) will be remapped to send a SIGINT signal and perform the same role, this will mean the program has one tidy point of closure.
 
 %UI design:%
 %If your software includes user interaction then you could also include a discussion (supported by diagrams) of decisions that you have made regarding the user interface.%
 \section{UI design}
+\subsection{Degradation effect User Interface}
+One of the ways mentioned before to control the degradation effects is by a user interface. It needs to have a way to easily add new buttons and text entries that link up to parameters in the script to make the interface scalable and easy to maintain, It also needs a window to display the same output as the terminal window, this can be achieved by `piping' the stdout to a custom section of the user interface. The `stdout' is the data stream that links up to a Linux terminal window, if the stdout points to somewhere else it will display where it is needed. Below is the initial drafted design for the user interface.
 
+\begin{center}
+	\includegraphics[scale=0.5]{Packet_UI_Design}
+	\begin{figure}[h]
+		\caption{Initial user interface design for the Degradation GUI}
+	\end{figure}
+\end{center}
 
+%TODO - Include an actual picture of the UI now and how it has changed if at all
 
 %Experimental design:
 %If you project includes any experiments, including but not limited to user testing, then you can discuss their design here. Note that again this does not exist in a vacuum and should be tied to your research.
 \section{Experiential design}
+\subsection{Latency Accuracy}
+In the initial stages of the project there were experiments that tested the effects of the degradation on the network, the tests were performed on the loopback (Internal network 127.0.0.1) with ICMP ping packets.
 
-\subsubsection{Experimental Tools}
-%TODO - Add here what tools were used
-%TODO - IPERF
-%TODO - Tcp No Save metrics
+This test was designed to show the accuracy of different ways of simulating latency, the first way being a static timer that just causes the thread to sleep for a set amount of time or a dynamic timer that calculates when the thread is called and when its has to wait it works out how much time since the thread was created and takes that of the set latency value:
 
-\input{experiments/packetloss_downloadspeed}
+The accuracy improved when issuing latency for the packets, here is a graph displaying the percentage error for each latency effect. Please not the relatively high percentage error in the small ranges of latency this is due to the error proportion being a much larger chunk of the overall target latency and therefore being a higher percentage error:
 
-\subsubsection{Latency and retransmission}
+\input{graphs/latency_accuracy}
 
-\comments{Graph here showing linear retransmission against increasing latency value}
-The expected result from this graph was a large peak at the time out period where all the packets send would flag up as retransmissions. This graph is flat due to the dynamic way that TCP works out its RTO (Retransmission Timeout) value that includes the Round trip time (i.e) and this test that created the graph above has the latency affecting the entire time to the dynamic value of the RTO was using the latency value to calculate it and therefore meant that changing the value of latency had no effect 
+As you can see from the graph the dynamic form of issuing latency is overall more accurate in simulation, but however, it is not perfect and there seems to be a small overall error. This performance is however more than suitable for the scope of this project.
 
-% ## Reading
-% https://tools.ietf.org/html/rfc6298
-% https://sgros.blogspot.co.uk/2012/02/calculating-tcp-rto.html
-% https://blog.catchpoint.com/2014/04/29/understanding-rtt-impact-on-tcp-retransmissions/
+\subsection{Visualising effects}
+The most effective way to visualise real world connections were running tests on SpeedTest.net \footnote{\url{http://beta.speedtest.net/}}. This is very useful to quickly visualise a certain effect on the network.
+
+Below are two images showing the effect of a 100ms latency on a networks speed. Both tests were performed on the same empty network and the best result was taken from 5 runs on each.
+
+\begin{center}
+	\includegraphics[scale=0.5]{SpeedNoEffect}
+	\begin{figure}[h]
+		\caption{The initial connection speed}
+	\end{figure}
+\end{center}
+
+\begin{center}
+	\includegraphics[scale=0.5]{Speed100ms}
+	\begin{figure}[h]
+		\caption{Network speed with a latency of 100m/s}
+	\end{figure}
+\end{center}
+
+As you can see from both images, the 100ms has evidently been applied effectively and the speed of the connection has dropped by around 10Mbps. This means in real world terms the time taken to download a 1GB file would take 35 seconds longer to download. This is not a considerable reduction but the latency is having a obvious effect on the network quality.
 
 
 %Test design and system testing:
 %Testing is an extremely important part of any software project and should not be a tacked on afterthought. You can include here a discussion of the design of any tests that you intend to carry out on your project. It would not be appropriate to include an exhaustive list of all the individual tests that you wish to conduct (consider the appendices for this) but examples would be useful to illustrate your discussion.
 %You should review how you have approached the testing and quality assurance of your delivered product, including relevant choice of incremental and/or integration testing, test scenarios, sample datasets, etc. as appropriate,  Exhaustive reproduction of extensive test records is not required, but sample evidence should be used to support your discussion.
 \section{Test design and system testing}
+There are various sections of the project that require a separate testing plan:
 
+\begin{itemize}
 
+	\item Traffic simulation programs\\
+	These are the client server programs that will simulate traffic over the synthetic net. These tests will need to 	make 	sure each client and server performs its role correctly.
+	
+	\item Packet script and effects\\
+	This is the script that will run on the custom router. Tests will be checking effects do their basic jobs and 			the script can be controlled effectively.
+	
+\end{itemize}
+
+\subsection{Traffic simulation programs}
+The test plan for this section will need to check all the intended functionality of each window. There are three aspects of each that will need testing:
+
+\begin{itemize}
+
+	\item UI \\
+	Tests will be created that click buttons and check user interface works effectively through automated testing.
+
+	\item Business Logic \\
+	Code behind the UI will have the relevant methods testing with expected and actual results.
+
+	\item Real world usage \\
+	The involvement of multiple windows and more complex functionality can be tested by using automated testing 			scripts.
+	
+\end{itemize}
+
+Appendix A contains the test plan for the program, each separate program has had its user interface and business logic tested and programs that are to be used together have had ``Live" tests created to check their interaction together. The automated tests have been achieved by using the CUIT (Coded User Interface Tests) \footnote{\url{https://msdn.microsoft.com/en-us/library/dd286726.aspx}} that are built into Visual Studio 2017. These allow clicks and movements to be recorded and repeated.
+
+\subsection{Packet Script}
+It was decided that a separate test plan was needed for the script that will be run on the router. This was because its design is considerably different to that of the traffic simulation programs. Each individual effect needs a basic test that uses a loopback ping test to simulate incoming traffic where a criteria is looked for, for example to test packet loss, the test pings the script until a packet is lost or a time-out is reached, this can perform a basic test on the functionality of the effect. Each effect will also require validation for the passed parameters, there will be a test created that will test various values inside and outside of the validation range.
+
+\subsection{Testing methodology considerations}
+Initially the methodology chosen to start development of the traffic simulation programs was ``Test Driven Development" \citep{beck2003test}, this was a tight methodology that increased development time and gave the added benefit of showing that new changes have not broken older functionality. This methodology was good to start off the project and allowed for a tight structure to be created where no time was wasted debugging previously working code, but as mentioned this methodology slowed development time down, this was chosen to be abandoned after 3-4 weeks to an ad-hoc approach. 
+This change was due to time restraints on the project and the less-important role that the traffic simulation programs had on the project compared to the degradation simulation script. The degradation script was developed in the ad-hoc approach, this was due to issue stated previously about the unknown aspects of the script and how it would be operating that it was decided that the time invested to write up test scripts would assume too much and would risk them having the be completely rewritten, tests therefore are to be written on demand when new functionality was.
 
 %System Implementation:$
-%You should review how you have implemented your project system, discussing any areas of the implementation which might for example involve code or processes which are not immediately obvious in structure or operation, where you have had to innovate or develop particular approaches.  Again, you should refer to relevant diagrams of code or object structures which should be included in documentation as appended.
+%You should review how you have implemented your project system, discussing any areas of the implementation which might for example involve code or processes which are not immesdiately obvious in structure or operation, where you have had to innovate or develop particular approaches.  Again, you should refer to relevant diagrams of code or object structures which should be included in documentation as appended.
 \section{System Implementation}
 

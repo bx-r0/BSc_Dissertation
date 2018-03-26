@@ -1,3 +1,4 @@
+
 %This is a narrative description of the general context within which your project fits. Depending on your particular project characteristics, you are required to include discussion of any or all of the following – previous related work; the work or objectives of a client; the essential principles of systems or techniques you are using.%
 
 %All this narrative should be properly referenced to source material citations. Remember that a high class project will refer to background sources beyond just those on the Web. %
@@ -63,16 +64,51 @@ Flow controls is a mechanism used by the protocol to ensure that the receiving p
 \subsubsection*{Sliding Window}
 To control the number of packets the protocol has in flight at any one time the protocol utilises the `sliding window. The size of the sliding window is altered by two factors: The size of the send buffer and the size of the destinations receive buffer, therefore the maximum amount of data the protocol can send is the smallest of the two previous values. The sliding window then dynamically works out how many packets it can send by working out the maximum data it can send while keeping track of the number of packets in flight (unacknowledged) and the current window size. This whole process gives the protocol the ability to dynamically adapt to changing conditions and prevent buffers from being overfilled the receiving end.
 
-
-\subsubsection*{Congestion control}
-When there are situations where multiple clients are connected to one receiver lets say a router for this example, the bandwidth needs to be split between the number of clients and this is performed by congestion controls. The clients send data and keep increasing their transfer rate until they discover packet loss, packet loss in this case is assumed to be a sign of congestion - this is because it thinks the packets are being lost because the router is dropping them due to insufficient packet buffering space. So as the number of clients requesting data from the router is reduced more bandwidth is freed up and available, the congestion algorithm is periodically probing the network to check for available bandwidth by increasing it transfer rate until packet loss is encountered where it then slows down and repeats the process. This results in TCP auto balancing when new clients are introduced and utilizing as much bandwidth as is available. Later this report will discuss the effects of packet loss, latency and other degradation signs on this congestion control.
-
-\subsubsection*{Congestion Algorithms}
-%TODO Talk here about common congesting algorithms and how they work - This will be great to talk later in the experiementation section
-
-
 \subsubsection*{Closing a connection}
 The closing of a TCP connection is very similar to the initial construction of a TCP connection, but in this case the protocol utilises the `FIN' flag defined in the TCP header. In this example it will be a client disconnection from a server. After all the data is transferred the client no longer requires a connection to the server and sends an empty packet with the FIN bit send, the server receives the packet and returns an ACK. The server now sends its own FIN and this is then acknowledged by the client. This middle step with the server sending an ACK and FIN separately is performed in a single packet in live networks. The client and server not know the connection is closed and will free up any resources allocated to that connection.
+
+\subsubsection*{Congestion control}
+When there are situations where multiple clients are connected to a single receiver, the bandwidth needs to be split equally between the clients, this is performed by the inbuilt TCP congestion control. The clients send data and keep increasing their transfer rate until they begin loosing packets. Packet loss therefore is assumed to be a sign of congestion - this is because it thinks the packets are being lost because the router is dropping them due to insufficient packet buffering space. So, when the number of clients drops the more bandwidth is freed up, the congestion algorithm utilises this because it has been periodically probing the network to check for available bandwidth, it does this by increasing it transfer rate until packet loss is encountered, where it then slows quickly reduces its transfer rate and repeats the process. This results in TCP auto balancing when new clients are introduces and removed and thus utilizing as much bandwidth as is available.
+
+The rate of transfer is defined by two values "Congestion Window" (Cwnd) and "Advertised Window". Congestion window is the amount of packets a connection stream allows in flight and the advertised window is used to inform the sending end how much buffer space is available to hold incoming packets. These both define the overall "winsize" where a small value means less packets can be sent without waiting for corresponding acknowledgements and therefore reducing the transfer speed. The equation below is used to define window size: 
+
+\begin{center}
+	$Winsize = Min(CongestionWindow, AdvertisedWindow)$
+\end{center}
+
+ Later this report will discuss the effects of packet loss, latency and other degradation signs on this congestion control.
+ 
+\subsubsection*{AIMD}
+AIMD standing for Additive Increase Multiplicative Decline is a feedback control algorithm used in TCP congestion control. It works by having a linear increase and exponential decline and it will naturally mean that if set up correctly all entities using AIMD will converge on equal usage of a resource, in this case network bandwidth. This famously produces a 'saw-tooth' pattern when the maximum capacity is reached.
+
+\subsubsection*{Slow Start}
+Slow start is designed for defining suitable initial transfer rates of a TCP connection, this is because an initial huge transfer rates of packets will cause buffer to overflow and will revert the connection to a crawl, so the solution to this is to start with a small-medium transfer rate and increase it per acknowledgement received.
+
+\subsubsection*{Congestion Algorithms}
+There are various algorithms used to manage congestion on a network and they work is slightly different and have situations where some may perform better than others. 
+
+\subsubsection*{TCP Reno}
+TCP Reno was first released in the 4.3BSD OS and is normally grouped up with TCP Tahoe as they share many similarities. TCP Reno performs its additive increase with RTT based calculations. It also introduces two new ideas "Fast Retransmit" and "Fast Recovery":
+
+{\bf Fast Retransmit}\\
+This mechanism uses 3 duplicated acknowledgements (These can be caused by re-orderings or missing segments) to signal the need for a retransmission, this process can repair single segment loss and does not involve the use of any time-outs and therefore can involve a lot less idle link time. After this the congestion window size is reduced by half because of detection of loss.
+
+{\bf Fast Recovery}\\
+For every duplicate ACKs a segment must arrive, this can therefore be used to assume that the receiving of a segment means the buffer in the receiving end has more space and also means the sending of more packets has a high chance not to cause the buffer on the receiving end to overflow so therefore, new segments are put onto the network when acknowledgement are received (Even duplicated). These techniques are both used together and can result in effective mitigation of packet loss.
+
+Reno defines congestion problems in terms of packet loss and can be defined either of two ways:
+
+\begin{itemize}
+	\item 3 duplicated acknowledgements is considered non-severe and the algorithm moves into congestion avoidance with Fast Retransmission and fast recovery coming into effect.
+	\item Retransmission defined by a time out is defined as {\bf severe} and will set the Congestion Window to the minimum value and start a Slow Start. Time outs are usually caused by multiple occurrences of packet loss.
+\end{itemize}
+
+
+\subsubsection*{TCP Cubic}
+TCP Cubic is an algorithm designed for high bandwidth networks with {\bf high latency}. TCP Reno as explained previously relies on acknowledgements to increase the Cwnd value, this is indirectly depended on round trip time (Latency) meaning high latency networks slowly increase the Cwnd value in algorithms that additivity increase in this RTT based fashion. TCP Cubic additive increase is a cubic function of the {\bf time} since the last congestion event, this means the latency and size of a network does not affect the gradual increase of the networks transfer speed.
+
+TCP Cubic is therefore much fairer across networks sizes due to the RTT not being a factor in speed increases, this however means that it may not be suitable for networks with a very small RTT as they will be able to increase there speed faster with another RTT based algorithm
+
 
 \clearpage
 \subsubsection{User Data Protocol (UDP)}
@@ -246,10 +282,9 @@ This tool includes very complex ways of simulating realistic degradation with ``
 
 %Comparison of Algotithms%
 %There may be a number of different algorithms which could be applied to the central problems in your project and you have had to choose which of these algorithms are the most appropriate for your implementation. If this is the case then you should provide a comparative analysis and critical appraisal of each of the potentially applicable algorithms, highlighting their key features and their strengths and weaknesses in relation to your project.%
-\section{Comparison of Algorithms}
-
+%\section{Comparison of Algorithms}
 
 
 %Process and Methodology%
 %If your project is concerned with improving, implementing or evaluating a particular technical process or method of working you should discuss these in detail. We are not expecting you to describe what software development methodology you are following in implementing your project and you certainly do not need to regurgitate textbook descriptions of the Waterfall method here as everyone already knows that model well.%
-\section{Process and Methodology}
+%\section{Process and Methodology}

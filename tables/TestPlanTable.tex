@@ -1,0 +1,103 @@
+\small
+\begin{longtable}{| p{2cm} | p{0.5cm} | p{4cm} | p{5cm} | p{3cm} |}
+	\hline
+		%HEADER
+		\bf{Section} & \bf{Test No} & \bf{Test Name} & \bf{Description} & \bf{Expected} \\ \hline
+		
+		%--- UDP CLIENT
+		\bf{UDP Client}&&&& \\ \hline
+		
+		% Business Logic
+		Logic &&&& \\ \hline
+		&& TestStartUp() & Creates a client object before each test & n/a\\ \hline
+		&& TestCleanUp() & No clean-up needed & n/a \\ \hline
+		&1& Connect-Disconnect() & The client connects performs no action then disconnects & n/a \\ \hline
+		&2& CreateClientObj() & A client object is created & n/a \\ \hline
+		&3& SendPacket() & Sends a single UDP packet & n/a\\ \hline
+		&4& CheckGridSend() & Checks the method sends out the correct number this depends on grid size & n/a \\ \hline
+		
+		% UI
+		UI &&&& \\ \hline
+		&& TestStartUp() & Loads up a fresh window from the command line & n/a \\ \hline
+		&& TestCleanUp() & Clicks the X in the top right corner & n/a \\ \hline
+		&5& ConnectClick() & Clicks the "Connect" button & n/a \\ \hline
+		&6& RestartClick() & Clicks the "Connect" button then the "Restart" button & n/a \\ \hline
+		&7& Connect-InvertCheck() & Clicks the "Connect" button and checks all the buttons invert their "Enabled" property correctly & Connect(Disabled), Restart(Enabled) \\\hline
+		&8& Restart-InvertCheck() & Clicks the "Connect" button, then the "Reset" button and checks the "Enabled" properties for all buttons are correct & Connect(Enabled), Restart(Disabled) \\\hline
+		&9& TextEntry() & Enters text into the text box and then "Connect" is clicked & n/a \\ \hline
+				
+		%--- UDP SERVER
+		\bf{UDP Server} &&&& \\ \hline		
+		
+		%Business 
+		Logic &&&& \\ \hline
+		&& TestStartUp() & Creates the client object & n/a \\ \hline
+		&& TestCleanUp() & n/a & n/a  \\ \hline
+		&10& CreateObject() & Tests that the server object can be created successfully & n/a \\ \hline
+		&11& WaitForTimeout() & Starts the server and checks it closes cleanly after time-out & n/a \\ \hline
+		
+		% UI
+		UI &&&& \\ \hline
+		&& TestStartUp() & Loads up a fresh window from the CMD line & n/a \\ \hline
+		&& TestCleanUp() & Clicks the X in the top right hand corner & n/a  \\ \hline
+		&12& StartClick() & Click the "Start" button & n/a \\ \hline
+		&13& RandomiseClick() & Click the "Randomise" button & n/a \\ \hline
+		&14& Start-ResetClick() & Clicks the "Start" button then resets and checks it returns to it's default state & n/a \\ \hline
+		&15& Randomise-ResetClick() & Clicks the "Randomise" button, the resets and checks it returns to it's default state & n/a \\ \hline
+		&16& Start-CheckInvert() & "Start" button clicked and then the test checks for "Enabled" property is inverted & n/a \\ \hline
+		&17& RestartCheckInvert() & "Start" then "Restart" button clicked and the test then checks for the correct inverting of the buttons "Enabled" property Start = Enabled, Restart = Disabled & n/a \\ \hline
+		&18& Stat-PacketLossReset() & Checks when the restart button is clicked the statistics is returned to default & "-" \\ \hline
+		&19& Stat-TotalPacketLossReset() & Checks when the restart button is clicked the statistics is returned to default & "-" \\ \hline
+		&20& Stat-TotalPacketSentReset() & Checks when the restart button is clicked the statistics is returned to default & "-" \\ \hline
+		&21& Stat-CheckDeafult() & "Start" is clicked and the test then waits for a time-out, it then checks the default values of the statistics & PacketLoss(100) \\ \hline
+		
+		%--- UDP COMBINED		
+		Live Tests &&&& \\ \hline
+		&& TestStartUp() & Both windows were opened on the command line & n/a \\ \hline
+		&& TestCleanUp() & Both windows are closed by automated actions & n/a \\ \hline
+		&22& SendAndRecieve-Valid() & The client sends packages to the server and the server accepts packets & n/a \\ \hline
+		&23& SendAndRecive-Valid-Twice() & The performs the same action at the above test but does the whole loop an extra time to check if the reset works correctly & n/a \\ \hline
+		&24& SendAndRecieve-Invalid() & This test doesn't connect the client to the server but a random IP on the network, this is to check the server will act accordingly & n/a \\ \hline
+
+		\bf{FTP Server} &&&& \\ \hline
+		
+		%--- FTP Logic
+		Logic &&&& \\ \hline
+		&& TestStartUp() & Creates the server object & n/a \\ \hline
+		&& TestCleanUp() & n/a & n/a \\ \hline
+		&25& CreateObject() & Creates a version of the server object & n/a \\ \hline
+		&26& ServerSetup() & Performs the server set-up & n/a \\ \hline
+		&27& ServerStart() & Sets up the server and starts it & n/a \\ \hline
+		&28& ServerStartStop() & Does a fully cycle for the server & n/a \\ \hline
+		
+		%--- FTP Combined
+		&& TestStartUp() & Loads up FTP Server and FileZilla & n/a \\ \hline
+		&& TestCleanUp() & Closes each window with automated actions & n/a \\ \hline
+		&& ValidConnection() & Automated UI test that simulates a valid connection and checks elements on the UI for signs of a valid connection & n/a \\ \hline
+		&& InvalidConnection() & Test that attempts to connect to a non working server & n/a \\ \hline
+		&& DownloadFile() & A test that simulates a download of a file and checks it completes fully & n/a \\ \hline
+		&& InteruptDownload() & Test that starts a download and interrupts it before completion & n/a \\ \hline
+	\hline
+\end{longtable}
+
+Packet Script Test Plan for the default effects.
+
+\begin{longtable}{| p{2cm} | p{0.5cm} | p{4cm} | p{5cm} | p{3cm} |}
+	\hline	
+	\bf{Section} & \bf{Test No} & \bf{Test Name} & \bf{Description} & \bf{Expected} \\ \hline
+	\bf{Effects} &&&& \\ \hline
+	PacketLoss &&&& \\ \hline
+	&1& StartPacketLoss() & Starts the script with the expected parameter (e.g. -pl 10) &  Script should start PacketLoss mode \\ \hline
+	&2& PacketLossEffect() & Pings the script and checks the effect on the ping packets, the test pings until one packet is lost. Checking for exact percentages isn't reliable enough & Some packet loss \\ \hline	
+	Latency &&&& \\ \hline
+	&3& StartLatency() & Starts the script with valid parameters for latency (e.g. -l 10) & Script should start in Latency mode \\ \hline
+	&4& LatencyEffect() & Pings the script and checks the latency value within a margin of error & Latency effect on ping packets \\ \hline	
+	Bandwidth &&&& \\\hline
+	&5& StartBandwidth() &  Starts the script with the expected parameters (e.g. -rl 100) & Script should start in Bandwidth limit mode \\ \hline
+	&6& BandwidthEffect() & Starts bandwidth mode and starts pinging the localhost, after a certain amount of packets the rate is calculated and checked against the rate limit value & n/a \\\hline
+	Script &&&& \\ \hline
+	&7& LatencyValidation() & Check that the validation works for the latency mode & Range = 1-1000ms \\\hline
+	&8& PacketLossValidation() & Check that the validation works for the packet loss mode & Range = 1-100\%\\\hline
+	&9& BandwidthValidation() & Checks that validation works for bandwidth mode & Range =  1-10000B/s\\\hline
+	
+\end{longtable}

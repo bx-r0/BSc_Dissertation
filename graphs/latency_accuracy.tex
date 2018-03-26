@@ -1,0 +1,17 @@
+\begin{tikzpicture}[every axis plot/.append style={thick}]
+		\begin{axis}[
+			width=\linewidth,
+			height=10cm,
+			grid=major,
+			xmin=1, xmax=100,
+			ymin=0, ymax=100,
+			xlabel=Latency (ms),
+			ylabel=Error (\%)]
+			\addplot table [x index=0, y index=1, mark=none, search path=csv_data, col sep=comma]{PingTestDynamicVsStatic.csv};		
+			\addlegendentry{Static}	
+			
+			\addplot table [x index=0, y index=2, mark=none, search path=csv_data, col sep=comma]{PingTestDynamicVsStatic.csv};		
+			\addlegendentry{Dynamic}	
+		 \end{axis}
+ \end{tikzpicture}
+ 
