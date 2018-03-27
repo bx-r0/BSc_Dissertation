@@ -7,12 +7,12 @@
 
 \section{Overview}
 \subsection{Script Design}
-The script utilises a section in the Linux kernel refereed to as the ``NFQUEUE''. This is as the name suggests a queue that is stored in kernel memory that will store up packets until the user provides one of the two verdicts: `Drop' or `Accept'. The packets are pushed into this queue by the use of `iptable' rules, iptabales is a tool designed to filter packets by criteria. Below is a flow diagram for the path a packet might take, each table can have filtering rules embedded into to it:
+The script utilises a section in the Linux kernel referred to as the ``NFQUEUE". This is as the name suggests a queue that is stored in kernel memory that will store up packets until the user provides one of the two verdicts: `Drop' or `Accept'. The packets are pushed into this queue by the use of `iptable' rules, iptabales is a tool designed to filter packets by criteria. Below is a flow diagram for the path a packet might take, each table can have filtering rules embedded into to it:
 
 % Diagram
 \input{diagrams/iptables}
 
-If there was a case where all packets entering the machine need filtering, an iptable rule would be added to the "Pre-Routing" section of the table to catch all packets leaving the machine. 
+If there was a case where all packets entering the machine need filtering, an iptable rule would be added to the "Pre-Routing" section of the table to catch all packets entering the machine. 
 
 So for example to move all packets entering from the network card into the NFQUEUE the iptable rule would be added like so:
 \begin{center}
@@ -25,7 +25,7 @@ Where `-a' tells to append a rule onto the `INPUT' table and `-j' is the rule th
 This forms the main component of the functionality of the script, a series of iptable rules that filter packets into the NFQUEUE and allow to script to perform verdicts on each packet separately allows for effects to be easily applied to packets entering and leaving the machine.
 
 \subsection{Degradation Effects}
-The script contains the functionality to simulate a plethora of effects each one and its functionality will be described below. Please not any of these effects can be chained together in any order.
+The script contains the functionality to simulate a plethora of effects and each effects functionality will be described below. Please not any of these effects can be chained together in any order.
 
 \subsubsection*{Latency}
 Latency as described in the background section is the delay in initiating a task and seeing its results. Latency is simulated by using a timing mechanisms where the arrival time of the packet is saved. The packet is then pushed into the NFQUEUE that triggers a single thread that will hold the packet for a set amount of time, the holding time is calculated by taking the amount of time the packet has already been in the script away from the target time. The packet is then marked as `ACCEPTED' and pushed out of the queue.
@@ -37,10 +37,10 @@ Packet loss is simulated by first assigning a target value, lets say for this ex
 There are two modes created for bandwidth; rate limiting and a simple display. Rate limiting allows the script to limit the rate of bandwidth flowing through the machine and calculates the rate transferred over a period of 5 seconds, if the rate is higher it waits until the rate drops below the target. This gives it the ability to adjust quickly and allows the script to be run for a long period of time without the overall average of the bandwidth affecting future changes. Displaying the bandwidth work exactly the same but without the limit check, this is useful when checking the current download speeds or the max transfer rate.
 
 \subsubsection*{Out-of-order}
-This effect changes the order of packets coming into the script, this can be used to check its effect on UDP and TCP and can test how quickly these issue can be rectified. It works by queuing up every packet into a list, then a single thread randomly picks an index of that list, accepts the packet and allows it to leave this means at its most extreme the order can be last in, first out and therefore going against normal operation.
+This effect changes the order of packets coming into the script, this can be used to check its effect on UDP and TCP and can test how quickly these issue can be rectified. It works by queuing up every packet into a list, then a single thread randomly picks an index of that list, accepts the packet and allows it to leave. This therefore means at its most extreme the order can be last in, first out.
 
 \subsubsection*{Connection Simulation}
-Connection simulation isn't quite a degradation effect but its intent is to simulate the effect of degradation on a common connection like `WiFi` or a 3G connection to see how these connections are effected by said degradation. This can be useful in some situations where for example testing a mobile applications performance over 3G with heavy latency, the mobile would connect to the script and the script would effect any traffic entering or leaving the handset.
+Connection simulation isn't quite a degradation effect but its intent is to simulate the effect of degradation on a common connection like `WiFi` or a 3G connection to see how these are effected by said degradation. This can be useful in some situations where for example testing a mobile applications performance over 3G with heavy latency, the mobile would connect to the script and the script would effect any traffic entering or leaving the handset.
 
 \subsubsection*{Jitter}
 Jitter mode clumps and separates packets in their transmission, with some it waits a small period of time other it will clump up delay as a total and then send them all at once. This is to test how the protocol deals with jitter in the connection. Jitter as explained in the background is the intra-packet latency i.e. the difference in time between arrivals of packets.
@@ -64,12 +64,12 @@ After both spoofed packets have been send out the ARP cache for each receiving e
 A couple of network attacks were implemented into the script, these served the purpose of providing very heavy artificial traffic designed to create heavy loads or mess with integral protocols. Not many attacks were added as they don't provide much purpose apart from stress testing and they reside on the edge of the scope of this project. There will also be a brief discussion into possible techniques to mitigate the effects. 
 
 \subsubsection{UDP Flooding}
-UDP flooding is a very simple attack, lots and lots of UDP packets are created and send over a network stream very quickly. This attack is designed to `flood' the buffers in the receiving machine and slow down or event prevent internet connection. The script creates 10 or so threads that create and send packet concurrently, this amount of threads easily reaches the max throughput of the test machines NIC card and massively reduces internet connection of the receiving end.
+UDP flooding is a very simple attack, lots of UDP packets are created and send over a network stream very quickly. This attack is designed to `flood' the buffers in the receiving machine and slow down or event prevent internet connection. The script creates 10 or so threads that create and send packet concurrently, this amount of threads easily reaches the max throughput of the test machines NIC card and massively reduces internet connection on the receiving end.
 
 The attack could be detected and prevented by a script that monitors the network transfers rates, this attack will create a huge spike in the transfer rate that can be detected and all traffic would be blocked from the sending party.
 
 \subsubsection{ARP Spamming}
-This attack works by once again exploiting the lack of authentication of the ARP protocol. In the entire network mode the script starts by detecting all active hosts on a network, it then starts sending out falsified ARP reply packets with randomly generated MAC addresses inside. This results in all computer on the networking having incorrect ARP cache values and resulting in computers incorrectly resolving IP and MAC address combinations and traffic not being allowed through.
+This attack works by once again exploiting the lack of authentication of the ARP protocol. In the entire network mode the script starts by detecting all active hosts on a network, it then starts sending out falsified ARP reply packets with randomly generated MAC addresses inside. This results in all computers on the networking having incorrect ARP cache values and resulting in computers incorrectly resolving IP and MAC address combinations and traffic not being allowed through.
 
 This attack is relatively easy to execute but can simply be prevented by issuing static ARP tables for each machine, this prevents unsolicited ARP replies from changing IP and MAC address combinations and also prevents ARP Spoofing from occurring on that network.
 
@@ -83,13 +83,13 @@ This attack is relatively easy to execute but can simply be prevented by issuing
 \subsubsection{Effect Class Diagram}
 
 \begin{center}
-	\includegraphics[scale=0.7]{Effect_Class_Design}
+	\input{diagrams/UML/effect_class_diagram}
 	\begin{figure}[h]
 		\caption{UML Class diagram for producing degradation effects}
 	\end{figure}
 \end{center}
 
-The above design is for the various effects that will be implemented into the program. They will be self contained within separate modules encased in an object. This was chosen so each effect is modular and self contained from one another, this will improve the potential readability and maintainability of the code base, it will also make the code base much more scalable where effects can be added with high speed because of the lack repeated code.  Each effect will inherit from the base class ``Effect", where it will obtain method and properties used for functionality, boolean variables for allowing printing and accepting packets, these are both necessary when `chaining' effects together, where a packet can only be accepted once and a single print will be required.
+The above design is for the various effects that will be implemented into the program. They will be self contained within separate modules encased in an object. This was chosen so each effect is modular and self contained from one another, this will improve the potential readability and maintainability of the code base, it will also make the code base much more scalable where effects can be added with high speed because of the lack of repeated code.  Each effect will inherit from the base class ``Effect", where it will obtain method and properties used for functionality, boolean variables for allowing printing and accepting packets, these are both necessary when `chaining' effects together, where a packet can only be accepted once and only a single print will be required.
 
 %TODO - Other class diagrams needed?
 
@@ -102,13 +102,13 @@ The above design is for the various effects that will be implemented into the pr
 	\end{figure}
 \end{center}
 
-Above is the activity diagram for the packet script that will implement the effect classes above, this script will be utilised directly from the command line or run by the GUI. The decision of having a single script that is controlled from multiple ways allow for one central point of functionality and means code can be shared throughout the project. The activity diagram shows the design choices for the direct control on the script. SIGINT is mentioned in the centre of the diagram, SIGINT is a built in signal in the Linux operating system that represents an interrupt signal, where it is triggered by pressing ``Control + C", this is the most common/clean way of stopping a script. The other alternatives to closing the script ``Control + Z" (SIGTSTP) and ``Control + /" (SIGQUIT) will be remapped to send a SIGINT signal and perform the same role, this will mean the program has one tidy point of closure.
+Above is the activity diagram for the packet script that will implement the effect classes above, this script will be utilised directly from the command line or run by the GUI. The decision of having a single script that is controlled by multiple ways allow for one central point of functionality and means code can be shared throughout the project. The activity diagram shows the design choices for the direct control on the script. SIGINT is mentioned in the centre of the diagram, SIGINT is a built in signal in the Linux operating system that represents an interrupt signal, where it is triggered by pressing ``Control + C", this is the most common/clean way of stopping a script. The other alternatives to closing the script ``Control + Z" (SIGTSTP) and ``Control + /" (SIGQUIT) will be remapped to send a SIGINT signal and perform the same role, this will mean the program has one tidy point of closure.
 
 %UI design:%
 %If your software includes user interaction then you could also include a discussion (supported by diagrams) of decisions that you have made regarding the user interface.%
 \section{UI design}
 \subsection{Degradation effect User Interface}
-One of the ways mentioned before to control the degradation effects is by a user interface. It needs to have a way to easily add new buttons and text entries that link up to parameters in the script to make the interface scalable and easy to maintain, It also needs a window to display the same output as the terminal window, this can be achieved by `piping' the stdout to a custom section of the user interface. The `stdout' is the data stream that links up to a Linux terminal window, if the stdout points to somewhere else it will display where it is needed. Below is the initial drafted design for the user interface.
+One of the ways mentioned before to control the degradation effects is by a user interface. It needs to have a way to easily add new buttons and text entries that link up to parameters in the script to make the interface scalable and easy to maintain, it also needs a window to display the same output as the terminal window, this can be achieved by `piping' the stdout to a custom section of the user interface. The `stdout' is the data stream that links up to a Linux terminal window, if the stdout points to somewhere else it will display where it is needed. Below is the initial drafted design for the user interface.
 
 \begin{center}
 	\includegraphics[scale=0.5]{Packet_UI_Design}
@@ -125,13 +125,13 @@ One of the ways mentioned before to control the degradation effects is by a user
 \subsection{Latency Accuracy}
 In the initial stages of the project there were experiments that tested the effects of the degradation on the network, the tests were performed on the loopback (Internal network 127.0.0.1) with ICMP ping packets.
 
-This test was designed to show the accuracy of different ways of simulating latency, the first way being a static timer that just causes the thread to sleep for a set amount of time or a dynamic timer that calculates when the thread is called and when its has to wait it works out how much time since the thread was created and takes that of the set latency value:
+This test was designed to show the accuracy of different ways of simulating latency, the first way being a static timer that just causes the thread to sleep for a set amount of time or a dynamic timer that calculates the elapsed time since the creation of the thread and the command telling the thread to sleep, the dynamic timer takes this elapsed time off the target latency value.
 
-The accuracy improved when issuing latency for the packets, here is a graph displaying the percentage error for each latency effect. Please not the relatively high percentage error in the small ranges of latency this is due to the error proportion being a much larger chunk of the overall target latency and therefore being a higher percentage error:
+Below the results are visualised in a single graph. Please note - the relatively high percentage error in the small ranges of latency this is due to the error proportion being a much larger chunk of the overall target latency and therefore being a higher percentage error:
 
 \input{graphs/latency_accuracy}
 
-As you can see from the graph the dynamic form of issuing latency is overall more accurate in simulation, but however, it is not perfect and there seems to be a small overall error. This performance is however more than suitable for the scope of this project.
+As you can see from the graph the dynamic form of issuing latency is overall more accurate in simulation, but however, it is still not perfect and there seems to be a small overall error present. This performance is however more than suitable for the scope of this project.
 
 \subsection{Visualising effects}
 The most effective way to visualise real world connections were running tests on SpeedTest.net \footnote{\url{http://beta.speedtest.net/}}. This is very useful to quickly visualise a certain effect on the network.
@@ -167,7 +167,7 @@ There are various sections of the project that require a separate testing plan:
 	These are the client server programs that will simulate traffic over the synthetic net. These tests will need to 	make 	sure each client and server performs its role correctly.
 	
 	\item Packet script and effects\\
-	This is the script that will run on the custom router. Tests will be checking effects do their basic jobs and 			the script can be controlled effectively.
+	This is the script that will run on the custom router. Tests will be checking effects do their basic jobs and the script can be controlled effectively.
 	
 \end{itemize}
 
@@ -177,7 +177,7 @@ The test plan for this section will need to check all the intended functionality
 \begin{itemize}
 
 	\item UI \\
-	Tests will be created that click buttons and check user interface works effectively through automated testing.
+	Tests will be created that click buttons and check the user interface works effectively through automated testing.
 
 	\item Business Logic \\
 	Code behind the UI will have the relevant methods testing with expected and actual results.
@@ -194,9 +194,9 @@ It was decided that a separate test plan was needed for the script that will be 
 
 \subsection{Testing methodology considerations}
 Initially the methodology chosen to start development of the traffic simulation programs was ``Test Driven Development" \citep{beck2003test}, this was a tight methodology that increased development time and gave the added benefit of showing that new changes have not broken older functionality. This methodology was good to start off the project and allowed for a tight structure to be created where no time was wasted debugging previously working code, but as mentioned this methodology slowed development time down, this was chosen to be abandoned after 3-4 weeks to an ad-hoc approach. 
-This change was due to time restraints on the project and the less-important role that the traffic simulation programs had on the project compared to the degradation simulation script. The degradation script was developed in the ad-hoc approach, this was due to issue stated previously about the unknown aspects of the script and how it would be operating that it was decided that the time invested to write up test scripts would assume too much and would risk them having the be completely rewritten, tests therefore are to be written on demand when new functionality was.
+This change was due to time restraints on the project and the less-important role that the traffic simulation programs had on the project compared to the degradation simulation script. The degradation script was developed in the ad-hoc approach, this was due to issue stated previously about the unknown aspects of the script and how it would be operating that it was decided that the time invested to write up test scripts would assume too much and would risk them having the be completely rewritten, tests therefore was added alongside new functionality.
 
 %System Implementation:$
 %You should review how you have implemented your project system, discussing any areas of the implementation which might for example involve code or processes which are not immesdiately obvious in structure or operation, where you have had to innovate or develop particular approaches.  Again, you should refer to relevant diagrams of code or object structures which should be included in documentation as appended.
-\section{System Implementation}
+%\section{System Implementation}
 
