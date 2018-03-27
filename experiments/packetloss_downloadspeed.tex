@@ -23,7 +23,7 @@ The test devised to prove this hypothesis will involve once again an iperf clien
 
 %Graph
 \begin{center}
-	\begin{tikzpicture}[ every axis plot/.append style={ultra thick}]
+	\begin{tikzpicture}[ every axis plot/.append style={thick}]
 		\begin{axis}[
 			title=\underline{Cwnd X Time},
 			mark=square,
@@ -45,7 +45,7 @@ This is known in live networks as the `sawtooth' pattern where the client is pro
 
 %Graph
 \begin{center}
-	\begin{tikzpicture}[every axis plot/.append style={ultra thick}]
+	\begin{tikzpicture}[every axis plot/.append style={thick}]
 		\begin{axis}[
 			title=\underline{Cwnd X Time},
 			mark=square,
@@ -65,22 +65,22 @@ Please also note the initial increase in transfer rate, this is displayed in the
 
 %Graph
 \begin{center}
-	\begin{tikzpicture}[every axis plot/.append style={ultra thick}]
+	\begin{tikzpicture}[every axis plot/.append style={thick}]
 		\begin{axis}[
 			title=\underline{Cwnd X Time},
 			mark=square,
 			width=\linewidth,
 			height=10cm, 
 			ymin=0, 
-			xmin=0,
+			xmin=0, xmax=0.5,
 			grid=major,
 			xlabel=Time (Seconds),
 			ylabel=Cwnd]
-			\addplot table [mark=none, search path=csv_data, col sep=comma]{PacketLossCwnd_SlowStart.csv};
+			\addplot table [mark=none, search path=csv_data, col sep=comma]{PacketLossCwnd.csv};
 		 \end{axis}
  	\end{tikzpicture}
 \end{center}
 
 
-This is known as the TCP Slow start and this is used by the protocol to naturally align itself into the network eco-system, it starts off with a modest transfer rate to prevent situations where an initial abnormally large transfer rate would fill buffers and cause network congestion and adjusts by incorporating the techniques explained above to manually adjust its transfer rate to fit naturally into the current network.
+This is known as the TCP Slow Start and this is used by the protocol to naturally align itself into the network eco-system, it starts off with a modest transfer rate to prevent situations where an initial abnormally large transfer rate would fill buffers and cause network congestion and adjusts by incorporating the techniques explained above to manually adjust its transfer rate to fit naturally into the current network.
  

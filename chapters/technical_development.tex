@@ -48,9 +48,6 @@ Jitter mode clumps and separates packets in their transmission, with some it wai
 \subsection{ARP Spoofing}
 The script also supports an ARP spoofing mode that allows it to sit between a gateway and a specified target. This means the script can perform all its functions on a single target with a very quick deployment time. As touched on in the background the ARP protocol performs no authentication on any changes to the ARP cache meaning that you can perform a man in the middle attack and route traffic through a machine of your choice.
 
-
-%TODO - Does this section need to be in the background [# 1]
-%<1>
 The script begins by grabbing the MAC addresses connected to the provided gateway and target IP addresses. Two ARP reply packets (denote by the `2' opcode) are sent out: One telling the victim that the current machines MAC address maps to the gateway, and the other telling the gateway that the victims IP maps to the current machines MAC address.
 
 Below is the process visualised:
@@ -62,7 +59,6 @@ As you can see both ends are connected and have gone through the process to reso
 Note after the 3rd device connects to the network, both devices gain a record of its IP and MAC address in their ARP cache. 
 
 After both spoofed packets have been send out the ARP cache for each receiving end gets updated, the text in red shows the changes caused by the spoofed ARP packets. Now when either end wants to talk to each other it will resolve the MAC address and send it with the new MAC address in the table, this will therefore get routed through the attacking PC and will allow the script to receive all the traffic between the two parties.
-%</1>
 
 \subsection{Network Attacks}
 A couple of network attacks were implemented into the script, these served the purpose of providing very heavy artificial traffic designed to create heavy loads or mess with integral protocols. Not many attacks were added as they don't provide much purpose apart from stress testing and they reside on the edge of the scope of this project. There will also be a brief discussion into possible techniques to mitigate the effects. 
