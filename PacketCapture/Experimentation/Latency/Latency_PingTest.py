@@ -8,6 +8,24 @@ from BaseClasses.Base_PingTest import PingTest
 from Effects.Latency import Latency
 #endregion Imports
 
+"""
+# ============================= # TEST SCRIPT # ============================= # 
+Description:
+    Test that is looking for accuracy of simulated latency
+
+Testing Method:
+    Localhost ping test
+
+Values obtained:
+    - Latency Value (Target)
+    - Average latency
+    - Error (%)
+    - Difference (ms)
+    - Data
+
+# =========================================================================== # 
+"""
+
 
 class LatencyPingTest(PingTest):
     """Test that looks for the accuracy in the simulation of latency"""
@@ -18,7 +36,11 @@ class LatencyPingTest(PingTest):
                          start_effect_value=1,
                          effect_step=10,
                          repeat_tests=1,
-                         data_headers=['Latency value (ms)', 'Average Latency', 'Error', 'Difference', 'Raw Values'],
+                         data_headers=['Latency value (ms)',
+                                       'Average Latency',
+                                       'Error',
+                                       'Difference',
+                                       'Raw Values'],
                          max_test_time=60,
                          print_time_estimate=False)
 

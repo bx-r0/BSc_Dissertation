@@ -10,8 +10,19 @@ from TcpCongestionControl import TcpCongestionControl
 #endregion Imports
 
 
+"""
+# ============================= # TEST SCRIPT # ============================= # 
+Description:
+
+Testing Method:
+    
+Values obtained:
+    
+# =========================================================================== # 
+"""
+
+
 class PacketLossTransferRateTest(Base_Test):
-    """Test that increases the packet loss and obtains the values for retransmissions"""
 
     def __init__(self):
         super().__init__('PacketLossTransferRate',

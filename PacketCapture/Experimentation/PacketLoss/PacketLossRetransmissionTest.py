@@ -8,6 +8,18 @@ from BaseClasses.Base_Test import Base_Test
 from Effects.PacketLoss import PacketLoss
 #endregion Imports
 
+"""
+# ============================= # TEST SCRIPT # ============================= # 
+Description:
+    Test that increases packet loss while keeping track of retransmissions
+
+Testing Method:
+
+Values obtained:
+
+# =========================================================================== # 
+"""
+
 
 class PacketLossRetranTest(Base_Test):
     """Test that increases the packet loss and obtains the values for retransmissions"""

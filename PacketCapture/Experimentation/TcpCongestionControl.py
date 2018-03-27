@@ -5,6 +5,8 @@ import subprocess
 class TcpCongestionControl:
 
     """
+    Allows for changing of congestion control algorithms with a static object
+
     Algorithms:
         'reno'  -
         'cubic' -

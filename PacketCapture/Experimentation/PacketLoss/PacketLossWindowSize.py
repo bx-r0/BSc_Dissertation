@@ -7,6 +7,16 @@ from BaseClasses.Base_Test import Base_Test
 from Effects.PacketLoss import PacketLoss
 #endregion Imports
 
+"""
+# ============================= # TEST SCRIPT # ============================= # 
+Description:
+
+Testing Method:
+
+Values obtained:
+
+# =========================================================================== # 
+"""
 
 class PacketLossWindowSize(Base_Test):
     """Test that compares Packet loss with the windows size of a packet"""

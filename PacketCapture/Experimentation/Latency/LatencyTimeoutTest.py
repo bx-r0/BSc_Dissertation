@@ -8,6 +8,21 @@ from Effects.Latency import Latency
 #endregion Imports
 
 
+# TODO: This script needs a redesign
+#   - What am I try to test for here?
+"""
+# ============================= # TEST SCRIPT # ============================= # 
+Description:
+    Test that is designed to pauses
+
+Testing Method:
+
+Values obtained:
+
+# =========================================================================== # 
+"""
+
+
 class LatencyTimeOutTest(Base_Test):
     """Test that compares Latency with the number of retransmissions, it should at some point have a very
     large increase in the retransmissions when the latency timeout value is obtained """

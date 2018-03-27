@@ -3,10 +3,22 @@ import subprocess
 
 
 class TestResult:
+    """
+    Class that encases IPEF functionality into an object
 
-    # TODO: Need to add server instance per test
+    Dictionary Options
+    ------------------
+    Interval
+    Transfer
+    Bandwidth
+    Write
+    Err
+    Rtry
+    Cwnd
+    RTT
+    """
 
-    def __init__(self, update_interval=0, test_time=5):
+    def __init__(self, update_interval=0, test_time=5, address='127.0.0.1'):
         """
         Bandwidth and Transfer are measured in :
                 MB (Transfer)
@@ -14,15 +26,17 @@ class TestResult:
         :param test_time: - Length of the test (default: 10)
         """
 
-        self.CMD = "sudo iperf -c 127.0.0.1 -t {} -f m".format(test_time)
+        self.CMD = "sudo iperf -c {} -t {} -f m".format(address, test_time)
 
         if update_interval > 0:
             self.CMD += ' -i {}'.format(update_interval)
 
+        # Single tests
         self.retransmissions = None
         self.bandwidth = None
         self.total_transferred = None
 
+        # For multi tests
         self.results_dict = {}
 
     def run_test(self):
@@ -80,8 +94,11 @@ class TestResult:
         return float(bandwidth), float(transfer)
 
     def extract_stats_update(self, output):
+        """
+        Extracts stats from an update line that is specified with the -i option
+        :param output: Entire output from the script
+        """
 
-        results = []
         lines = bytes(output).decode('utf-8').split('\n')
 
         # Removes the first 6 lines and the final line

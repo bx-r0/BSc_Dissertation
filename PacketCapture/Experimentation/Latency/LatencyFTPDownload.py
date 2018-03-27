@@ -9,6 +9,22 @@ from Effects.Latency import Latency
 #endregion Imports
 
 
+"""
+# ============================= # TEST SCRIPT # ============================= # 
+Description:
+    Test that uses FTP to calculate the speed of the ftp download
+
+Testing Method:
+    External/Internal FTP server
+
+Values obtained:
+    - Latency value
+    - FTP download time
+
+# =========================================================================== # 
+"""
+
+
 class LatencyFTPDownload(Base_Test):
     """Checks the download time for 512KB file.
     CSV Format:

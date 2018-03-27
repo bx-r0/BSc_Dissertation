@@ -10,12 +10,38 @@ from Effects.PacketLoss import PacketLoss
 from TcpCongestionControl import TcpCongestionControl
 #endregion Imports
 
+"""
+# ============================= # TEST SCRIPT # ============================= # 
+Description:
+    Test that uses PacketLossTimeDrop.py to drop packets and measure stats 
+    around that connection.
+    
+    The run_test() method can be used to run multiple tests per script and 
+    change values like congestion algorithm and values to be saved
+
+Testing Method:
+    IPERF 
+        - Local 
+        - Public server
+        
+Values obtained:
+    - Interval
+    - Transfer
+    - Bandwidth
+    - Write
+    - Err
+    - Rtry
+    - Cwnd
+    - RTT
+# =========================================================================== # 
+"""
+
 
 class PacketLossTransferRateTestOverTime(Base_Test):
     """Test that increases the packet loss and obtains the values for retransmissions"""
 
     def __init__(self):
-        super().__init__('PacketLossTransferRateOverTime',
+        super().__init__('PacketLoss_Stats_OverTime',
                          max_effect_value=0,
                          start_effect_value=0,
                          effect_step=1,
@@ -30,18 +56,10 @@ class PacketLossTransferRateTestOverTime(Base_Test):
         self.PACKET_LOSS_INTERVAL = 1
         self.TEST_TIME = 10
 
-        self.CONGESTION_ALGO = 'reno'
+        self.CONGESTION_ALGO = 'cubic'
 
-    # Dictionary Options
-    # ------------------
-    # Interval
-    # Transfer
-    # Bandwidth
-    # Write
-    # Err
-    # Rtry
-    # Cwnd
-    # RTT
+        #self.IPERF_ADDRESS = '127.0.0.1'
+        self.IPERF_ADDRESS = 'ping.online.net'
 
     def custom_test_behavior(self, packet_loss_value, data):
         """
@@ -51,32 +69,58 @@ class PacketLossTransferRateTestOverTime(Base_Test):
         :return: Returns the altered data to be used in the .csv
         """
 
+        # Comment out rows here to change what is saveds
+        requested_info = [
+            'Interval',
+            'Cwnd',
+            'Transfer',
+            'Bandwidth',
+            'Write',
+            'Err',
+            'Rtry',
+            'RTT'
+            ]
+
         # NOTE: Command is needed to stop tcp from saving session stats
         os.system('sysctl -w net.ipv4.tcp_no_metrics_save=0')
 
-        TcpCongestionControl.set_algorithm(self.CONGESTION_ALGO)
+        packet_loss_obj = PacketLossTimeDrop(self.PACKET_LOSS_INTERVAL, gather_stats=False, show_output=False)
+        self.run_test(None, requested_info, 'cubic')
+        self.run_test(None, requested_info, 'reno')
 
-        packet_loss_obj = PacketLossTimeDrop(self.PACKET_LOSS_INTERVAL,
-                                             gather_stats=False,
-                                             show_output=False)
-
-        IperfResult = self.run_iperf_multi(None,
-                                           'TCP',
-                                           update_interval=self.UPDATE_INTERVAL,
-                                           test_time=self.TEST_TIME)
-
-        requested_info = ['Interval', 'Cwnd', 'Transfer', 'Bandwidth', 'Write', 'Err', 'Rtry', 'RTT']
-
-        for x in requested_info:
-            self.add_data(IperfResult, x)
-
-        print('Actual Retransmissions {}'.format(IperfResult.retransmissions))
-
-        TcpCongestionControl.reset()
 
         return data
 
+    def run_test(self, effect_obj, requested_info, congestion_algo):
+        """
+        Runs the test with required data and congestion algorithm used
+        :param effect_obj: - Effect object used to run the test
+        :param requested_info: - The data headings required
+        :param congestion_algo: - Name of the congestion algorithm
+        :return:
+        """
+
+        TcpCongestionControl.set_algorithm(congestion_algo)
+        IperfResult = self.run_iperf_multi(effect_obj,
+                                           'TCP',
+                                           update_interval=self.UPDATE_INTERVAL,
+                                           test_time=self.TEST_TIME,
+                                           address=self.IPERF_ADDRESS)
+        self.save_csv([''])
+        self.save_csv([congestion_algo])
+        for x in requested_info:
+            self.add_data(IperfResult, x)
+
+        TcpCongestionControl.reset()
+
     def add_data(self, IperfResult, key):
+        """
+        Saves a list of data to .csv
+        :param IperfResult: - The IPERF test object
+        :param key: - The name of the data in the dictionary
+        :return:
+        """
+
         cwnd_list = [key]
         for i in IperfResult.results_dict[key]:
             cwnd_list.append(i)

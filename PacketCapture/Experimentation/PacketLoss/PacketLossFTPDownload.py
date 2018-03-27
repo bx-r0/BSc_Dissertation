@@ -8,6 +8,22 @@ from BaseClasses.Base_Test import Base_Test
 from Effects.PacketLoss import PacketLoss
 #endregion Imports
 
+"""
+# ============================= # TEST SCRIPT # ============================= # 
+Description:
+    Test that uses FTP to calculate download times when using a FTP download 
+    connection
+
+Testing Method:
+    External/Internal FTP connection
+
+Values obtained:
+    - Packet Loss
+    - File Download Time
+
+# =========================================================================== # 
+"""
+
 
 class PacketLossFTPDownload(Base_Test):
 
