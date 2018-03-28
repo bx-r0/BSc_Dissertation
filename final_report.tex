@@ -17,7 +17,10 @@
 \usepackage{parskip}
 \usepackage{tikz-uml}
 \usepackage{tikz}
+\usepackage{tcolorbox}
 \usepackage{longtable}
+\tcbuselibrary{listings,skins}
+\usetikzlibrary{calc}
 
 \usetikzlibrary{arrows.meta}
 \usetikzlibrary{chains}
@@ -34,9 +37,45 @@
 % Custom fonts
 \newenvironment{console_font}{\fontfamily{pcr}\selectfont}{\par}
 
-\begin{document}
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+ 
+\lstdefinestyle{mystyle}{
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{blue},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\footnotesize\ttfamily ,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left, 
+    columns=fixed,                                   
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2,
+    language=Python,
+    numberstyle=\tiny, 
+	numbersep=8pt
+}
 
-	
+%Used to format code listings
+\newtcblisting{Code}[2][]{
+	colback=white,
+    arc=0pt, outer arc=0pt,
+    listing only, 
+    listing style=mystyle,
+    title=#2,
+    hbox,
+    #1
+}
+
+
+\begin{document}
 
 	%Title Page
 	\title{Compromised and Degraded Network Simulation}
@@ -45,8 +84,9 @@
 	\newcommand{\progname}{Computer Science}
 	\author{Aidan Fray}
 	\newcommand{\wordcount}{X}
-	%\input{title_page/page}		
 
+	% Document format
+	%\input{title_page/page}		
 	\newpage
 	\tableofcontents
 	\input{chapters/introduction}
@@ -54,7 +94,7 @@
 	\input{chapters/background}
 	\input{chapters/technical_development}
 	\input{chapters/evaluation}
-	%\input{chapters/conclusion}
+	\input{chapters/conclusion}
 	%\input{chapters/appendix}
 	
 	%\bibliographystyle{hull}

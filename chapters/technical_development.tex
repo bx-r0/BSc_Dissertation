@@ -17,8 +17,17 @@ Below is the system architecture for the degradation tool:
 	\end{figure}
 \end{center}
 
-
 It was decided early on that the script was to be controlled by two forms of interfaces; Graphical User Interface (GUI) and a text based Command Line Interface (CLI). This was to allow the tool to be run on the router (CLI) and also run on separate machines (GUI or CLI), this makes the tool versatile to many situations.
+
+The system design is split into two stages:
+
+\begin{itemize}
+\item {\bf NFQUEUE Setup}\\
+This section involves the creation of the NFQUEUE object, the binding of effect method to the queue and initialisation of variables dictating preferences.
+
+\item {\bf NFQUEUE Running}\\
+Each packet that is placed into the queue triggers this section, the handler is called that assigns a task to run the selected effect on the packet to one of the worker threads in a previously created thread pool. This allows custom effects alongside filtering can be dynamically applied to all the packets.
+\end{itemize}
 
 \subsection{Parameter Handling}
 Parameter handling is only required on the CLI due to the unrestricted input of the interface. Below is the activity diagram for the parameter handling process:
@@ -30,10 +39,9 @@ Parameter handling is only required on the CLI due to the unrestricted input of 
 	\end{figure}	
 \end{center}
 
+The parameter handling as stated previously is only required if the command line interface is used, this adds a little overhead in processing when using the command line but it is an unavoidable process. The error section when the `Usage' is printed will stop the entire program from continuing and will print a structured help message with the required format of the command. For most errors human readable output will be produces the aid in the debugging of the entered command.
 
-The parameter handling as stated previously is only required if the command line is used, this adds a little overhead in processing when using the command line but it is an unavoidable process. The error section when the 		`Usage' is printed will stop the entire program from continuing and will print a structured help message with the required format. For most errors human readable output will be produces the aid in the debugging of the entered command.
-
-\subsection{Effect Choice}
+\subsection{Effect Choice \& NQUEUE Creation}
 
 \begin{center}
 	\input{diagrams/UML/effectChoiceAD}
@@ -43,16 +51,17 @@ The parameter handling as stated previously is only required if the command line
 \end{center}
 
 
-Choosing a mode for the program gives the ability to switch between degradation effect and arrangement of effects. This process is exactly the same for GUI and CLI:
+Choosing a mode for the program gives the ability to switch between degradation effect and arrangement of effects. This process is exactly the same for GUI and CLI. This is due to the shared code between the different user interfaces, all the CLI does is add a wrapper on top that allows control of the concealed code by the way of parsed arguments and the GUI just directly calls these methods when buttons are clicked.
 
+\subsection{Incoming Packets}
+\begin{center}
+	\input{diagrams/UML/incommingPacketAD}
+	\begin{figure}[h]
+		\caption{Activity diagram for running an effect on a single packet}
+	\end{figure}
+\end{center}
 
-
-
-%TODO - Explain Activity Diagram
-
-\subsection{NFQUEUE Creation}
-%TODO
-
+Above is the activity diagram for the process of running an effect on a single packet. The script automatically effects every packet that is placed in the NFQUEUE, this means protocol support does not need to be managed and no code manipulating or monitoring sockets is required.
 
 % Section Description:
 %
@@ -116,6 +125,21 @@ So for example to move all packets entering from the network card into the NFQUE
 Where `-a' tells to append a rule onto the `INPUT' table and `-j' is the rule that affects the packet, in this case pushing it into the default queue.
 
 This forms the main component of the functionality of the script, a series of iptable rules that filter packets into the NFQUEUE and allow to script to perform verdicts on each packet separately allows for effects to be easily applied to packets entering and leaving the machine.
+
+
+
+The NFQUEUE is created like so: 
+\begin{center}
+\begin{Code}[]{NFQUEUE Creation}
+# Setup for the NQUEUE
+nfqueue = NetfilterQueue()
+
+try:
+	nfqueue.bind(0, mode)  # 0 is the default NFQUEUE
+except OSError:
+	print_force("[!] Queue already created")
+\end{Code}
+\end{center}
 
 \subsection{Degradation Effects}
 The script contains the functionality to simulate a plethora of effects and each effects functionality will be described below. Please not any of these effects can be chained together in any order.

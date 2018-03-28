@@ -15,10 +15,17 @@
 
 	\node (start) [shape=circle, fill=black]{};
 	
-	\node (setQueue) [right of=start, normal, xshift=\widthEffectChoice]{Binds the NFQUEUE's `Mode' to chosen effect};
-	\node (setVariables) [right of=setQueue, normal, xshift=\widthEffectChoice]{Sets all preference variables by parsed arguments};
-	\node (userOutput) [below of=setVariables, normal, yshift=-\widthEffectChoice + 2cm]{Displays summary of chosen modes and prefrences to the user};
-	\node (runNfqueue) [left of=userOutput, normal, xshift=-\widthEffectChoice]{NFQUEUE Object is then run. That will pass all packets to the assigned 'Mode'};
+	\node (setQueue) [right of=start, normal, xshift=\widthEffectChoice]
+	{Binds the NFQUEUE's `Mode' to chosen effect};
+	
+	\node (setVariables) [right of=setQueue, normal, xshift=\widthEffectChoice]
+	{Sets all \\ preference \\ variables by parsed \\ arguments};
+	
+	\node (userOutput) [fill=blue!15, below of=setVariables, normal, yshift=-\widthEffectChoice + 2cm]
+	{Displays summary of chosen modes and prefrences to the user};
+	
+	\node (runNfqueue) [left of=userOutput, normal, xshift=-\widthEffectChoice]
+	{NFQUEUE Object is then run. That will pass all packets to the assigned 'Mode'};
 
 	\node (end) [shape=circle, fill=black, below of=start, yshift=-\widthEffectChoice + 2cm]{};
 
