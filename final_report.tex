@@ -36,6 +36,7 @@
 
 % Custom fonts
 \newenvironment{console_font}{\fontfamily{pcr}\selectfont}{\par}
+\newcommand*{\code}{\ttfamily\selectfont}
 
 \definecolor{codegreen}{rgb}{0,0.6,0}
 \definecolor{codegray}{rgb}{0.5,0.5,0.5}
@@ -44,10 +45,10 @@
  
 \lstdefinestyle{mystyle}{
     commentstyle=\color{codegreen},
-    keywordstyle=\color{blue},
+    keywordstyle={\bf \color{blue}},
     numberstyle=\tiny\color{codegray},
     stringstyle=\color{codepurple},
-    basicstyle=\footnotesize\ttfamily ,
+    basicstyle=\footnotesize\ttfamily,
     breakatwhitespace=false,         
     breaklines=true,                 
     captionpos=b,                    
@@ -57,7 +58,7 @@
     showspaces=false,                
     showstringspaces=false,
     showtabs=false,                  
-    tabsize=2,
+    tabsize=7,
     language=Python,
     numberstyle=\tiny, 
 	numbersep=8pt
@@ -65,12 +66,16 @@
 
 %Used to format code listings
 \newtcblisting{Code}[2][]{
+	top=0cm,
+	bottom=0cm,
+	left=0.5cm,
+	right=0cm,
 	colback=white,
-    arc=0pt, outer arc=0pt,
+	colframe=black,
+    arc=1pt, outer arc=1pt,
     listing only, 
     listing style=mystyle,
     title=#2,
-    hbox,
     #1
 }
 
@@ -88,7 +93,7 @@
 	% Document format
 	%\input{title_page/page}		
 	\newpage
-	\tableofcontents
+	%\tableofcontents
 	\input{chapters/introduction}
 	\input{chapters/aim_objectives}
 	\input{chapters/background}

@@ -126,11 +126,12 @@ Where `-a' tells to append a rule onto the `INPUT' table and `-j' is the rule th
 
 This forms the main component of the functionality of the script, a series of iptable rules that filter packets into the NFQUEUE and allow to script to perform verdicts on each packet separately allows for effects to be easily applied to packets entering and leaving the machine.
 
+Below is code for the creation of the NFQUEUE object along side the iptable rules:
+\begin{Code}[]{NFQUEUE}
+# iptables
+os.system("iptables -A INPUT -j NFQUEUE")
+os.system("iptables -A OUTPUT -j NFQUEUE")
 
-
-The NFQUEUE is created like so: 
-\begin{center}
-\begin{Code}[]{NFQUEUE Creation}
 # Setup for the NQUEUE
 nfqueue = NetfilterQueue()
 
@@ -138,8 +139,25 @@ try:
 	nfqueue.bind(0, mode)  # 0 is the default NFQUEUE
 except OSError:
 	print_force("[!] Queue already created")
+	
+nfqueue.run()
 \end{Code}
-\end{center}
+
+In the code above the variable {\code mode} contains a method that performs effects on the packets. An example below shows what {\code mode} would equal if the effect chosen was latency:
+
+\begin{Code}{Latency Packet Mode}
+def packet_latency(packet):
+    """This function is used to incur latency on packets"""
+    if affect_packet(packet):
+        assign_thread(latency_obj.effect, [[packet, time.time()]])
+    else:
+        packet.accept()
+\end{Code}
+
+There are a couple of aspect to note in the above code listing:
+{\code affect\_packet} is the method that checks the packet against the active filters. {\code assign\_thread} is the method that assigns the object effect method ({\code latency\_obj.effect}) to an idle thread in the pool and 
+{\code packet.accept()} and {\code packet.drop()} are the ways the packet is assigned a verdict, this can be done at any point in the code and becomes instantly active.
+
 
 \subsection{Degradation Effects}
 The script contains the functionality to simulate a plethora of effects and each effects functionality will be described below. Please not any of these effects can be chained together in any order.
@@ -147,11 +165,83 @@ The script contains the functionality to simulate a plethora of effects and each
 \subsubsection{Latency}
 Latency as described in the background section is the delay in initiating a task and seeing its results. Latency is simulated by using a timing mechanisms where the arrival time of the packet is saved. The packet is then pushed into the NFQUEUE that triggers a single thread that will hold the packet for a set amount of time, the holding time is calculated by taking the amount of time the packet has already been in the script away from the target time. The packet is then marked as `ACCEPTED' and pushed out of the queue.
 
+\begin{Code}{Latency}
+def custom_effect(self, packet):
+	"""Thread functionality"""
+
+	# # Dynamic time mode
+	# Parameters contained within a single object
+	if type(packet) is list:
+		packetObj = packet[0]
+		startTime = packet[1]
+
+		# Works out the time difference between
+		# thread conception and now
+		elapsed = time.time() - startTime
+            
+		# Take the elapsed time off the target
+		wait_time = self.latency_value - elapsed
+
+		if wait_time < 0:
+			pass
+		else:
+			time.sleep(wait_time)
+			self.accept(packetObj)
+			
+		# # Static time mode
+		else:
+			time.sleep(self.latency_value)
+			self.accept(packet)
+
+\end{Code}
+
 \subsubsection{Packet Loss}
 Packet loss is simulated by first assigning a target value, lets say for this example 10\%. For each packet the script randomly generates a number between 1 and 100, if that value is less than the target value the packet is dropped, and if the value is larger the packet is accepted. This therefore creates the effect of packet loss. It does however require a fair amount of packets to balance out statistically and reach the percentage target.
 
+\begin{Code}{Packet Loss}
+def custom_effect(self, packet):
+        """This function will issue packet loss,
+           a percentage is defined and anything
+           lower is dropped and anything higher is accepted"""
+
+        if self.packet_loss_percentage != 0:
+
+            # random value from 0 to 100
+            random_value = random.uniform(0, 100)
+
+            if self.packet_loss_percentage > random_value:
+                self.dropped_packets += 1
+                packet.drop()
+
+            # Accept the packet
+            else:
+                self.accept(packet)
+        else:
+            self.accept(packet)
+\end{Code}
+
 \subsubsection{Bandwidth}
 There are two modes created for bandwidth; rate limiting and a simple display. Rate limiting allows the script to limit the rate of bandwidth flowing through the machine and calculates the rate transferred over a period of 5 seconds, if the rate is higher it waits until the rate drops below the target. This gives it the ability to adjust quickly and allows the script to be run for a long period of time without the overall average of the bandwidth affecting future changes. Displaying the bandwidth work exactly the same but without the limit check, this is useful when checking the current download speeds or the max transfer rate.
+
+Limiting bandwidth is below:
+
+\begin{Code}{Bandwidth Limit}
+def custom_effect(self, packet):
+	"""Used to limit the bandwidth"""
+
+	# Adds packet to the backlog
+	self.packet_backlog.append(packet)
+	
+	# The algorithm will send until the backlog is empty or 
+	# the limit is exceeded
+	while self.rate < self.bandwidth and len(self.packet_backlog) > 0:
+		self.send_packet(self.packet_backlog[0])
+            
+		# Packet is removed from the list
+		del self.packet_backlog[0]
+			
+		self.calculate_rate_overall_avg()
+\end{Code}
 
 \subsubsection{Out-of-order}
 This effect changes the order of packets coming into the script, this can be used to check its effect on UDP and TCP and can test how quickly these issue can be rectified. It works by queuing up every packet into a list, then a single thread randomly picks an index of that list, accepts the packet and allows it to leave. This therefore means at its most extreme the order can be last in, first out.
