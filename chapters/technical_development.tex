@@ -5,8 +5,101 @@
 
 \chapter{Technical Development}
 
-\section{Overview}
-\subsection{Script Design}
+% Section Description:
+%
+\section{Tool Architecture}
+Below is the system architecture for the degradation tool:
+
+\begin{center}
+	\input{diagrams/system_design}
+	\begin{figure}[h]
+		\caption{Architecture of the overall degradation tool}
+	\end{figure}
+\end{center}
+
+
+It was decided early on that the script was to be controlled by two forms of interfaces; Graphical User Interface (GUI) and a text based Command Line Interface (CLI). This was to allow the tool to be run on the router (CLI) and also run on separate machines (GUI or CLI), this makes the tool versatile to many situations.
+
+\subsection{Parameter Handling}
+Parameter handling is only required on the CLI due to the unrestricted input of the interface. Below is the activity diagram for the parameter handling process:
+
+\begin{center}
+	\input{diagrams/UML/parameterAD}
+	\begin{figure}[h]
+		\caption{UML Activity Diagram for parsing and handling parameters}
+	\end{figure}	
+\end{center}
+
+
+The parameter handling as stated previously is only required if the command line is used, this adds a little overhead in processing when using the command line but it is an unavoidable process. The error section when the 		`Usage' is printed will stop the entire program from continuing and will print a structured help message with the required format. For most errors human readable output will be produces the aid in the debugging of the entered command.
+
+\subsection{Effect Choice}
+
+\begin{center}
+	\input{diagrams/UML/effectChoiceAD}
+	\begin{figure}[h]
+		\caption{UML Activity Diagram for assigning the choice of effect}
+	\end{figure}
+\end{center}
+
+
+Choosing a mode for the program gives the ability to switch between degradation effect and arrangement of effects. This process is exactly the same for GUI and CLI:
+
+
+
+
+%TODO - Explain Activity Diagram
+
+\subsection{NFQUEUE Creation}
+%TODO
+
+
+% Section Description:
+%
+\section{Tool Class Design}
+\subsection{Effect Class Diagram}
+
+\begin{center}
+	\input{diagrams/UML/effect_class_diagram}
+	\begin{figure}[h]
+		\caption{UML Class diagram for producing degradation effects}
+	\end{figure}
+\end{center}
+
+The above design is for the various effects that will be implemented into the program. They will be self contained within separate modules encased in an object. This was chosen so each effect is modular and self contained from one another, this will improve the potential readability and maintainability of the code base, it will also make the code base much more scalable where effects can be added with high speed because of the lack of repeated code.  Each effect will inherit from the base class ``Effect", where it will obtain method and properties used for functionality, boolean variables for allowing printing and accepting packets, these are both necessary when `chaining' effects together, where a packet can only be accepted once and only a single print will be required.
+
+\subsection{Effect Activity Diagram}
+\begin{center}
+	\includegraphics[scale=0.6]{Packet_Activity_Diagram}
+	\begin{figure}[h]
+		\caption{Activity Diagram for the degradation script}
+	\end{figure}
+\end{center}
+
+Above is the activity diagram for the packet script that will implement the effect classes above, this script will be utilised directly from the command line or run by the GUI. The decision of having a single script that is controlled by multiple ways allow for one central point of functionality and means code can be shared throughout the project. The activity diagram shows the design choices for the direct control on the script. SIGINT is mentioned in the centre of the diagram, SIGINT is a built in signal in the Linux operating system that represents an interrupt signal, where it is triggered by pressing ``Control + C", this is the most common/clean way of stopping a script. The other alternatives to closing the script ``Control + Z" (SIGTSTP) and ``Control + /" (SIGQUIT) will be remapped to send a SIGINT signal and perform the same role, this will mean the program has one tidy point of closure.
+
+
+
+
+% Section Description:
+%
+\section{Tool UI Design}
+One of the ways mentioned before to control the degradation effects is by a user interface. It needs to have a way to easily add new buttons and text entries that link up to parameters in the script to make the interface scalable and easy to maintain, it also needs a window to display the same output as the terminal window, this can be achieved by `piping' the stdout to a custom section of the user interface. The `stdout' is the data stream that links up to a Linux terminal window, if the stdout points to somewhere else it will display where it is needed. Below is the initial drafted design for the user interface.
+
+\begin{center}
+	\includegraphics[scale=0.5]{Packet_UI_Design}
+	\begin{figure}[h]
+		\caption{Initial user interface design for the Degradation GUI}
+	\end{figure}
+\end{center}
+
+
+
+% Section Description:
+%
+\section{Tool Implementation}
+
+\subsection{NFQUEUE}
 The script utilises a section in the Linux kernel referred to as the ``NFQUEUE". This is as the name suggests a queue that is stored in kernel memory that will store up packets until the user provides one of the two verdicts: `Drop' or `Accept'. The packets are pushed into this queue by the use of `iptable' rules, iptabales is a tool designed to filter packets by criteria. Below is a flow diagram for the path a packet might take, each table can have filtering rules embedded into to it:
 
 % Diagram
@@ -27,22 +120,22 @@ This forms the main component of the functionality of the script, a series of ip
 \subsection{Degradation Effects}
 The script contains the functionality to simulate a plethora of effects and each effects functionality will be described below. Please not any of these effects can be chained together in any order.
 
-\subsubsection*{Latency}
+\subsubsection{Latency}
 Latency as described in the background section is the delay in initiating a task and seeing its results. Latency is simulated by using a timing mechanisms where the arrival time of the packet is saved. The packet is then pushed into the NFQUEUE that triggers a single thread that will hold the packet for a set amount of time, the holding time is calculated by taking the amount of time the packet has already been in the script away from the target time. The packet is then marked as `ACCEPTED' and pushed out of the queue.
 
-\subsubsection*{Packet Loss}
+\subsubsection{Packet Loss}
 Packet loss is simulated by first assigning a target value, lets say for this example 10\%. For each packet the script randomly generates a number between 1 and 100, if that value is less than the target value the packet is dropped, and if the value is larger the packet is accepted. This therefore creates the effect of packet loss. It does however require a fair amount of packets to balance out statistically and reach the percentage target.
 
-\subsubsection*{Bandwidth}
+\subsubsection{Bandwidth}
 There are two modes created for bandwidth; rate limiting and a simple display. Rate limiting allows the script to limit the rate of bandwidth flowing through the machine and calculates the rate transferred over a period of 5 seconds, if the rate is higher it waits until the rate drops below the target. This gives it the ability to adjust quickly and allows the script to be run for a long period of time without the overall average of the bandwidth affecting future changes. Displaying the bandwidth work exactly the same but without the limit check, this is useful when checking the current download speeds or the max transfer rate.
 
-\subsubsection*{Out-of-order}
+\subsubsection{Out-of-order}
 This effect changes the order of packets coming into the script, this can be used to check its effect on UDP and TCP and can test how quickly these issue can be rectified. It works by queuing up every packet into a list, then a single thread randomly picks an index of that list, accepts the packet and allows it to leave. This therefore means at its most extreme the order can be last in, first out.
 
-\subsubsection*{Connection Simulation}
+\subsubsection{Connection Simulation}
 Connection simulation isn't quite a degradation effect but its intent is to simulate the effect of degradation on a common connection like `WiFi` or a 3G connection to see how these are effected by said degradation. This can be useful in some situations where for example testing a mobile applications performance over 3G with heavy latency, the mobile would connect to the script and the script would effect any traffic entering or leaving the handset.
 
-\subsubsection*{Jitter}
+\subsubsection{Jitter}
 Jitter mode clumps and separates packets in their transmission, with some it waits a small period of time other it will clump up delay as a total and then send them all at once. This is to test how the protocol deals with jitter in the connection. Jitter as explained in the background is the intra-packet latency i.e. the difference in time between arrivals of packets.
 
 \subsection{ARP Spoofing}
@@ -73,91 +166,10 @@ This attack works by once again exploiting the lack of authentication of the ARP
 
 This attack is relatively easy to execute but can simply be prevented by issuing static ARP tables for each machine, this prevents unsolicited ARP replies from changing IP and MAC address combinations and also prevents ARP Spoofing from occurring on that network.
 
-%System design:
-%This can include UML diagrams such as class diagrams, use case diagrams, activity diagrams, etc.
-%If you find that these are taking up a lot of space/words, then you should prioritise and relegate where appropriate to the appendices. 
-%This should not just be a list of unexplained diagrams, but should rather include discussions of the most interesting parts of your design, tying them to your background and objectives.
-\section{System design}
-
-\subsection{Class Structure}
-\subsubsection{Effect Class Diagram}
-
-\begin{center}
-	\input{diagrams/UML/effect_class_diagram}
-	\begin{figure}[h]
-		\caption{UML Class diagram for producing degradation effects}
-	\end{figure}
-\end{center}
-
-The above design is for the various effects that will be implemented into the program. They will be self contained within separate modules encased in an object. This was chosen so each effect is modular and self contained from one another, this will improve the potential readability and maintainability of the code base, it will also make the code base much more scalable where effects can be added with high speed because of the lack of repeated code.  Each effect will inherit from the base class ``Effect", where it will obtain method and properties used for functionality, boolean variables for allowing printing and accepting packets, these are both necessary when `chaining' effects together, where a packet can only be accepted once and only a single print will be required.
-
-%TODO - Other class diagrams needed?
-
-\subsubsection{Degradation effect Activity Diagram}
-
-\begin{center}
-	\includegraphics[scale=0.6]{Packet_Activity_Diagram}
-	\begin{figure}[h]
-		\caption{Activity Diagram for the degradation script}
-	\end{figure}
-\end{center}
-
-Above is the activity diagram for the packet script that will implement the effect classes above, this script will be utilised directly from the command line or run by the GUI. The decision of having a single script that is controlled by multiple ways allow for one central point of functionality and means code can be shared throughout the project. The activity diagram shows the design choices for the direct control on the script. SIGINT is mentioned in the centre of the diagram, SIGINT is a built in signal in the Linux operating system that represents an interrupt signal, where it is triggered by pressing ``Control + C", this is the most common/clean way of stopping a script. The other alternatives to closing the script ``Control + Z" (SIGTSTP) and ``Control + /" (SIGQUIT) will be remapped to send a SIGINT signal and perform the same role, this will mean the program has one tidy point of closure.
-
-%UI design:%
-%If your software includes user interaction then you could also include a discussion (supported by diagrams) of decisions that you have made regarding the user interface.%
-\section{UI design}
-\subsection{Degradation effect User Interface}
-One of the ways mentioned before to control the degradation effects is by a user interface. It needs to have a way to easily add new buttons and text entries that link up to parameters in the script to make the interface scalable and easy to maintain, it also needs a window to display the same output as the terminal window, this can be achieved by `piping' the stdout to a custom section of the user interface. The `stdout' is the data stream that links up to a Linux terminal window, if the stdout points to somewhere else it will display where it is needed. Below is the initial drafted design for the user interface.
-
-\begin{center}
-	\includegraphics[scale=0.5]{Packet_UI_Design}
-	\begin{figure}[h]
-		\caption{Initial user interface design for the Degradation GUI}
-	\end{figure}
-\end{center}
-
-%TODO - Include an actual picture of the UI now and how it has changed if at all
 
 %Experimental design:
 %If you project includes any experiments, including but not limited to user testing, then you can discuss their design here. Note that again this does not exist in a vacuum and should be tied to your research.
-\section{Experiential design}
-\subsection{Latency Accuracy}
-In the initial stages of the project there were experiments that tested the effects of the degradation on the network, the tests were performed on the loopback (Internal network 127.0.0.1) with ICMP ping packets.
 
-This test was designed to show the accuracy of different ways of simulating latency, the first way being a static timer that just causes the thread to sleep for a set amount of time or a dynamic timer that calculates the elapsed time since the creation of the thread and the command telling the thread to sleep, the dynamic timer takes this elapsed time off the target latency value.
-
-Below the results are visualised in a single graph. Please note - the relatively high percentage error in the small ranges of latency this is due to the error proportion being a much larger chunk of the overall target latency and therefore being a higher percentage error:
-
-\input{graphs/latency_accuracy}
-
-As you can see from the graph the dynamic form of issuing latency is overall more accurate in simulation, but however, it is still not perfect and there seems to be a small overall error present. This performance is however more than suitable for the scope of this project.
-
-\subsection{Visualising effects}
-The most effective way to visualise real world connections were running tests on SpeedTest.net \footnote{\url{http://beta.speedtest.net/}}. This is very useful to quickly visualise a certain effect on the network.
-
-Below are two images showing the effect of a 100ms latency on a networks speed. Both tests were performed on the same empty network and the best result was taken from 5 runs on each.
-
-\begin{center}
-	\includegraphics[scale=0.5]{SpeedNoEffect}
-	\begin{figure}[h]
-		\caption{The initial connection speed}
-	\end{figure}
-\end{center}
-
-\begin{center}
-	\includegraphics[scale=0.5]{Speed100ms}
-	\begin{figure}[h]
-		\caption{Network speed with a latency of 100m/s}
-	\end{figure}
-\end{center}
-
-As you can see from both images, the 100ms has evidently been applied effectively and the speed of the connection has dropped by around 10Mbps. This means in real world terms the time taken to download a 1GB file would take 35 seconds longer to download. This is not a considerable reduction but the latency is having a obvious effect on the network quality.
-
-
-%Test design and system testing:
-%Testing is an extremely important part of any software project and should not be a tacked on afterthought. You can include here a discussion of the design of any tests that you intend to carry out on your project. It would not be appropriate to include an exhaustive list of all the individual tests that you wish to conduct (consider the appendices for this) but examples would be useful to illustrate your discussion.
-%You should review how you have approached the testing and quality assurance of your delivered product, including relevant choice of incremental and/or integration testing, test scenarios, sample datasets, etc. as appropriate,  Exhaustive reproduction of extensive test records is not required, but sample evidence should be used to support your discussion.
 \section{Test design and system testing}
 There are various sections of the project that require a separate testing plan:
 
@@ -196,7 +208,41 @@ It was decided that a separate test plan was needed for the script that will be 
 Initially the methodology chosen to start development of the traffic simulation programs was ``Test Driven Development" \citep{beck2003test}, this was a tight methodology that increased development time and gave the added benefit of showing that new changes have not broken older functionality. This methodology was good to start off the project and allowed for a tight structure to be created where no time was wasted debugging previously working code, but as mentioned this methodology slowed development time down, this was chosen to be abandoned after 3-4 weeks to an ad-hoc approach. 
 This change was due to time restraints on the project and the less-important role that the traffic simulation programs had on the project compared to the degradation simulation script. The degradation script was developed in the ad-hoc approach, this was due to issue stated previously about the unknown aspects of the script and how it would be operating that it was decided that the time invested to write up test scripts would assume too much and would risk them having the be completely rewritten, tests therefore was added alongside new functionality.
 
-%System Implementation:$
-%You should review how you have implemented your project system, discussing any areas of the implementation which might for example involve code or processes which are not immesdiately obvious in structure or operation, where you have had to innovate or develop particular approaches.  Again, you should refer to relevant diagrams of code or object structures which should be included in documentation as appended.
-%\section{System Implementation}
 
+
+
+
+% Section Description
+%
+\section{Experiential design}
+\subsection{Latency Accuracy}
+In the initial stages of the project there were experiments that tested the effects of the degradation on the network, the tests were performed on the loopback (Internal network 127.0.0.1) with ICMP ping packets.
+
+This test was designed to show the accuracy of different ways of simulating latency, the first way being a static timer that just causes the thread to sleep for a set amount of time or a dynamic timer that calculates the elapsed time since the creation of the thread and the command telling the thread to sleep, the dynamic timer takes this elapsed time off the target latency value.
+
+Below the results are visualised in a single graph. Please note - the relatively high percentage error in the small ranges of latency this is due to the error proportion being a much larger chunk of the overall target latency and therefore being a higher percentage error:
+
+\input{graphs/latency_accuracy}
+
+As you can see from the graph the dynamic form of issuing latency is overall more accurate in simulation, but however, it is still not perfect and there seems to be a small overall error present. This performance is however more than suitable for the scope of this project.
+
+\subsection{Visualising effects}
+The most effective way to visualise real world connections were running tests on SpeedTest.net \footnote{\url{http://beta.speedtest.net/}}. This is very useful to quickly visualise a certain effect on the network.
+
+Below are two images showing the effect of a 100ms latency on a networks speed. Both tests were performed on the same empty network and the best result was taken from 5 runs on each.
+
+\begin{center}
+	\includegraphics[scale=0.5]{SpeedNoEffect}
+	\begin{figure}[h]
+		\caption{The initial connection speed}
+	\end{figure}
+\end{center}
+
+\begin{center}
+	\includegraphics[scale=0.5]{Speed100ms}
+	\begin{figure}[h]
+		\caption{Network speed with a latency of 100m/s}
+	\end{figure}
+\end{center}
+
+As you can see from both images, the 100ms has evidently been applied effectively and the speed of the connection has dropped by around 10Mbps. This means in real world terms the time taken to download a 1GB file would take 35 seconds longer to download. This is not a considerable reduction but the latency is having a obvious effect on the network quality.

@@ -1,0 +1,37 @@
+\newcommand{\widthParameter}{4cm}
+
+\tikzset{%
+	>={Latex[width=2mm,length=2mm]},
+	% Specifications for style of nodes:
+            base/.style = {draw=black,
+                           minimum width=\widthParameter, 
+                           text width=\widthParameter, 
+                           minimum height=1cm, 
+                           text centered},                           
+            decision/.style = {base, diamond, fill=yellow!15},
+            normal/.style = {base, rectangle, rounded corners}}
+
+\begin{tikzpicture}
+
+	\node (start) [shape=circle, fill=black]{};
+	
+	\node (command) [normal, right of=start, xshift=\widthParameter]{Command is entered};
+	\node (parse) [normal, right of=command, xshift=\widthParameter]{Parameters are parsed};
+	
+	\node (correctParam) [decision, below of=parse, yshift=\widthParameter * -1]{Parameters Correct?};
+	\node (showUsage) [normal, below of=correctParam, yshift=-\widthParameter, fill=red!15]{Show Usage and quit};
+	\node (saveParam) [normal, left of=correctParam, xshift=-\widthParameter * 2]{Call coresponding argument method with arguments};
+
+	\node (end) [shape=circle, fill=black, below of=saveParam, yshift=-\widthParameter]{};
+
+	\draw[->] (start)--(command);
+	\draw[->] (command)--(parse);
+	\draw[->] (parse)--(correctParam);
+	
+	\draw[->] (correctParam)--node[fill=white]{No}(showUsage);
+	\draw[->] (correctParam)--node[fill=white]{Yes}(saveParam);
+	
+	\draw[->] (saveParam)--(end);
+	\draw[->] (showUsage)--(end);
+
+\end{tikzpicture}
