@@ -6,13 +6,13 @@
   % Specifications for style of nodes:
             base/.style = {rectangle, rounded corners, draw=black,
                            minimum width=\width, minimum height=1cm,
-                           text centered, font=\sffamily},
+                           text centered},
             red/.style = {base, fill=red!15},
             blue/.style = {base, fill=blue!15}}
           
 
 \begin{center}
-\begin{tikzpicture}[node distance=1.5cm, every node/.style={fill=white, font=\sffamily}, align=center]
+\begin{tikzpicture}[node distance=1.5cm, every node/.style={fill=white}, align=center]
 
 	\node(User)[xshift=-10cm]{\includegraphics[scale=\imageScale]{User}};		
 	\node(UserText)[below of=User]{User};		

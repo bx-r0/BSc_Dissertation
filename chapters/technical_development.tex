@@ -113,6 +113,10 @@ The script utilises a section in the Linux kernel referred to as the ``NFQUEUE".
 
 % Diagram
 \input{diagrams/iptables}
+\begin{figure}[h]
+	\caption{Diagram showing the iptables map}
+	\label{ref:iptables}
+\end{figure}
 
 If there was a case where all packets entering the machine need filtering, an iptable rule would be added to the "Pre-Routing" section of the table to catch all packets entering the machine. 
 
@@ -142,6 +146,9 @@ except OSError:
 	
 nfqueue.run()
 \end{Code}
+\begin{figure}[h]
+	\caption{Programmatically creating an NFQUEUE}
+\end{figure}
 
 In the code above the variable {\code mode} contains a method that performs effects on the packets. An example below shows what {\code mode} would equal if the effect chosen was latency:
 
@@ -153,6 +160,9 @@ def packet_latency(packet):
     else:
         packet.accept()
 \end{Code}
+\begin{figure}[h]
+	\caption{Example of a potential structure of a {\code Mode}}
+\end{figure}
 
 There are a couple of aspect to note in the above code listing:
 {\code affect\_packet} is the method that checks the packet against the active filters. {\code assign\_thread} is the method that assigns the object effect method ({\code latency\_obj.effect}) to an idle thread in the pool and 
@@ -188,12 +198,15 @@ def custom_effect(self, packet):
 			time.sleep(wait_time)
 			self.accept(packetObj)
 			
-		# # Static time mode
-		else:
-			time.sleep(self.latency_value)
-			self.accept(packet)
+	# # Static time mode
+	else:
+		time.sleep(self.latency_value)
+		self.accept(packet)
 
 \end{Code}
+\begin{figure}[h]
+	\caption{Code that simulates latency on a connection}
+\end{figure}
 
 \subsubsection{Packet Loss}
 Packet loss is simulated by first assigning a target value, lets say for this example 10\%. For each packet the script randomly generates a number between 1 and 100, if that value is less than the target value the packet is dropped, and if the value is larger the packet is accepted. This therefore creates the effect of packet loss. It does however require a fair amount of packets to balance out statistically and reach the percentage target.
@@ -219,11 +232,14 @@ def custom_effect(self, packet):
         else:
             self.accept(packet)
 \end{Code}
+\begin{figure}[h]
+	\caption{Code that causes packet loss on all incoming traffic}
+\end{figure}
 
 \subsubsection{Bandwidth}
 There are two modes created for bandwidth; rate limiting and a simple display. Rate limiting allows the script to limit the rate of bandwidth flowing through the machine and calculates the rate transferred over a period of 5 seconds, if the rate is higher it waits until the rate drops below the target. This gives it the ability to adjust quickly and allows the script to be run for a long period of time without the overall average of the bandwidth affecting future changes. Displaying the bandwidth work exactly the same but without the limit check, this is useful when checking the current download speeds or the max transfer rate.
 
-Limiting bandwidth is below:
+Limiting bandwidth is displayed in Figure~\ref{ref:BandwidthCode} below:
 
 \begin{Code}{Bandwidth Limit}
 def custom_effect(self, packet):
@@ -242,6 +258,10 @@ def custom_effect(self, packet):
 			
 		self.calculate_rate_overall_avg()
 \end{Code}
+\begin{figure}[h]
+	\caption{Code that is used to limit the bandwidth of a connection}
+	\label{ref:BandwidthCode}
+\end{figure}
 
 \subsubsection{Out-of-order}
 This effect changes the order of packets coming into the script, this can be used to check its effect on UDP and TCP and can test how quickly these issue can be rectified. It works by queuing up every packet into a list, then a single thread randomly picks an index of that list, accepts the packet and allows it to leave. This therefore means at its most extreme the order can be last in, first out.
@@ -260,9 +280,17 @@ The script begins by grabbing the MAC addresses connected to the provided gatewa
 Below is the process visualised:
 
 \input{diagrams/ARP/arp_diagram_before}
+\begin{figure}[h]
+	\caption{Diagram displaying ARP Cache of a small network}
+\end{figure}
+
 As you can see both ends are connected and have gone through the process to resolve the IP addresses to MAC addresses, you can see above each device their corresponding IP, MAC and ARP Cache. The ARP cache as mentioned previously is a record linking IP addresses to MAC addresses.
 
 \input{diagrams/ARP/arp_diagram_after}
+\begin{figure}[h]
+	\caption{Diagram visualising the ARP Tables after a spoofing attack}
+\end{figure}
+
 Note after the 3rd device connects to the network, both devices gain a record of its IP and MAC address in their ARP cache. 
 
 After both spoofed packets have been send out the ARP cache for each receiving end gets updated, the text in red shows the changes caused by the spoofed ARP packets. Now when either end wants to talk to each other it will resolve the MAC address and send it with the new MAC address in the table, this will therefore get routed through the attacking PC and will allow the script to receive all the traffic between the two parties.
@@ -275,16 +303,108 @@ UDP flooding is a very simple attack, lots of UDP packets are created and send o
 
 The attack could be detected and prevented by a script that monitors the network transfers rates, this attack will create a huge spike in the transfer rate that can be detected and all traffic would be blocked from the sending party.
 
+\begin{Code}{UDP Flooding}
+  def effect(self):
+        """The main body of the attack"""
+
+        # Destination
+        port = random.randint(0, 65535)
+
+        # Creates a UDP packet with 1024 bytes of random data
+        # Scapy is used to construct the packet
+        pkt = bytes(IP(dst=self.target_ip) / UDP(sport=52, dport=port) / 
+        			Raw(load=random._urandom(1024)))
+
+        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+
+        while self.running:
+
+            # Uses the previously created socket to send
+            sock.sendto(pkt, (self.target_ip, port))
+			
+\end{Code}
+\begin{figure}[h]
+	\caption{Code displaying the sending of UDP packets}
+	\label{ref:UdpFloodingFigure}
+\end{figure}
+
+Figure~\ref{ref:UdpFloodingFigure} above is a section of code from the UDP flooding attack script. As mentioned previously around 10 threads will run the code at the same time in an attempt to maximise the throughput of UDP packets. The effects of the attack are visible on the targets end and causes a visual degradation in the connection speed.
+
 \subsubsection{ARP Spamming}
 This attack works by once again exploiting the lack of authentication of the ARP protocol. In the entire network mode the script starts by detecting all active hosts on a network, it then starts sending out falsified ARP reply packets with randomly generated MAC addresses inside. This results in all computers on the networking having incorrect ARP cache values and resulting in computers incorrectly resolving IP and MAC address combinations and traffic not being allowed through.
 
+\begin{Code}{ARP Spamming}
+def start(self):
+   while self.running:
+        
+       # Talks to every machine and changes the ARP value
+       # The list of hosts is obtained by an NMAP scan
+       for host_dst in self.active_hosts:
+           count = 0
+
+           for host_src in self.active_hosts:
+           if host_dst != host_src:
+                 
+           # Send the ARP packet - rnd_mac_addresses() creates
+           # a fully random  MAC address
+           self.send_arp_packet(host_dst, 
+                                host_src, 
+                                self.rnd_mac_addresses[count])
+                                         
+           count += 1
+
+
+
+def send_arp_packet(self, dst, src, mac, op_code=2):
+        
+    # Construction of the ARP Packet
+    pkt = ARP(op=2, 
+              pdst=dst, 
+              psrc=src, 
+              hwdst="ff:ff:ff:ff:ff:ff", 
+              hwsrc=mac)
+
+    send(pkt, verbose=0)
+					
+\end{Code}
+\begin{figure}[h]
+	\caption{Code from the ArpSpamming.py script}
+	\label{fig:ArpSpammingCode}
+\end{figure}
+
+
+Figure~\ref{fig:ArpSpammingCode} above shows the attack effecting the entire network, the scan finds all active hosts and returns them as a list that is then used as source and destination IP addresses that ultimately end up affecting the entire local networks ARP cache.
+
 This attack is relatively easy to execute but can simply be prevented by issuing static ARP tables for each machine, this prevents unsolicited ARP replies from changing IP and MAC address combinations and also prevents ARP Spoofing from occurring on that network.
+
+
+\subsection{Router Design}
+The router is required to create and access point and allow access to the internet. Traffic will be routed through the router that is destined for other location, this will mean traffic will flow through the "Forward" section of the iptables map (Refer to Figure: ~\ref{ref:iptables}). Therefore, a rule is required to catch any traffic from flowing into the machine. 
+
+The router also needs a couple of tools to manage the assigning of IPs (DHCP server) and creation of an access point (Hostapd \footnote{\url{https://w1.fi/hostapd/}}). The exact implementation of these tool will be explained in the next section.
+
+
+\subsection{Router Implementation}
+Hostapd has been used very simply to create a single WPA2 protected access point, this however requires a WiFi dongle that supports Access Point Mode - the WiFi dongle used for this project was the TP-LINK TL-WN722N and was strong enough to provide ample range.
+
+Below in Figure~\ref{ref:Hostapd} is the configuration script used:
+
+{\bf TODO - Hostapd Script}
+\begin{figure}[h]
+	\caption{Hostapd script used to create the access point}
+	\label{ref:Hostapd}
+\end{figure}
+%TODO - Explain aspects of scripts
+
+The router also needs to assign IP addresses to newly connected devices, it does this by utilising DHCP. DHCP stands for Dynamic Host Configuration Protocol and as the name suggests configures connected hosts. A DHCP server is created on the Raspberry Pi that will automatically assign a local IP to that device and allow it to communicate with other devices on the LAN and the internet.
+
+\comments{Talk about LAN config (Subnet, gateway etc}
 
 
 %Experimental design:
 %If you project includes any experiments, including but not limited to user testing, then you can discuss their design here. Note that again this does not exist in a vacuum and should be tied to your research.
 
-\section{Test design and system testing}
+\section{Testing}
 There are various sections of the project that require a separate testing plan:
 
 \begin{itemize}
@@ -355,7 +475,7 @@ Below are two images showing the effect of a 100ms latency on a networks speed. 
 \begin{center}
 	\includegraphics[scale=0.5]{Speed100ms}
 	\begin{figure}[h]
-		\caption{Network speed with a latency of 100m/s}
+		\caption{Network speed with a latency of 100ms}
 	\end{figure}
 \end{center}
 

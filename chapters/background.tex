@@ -181,7 +181,7 @@ TCP has various protocols built on top of it. One of the most widely used protoc
 \subsubsection*{FTP}
 Another protocol based on top of TCP is FTP (File Transfer Protocol) \citep{FTP}, and as the broken down acronym suggests is the protocol used to transfer files across a network. This protocol has been selected also due to its integral use in a live network. It also has a quite intuitive way of representing the speed of a network through a download speed that is easy to understand for most users. The protocol will be tested with dummy files ranging from 1MB to 5GB. This size range was chosen to fully cover the normal spectrum of file size where it roughly ranges from a Word document to a high quality video.
 
-\subsubsection{Other TCP Considerations}
+\subsubsection*{Other TCP Considerations}
 
 \subsubsection*{SFTP}
 SFTP (SSH File Transfer Protocol) \citep{SFTP} was a consideration as a protocol to be used for the demonstration purposes. SFTP effectively is a secure version of FTP (but not to be mixed up with the Simple File Transfer Protocol). This was decided not to be used because of its added features such as authentication does not fit within the scope of the project, and does not relate to network degradation. 
@@ -202,8 +202,20 @@ UDP due to its speed but inherent unreliability, UDP is hugely affected by packe
 
 Other effects can also be performed on UDP to simulate degradation, latency and the arrival order of the packets are big signs of hostile transfer conditions. The monitoring of the latency and order can be performed by the UDP interface and could provide a much more detailed overview of the current health of the connection.
 
-\subsection*{Other UDP based protocols}
+\subsubsection*{Other UDP based protocols}
 UDP is used for situations where speed is required but reliability is not. Media streaming is a common example, lots of data needs to arrive to the client quickly where a small number of missed frames can go unnoticed. However, this kind of implementation would be a huge overhead and even if a 3rd party application was used set-up and debugging would utilise time while providing not much more insight into what is happening to the protocol when degradation is active. This is why UDP had been left as bare boned as possible and the protocol has been left relatively exposed to allow an effective way to visualise the effects.
+
+\subsubsection{Other protocols}
+\subsubsection*{SPDY}
+SPDY \citep{belshe2012spdy} is a Google created transport protocol designed to transfer web content. Its name is not an acronym and is pronounced "Speedy". SPDY works by manipulating HTTP traffic with the goals of reducing web load, latency and improving web security. However, in 2015 the protocol was deprecated by Google \citep{blog2015hello}, this was mainly due to the timing of the release of HTTP/2 where the improvements of SPDY were present in the upcoming version of HTTP. Fully support for SPDY was removed in 2016. Due to SPDYs depreciation it was discarded as an option for this project.
+
+\subsubsection*{QUIC}
+QUIC \citep{hamilton2016quic} is an early stage transport layer protocol developed by Google where it was announced in 2013. QUIC is built upon UDP and is designed to provide faster transfer speed in web applications that utilise TCP.
+It has a multitude of extra features, involving bandwidth estimation to reduce congestion, movement of congestion control into the application space rather than having the control embedded into the kernel meaning applications can adapt quicker and provide more bespoke decisions. QUIC also attempts to reduce latency by the simple inclusion of performing less transfers from that of an equivalent TCP connection. QUIC also includes techniques to attempt the handling of packet loss better than that of TCP. Techniques like: proactive speculative retransmissions ('Important' data is sent more than once).
+
+There were initally concerns about UDP connectivity and the possibility that many uses would be behind systems that block UDP traffic was mitigated by Chromium connectivity experiments \citep{roskind2013quic} where 91-94\% of Google users could make a UDP connection outbound.
+
+QUIC wasn't chosen as an addition to this project due to it being in its infancy, where its adoption is still within the early stages. There are however available open source client and servers pairs available and the inclusion of this transport protocol would be a good addition in potential future work.
 
 \subsection{Operating Systems}
 

@@ -22,6 +22,7 @@
 \tcbuselibrary{listings,skins}
 \usetikzlibrary{calc}
 
+
 \usetikzlibrary{arrows.meta}
 \usetikzlibrary{chains}
 \usepackage{epstopdf}
@@ -75,7 +76,7 @@
     arc=1pt, outer arc=1pt,
     listing only, 
     listing style=mystyle,
-    title=#2,
+    title= ,
     #1
 }
 
@@ -93,7 +94,7 @@
 	% Document format
 	%\input{title_page/page}		
 	\newpage
-	%\tableofcontents
+	\tableofcontents
 	\input{chapters/introduction}
 	\input{chapters/aim_objectives}
 	\input{chapters/background}
@@ -102,7 +103,7 @@
 	\input{chapters/conclusion}
 	%\input{chapters/appendix}
 	
-	%\bibliographystyle{hull}
-	%\bibliography{report}
+	\bibliographystyle{hull}
+	\bibliography{report}
 	
 \end{document}
