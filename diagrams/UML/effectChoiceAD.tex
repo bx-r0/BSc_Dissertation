@@ -1,33 +1,20 @@
-\newcommand{\widthEffectChoice}{4cm}
-
-\tikzset{%
-	>={Latex[width=2mm,length=2mm]},
-	% Specifications for style of nodes:
-            base/.style = {draw=black,
-                           minimum width=\widthEffectChoice, 
-                           text width=\widthEffectChoice, 
-                           minimum height=1cm, 
-                           text centered},                           
-            decision/.style = {base, diamond, fill=yellow!15},
-            normal/.style = {base, rectangle, rounded corners}}
-
 \begin{tikzpicture}
 
 	\node (start) [shape=circle, fill=black]{};
 	
-	\node (setQueue) [right of=start, normal, xshift=\widthEffectChoice]
+	\node (setQueue) [right of=start, normal, xshift=\width]
 	{Binds the NFQUEUE's `Mode' to chosen effect};
 	
-	\node (setVariables) [right of=setQueue, normal, xshift=\widthEffectChoice]
+	\node (setVariables) [right of=setQueue, normal, xshift=\width]
 	{Sets all \\ preference \\ variables by parsed \\ arguments};
 	
-	\node (userOutput) [fill=blue!15, below of=setVariables, normal, yshift=-\widthEffectChoice + 2cm]
+	\node (userOutput) [fill=blue!15, below of=setVariables, normal, yshift=-\width]
 	{Displays summary of chosen modes and prefrences to the user};
 	
-	\node (runNfqueue) [left of=userOutput, normal, xshift=-\widthEffectChoice]
+	\node (runNfqueue) [left of=userOutput, normal, xshift=-\width]
 	{NFQUEUE Object is then run. That will pass all packets to the assigned 'Mode'};
 
-	\node (end) [shape=circle, fill=black, below of=start, yshift=-\widthEffectChoice + 2cm]{};
+	\node (end) [shape=circle, fill=black, below of=start, yshift=-\width]{};
 
 	%Arrows
 	\draw[->] (start)--(setQueue);

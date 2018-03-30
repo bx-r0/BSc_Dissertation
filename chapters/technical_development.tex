@@ -77,18 +77,16 @@ Above is the activity diagram for the process of running an effect on a single p
 
 The above design is for the various effects that will be implemented into the program. They will be self contained within separate modules encased in an object. This was chosen so each effect is modular and self contained from one another, this will improve the potential readability and maintainability of the code base, it will also make the code base much more scalable where effects can be added with high speed because of the lack of repeated code.  Each effect will inherit from the base class ``Effect", where it will obtain method and properties used for functionality, boolean variables for allowing printing and accepting packets, these are both necessary when `chaining' effects together, where a packet can only be accepted once and only a single print will be required.
 
-\subsection{Effect Activity Diagram}
+\subsection{Tool Activity Diagram}
 \begin{center}
-	\includegraphics[scale=0.6]{Packet_Activity_Diagram}
+	\input{diagrams/UML/effectDesignAD}
 	\begin{figure}[h]
-		\caption{Activity Diagram for the degradation script}
+		\caption{Activity Diagram for the degradation tool}
+		\label{ref:ToolAD}
 	\end{figure}
 \end{center}
 
-Above is the activity diagram for the packet script that will implement the effect classes above, this script will be utilised directly from the command line or run by the GUI. The decision of having a single script that is controlled by multiple ways allow for one central point of functionality and means code can be shared throughout the project. The activity diagram shows the design choices for the direct control on the script. SIGINT is mentioned in the centre of the diagram, SIGINT is a built in signal in the Linux operating system that represents an interrupt signal, where it is triggered by pressing ``Control + C", this is the most common/clean way of stopping a script. The other alternatives to closing the script ``Control + Z" (SIGTSTP) and ``Control + /" (SIGQUIT) will be remapped to send a SIGINT signal and perform the same role, this will mean the program has one tidy point of closure.
-
-
-
+Figure~\ref{ref:ToolAD} above is the activity diagram for the tool that will implement the effect classes above, this tool will be utilised directly from the command line or run by the GUI. The decision of having a single script that is controlled by multiple ways allow for one central point of functionality and means code can be shared throughout the project. The activity diagram shows the design choices for the direct control on the script. SIGINT is mentioned in the centre of the diagram, SIGINT is a built in signal in the Linux operating system that represents an interrupt signal, where it is triggered by pressing ``Control + C", this is the most common/clean way of stopping a script. The other alternatives to closing the script ``Control + Z" (SIGTSTP) and ``Control + /" (SIGQUIT) will be remapped to send a SIGINT signal and perform the same role, this will mean the program has one tidy point of closure.
 
 % Section Description:
 %
@@ -389,17 +387,37 @@ Hostapd has been used very simply to create a single WPA2 protected access point
 
 Below in Figure~\ref{ref:Hostapd} is the configuration script used:
 
-{\bf TODO - Hostapd Script}
-\begin{figure}[h]
-	\caption{Hostapd script used to create the access point}
-	\label{ref:Hostapd}
-\end{figure}
+\begin{center}
+	{\bf TODO - Hostapd Script}
+	\begin{figure}[h]
+		\caption{Hostapd script used to create the access point}
+		\label{ref:Hostapd}
+	\end{figure}
+\end{center}
+
 %TODO - Explain aspects of scripts
 
 The router also needs to assign IP addresses to newly connected devices, it does this by utilising DHCP. DHCP stands for Dynamic Host Configuration Protocol and as the name suggests configures connected hosts. A DHCP server is created on the Raspberry Pi that will automatically assign a local IP to that device and allow it to communicate with other devices on the LAN and the internet.
 
-\comments{Talk about LAN config (Subnet, gateway etc}
+\begin{center}
+\begin{Scripts}{}
+subnet 192.168.10.0 netmask 255.255.255.0 {
+	range 192.168.10.10 192.168.10.20;
+ 	option broadcast-address 192.168.10.255;
+ 	option routers 192.168.10.1;
+ 	default-lease-time 600;
+ 	max-lease-time 7200;
+ 	option domain-name "local-network";
+ 	option domain-name-servers 8.8.8.8, 8.8.4.4;
+}
+\end{Scripts}
+\begin{figure}[h]
+	\caption{Configuration file used to create the DHCP Server}
+	\label{ref:dhcp-server}
+\end{figure}
+\end{center}
 
+In Figure~\ref{ref:dhcp-server} above are the commands to define the subnet, DNS servers (Google's are used) and range of devices allowed on the network. This DHCP-Server allocates IP addresses ranging from 192.168.10.10 - 192.168.10.20, with the router being allocated 192.168.10.1.
 
 %Experimental design:
 %If you project includes any experiments, including but not limited to user testing, then you can discuss their design here. Note that again this does not exist in a vacuum and should be tied to your research.
@@ -456,9 +474,16 @@ This test was designed to show the accuracy of different ways of simulating late
 
 Below the results are visualised in a single graph. Please note - the relatively high percentage error in the small ranges of latency this is due to the error proportion being a much larger chunk of the overall target latency and therefore being a higher percentage error:
 
-\input{graphs/latency_accuracy}
+\begin{center}
+	\input{graphs/latency_accuracy}
+	\begin{figure}[h]
+		\caption{Error percentage in simulating latency}
+		\label{ref:latencyAccuracy}
+	\end{figure}
+\end{center}
 
-As you can see from the graph the dynamic form of issuing latency is overall more accurate in simulation, but however, it is still not perfect and there seems to be a small overall error present. This performance is however more than suitable for the scope of this project.
+
+As you can see from the Figure~\ref{ref:latencyAccuracy} the dynamic form of issuing latency is overall more accurate in simulation, but however, it is still not perfect and there seems to be a small overall error present. This performance is however more than suitable for the scope of this project.
 
 \subsection{Visualising effects}
 The most effective way to visualise real world connections were running tests on SpeedTest.net \footnote{\url{http://beta.speedtest.net/}}. This is very useful to quickly visualise a certain effect on the network.

@@ -1,35 +1,19 @@
-\newcommand{\widthIncomming}{3cm}
-
-\newcommand{\noLink}{node[fill=white]{No}}
-\newcommand{\yesLink}{node[fill=white]{Yes}}
-
-\tikzset{%
-	>={Latex[width=2mm,length=2mm]},
-	% Specifications for style of nodes:
-            base/.style = {draw=black,
-                           minimum width=\widthIncomming, 
-                           text width=\widthIncomming, 
-                           minimum height=1cm, 
-                           text centered},                           
-            decision/.style = {base, diamond, fill=yellow!15},
-            normal/.style = {base, rectangle, rounded corners}}
-
 \begin{tikzpicture}
 
 	\node (start) [shape=circle, fill=black]{};
 	
-	\node (handler) [normal, right of=start, xshift=\widthIncomming * 2] 
+	\node (handler) [normal, right of=start, xshift=\width * 2] 
 	{Packet placed into queue caught by handler method};
 	
-	\node (filterSet) [below of=handler, yshift=-\widthIncomming, decision] {Is packet filter set?};
-	\node (targetCheck) [left of=filterSet, xshift=-\widthIncomming * 2, normal]{Check filter against packet};
-	\node (passFilter) [below of=targetCheck, yshift=-\widthIncomming, decision]{Does packet pass filter};
+	\node (filterSet) [below of=handler, yshift=-\width, decision] {Is packet filter set?};
+	\node (targetCheck) [left of=filterSet, xshift=-\width * 2, normal]{Check filter against packet};
+	\node (passFilter) [below of=targetCheck, yshift=-\width, decision]{Does packet pass filter};
 	
-	\node (runEffect) [below of=filterSet, yshift=-\widthIncomming, normal, fill=red!15]
+	\node (runEffect) [below of=filterSet, yshift=-\width, normal, fill=red!15]
 	{Run assigned \\ effect on packet};	
 	
-	\node (Accept) 	[fill=blue!15, below of=passFilter, normal, yshift=-\widthIncomming]{Accept Packet};
-	\node (Drop)	[fill=blue!15, below of=runEffect, normal, yshift=-\widthIncomming]{Drop Packet};	
+	\node (Accept) 	[fill=blue!15, below of=passFilter, normal, yshift=-\width]{Accept Packet};
+	\node (Drop)	[fill=blue!15, below of=runEffect, normal, yshift=-\width]{Drop Packet};	
 	
 	%Find the middle between the two nodes
  	\coordinate (CENTER) at ($(Accept)!0.5!(Drop)$);		
