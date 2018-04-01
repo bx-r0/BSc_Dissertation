@@ -105,6 +105,8 @@ One of the ways mentioned before to control the degradation effects is by a user
 % Section Description:
 %
 \section{Tool Implementation}
+The tool performs the degradation effect on the computer is is running on, the script is written in Python 3.6 \citep{pranskevichuspython} and can be run on a computer running a Linux based OS plus the required Python interpreter.
+
 
 \subsection{NFQUEUE}
 The script utilises a section in the Linux kernel referred to as the ``NFQUEUE". This is as the name suggests a queue that is stored in kernel memory that will store up packets until the user provides one of the two verdicts: `Drop' or `Accept'. The packets are pushed into this queue by the use of `iptable' rules, iptabales is a tool designed to filter packets by criteria. Below is a flow diagram for the path a packet might take, each table can have filtering rules embedded into to it:

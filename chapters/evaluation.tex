@@ -46,8 +46,43 @@ The project has met the requirements of this objective. The router can be used i
 \subsection{Overall}
 %TODO - Explain how the overall goal has been met
 
+
+\section{Project Management}
+The implementation of the degradation tool required planning and structure to ease the process of developing the software. This project used GitHub \footnote{\url{https://github.com/}} and its various tools available to provide structure to the project.
+
+\subsection{Issues}
+Issues was one of the main ways problems and enhancements were recorded and tracked, comments were placed on there with information regarding how to fix the issue and what the issue requires for completion. Appendix~\ref{ref:GitHubAppendix} contains a snapshot of actual issue that had been closed over the development of the project in Figure~\ref{ref:GitHubIssues} and also contains an example of what was used for description of the issues in Figure~\ref{ref:GitHubIssueExample}.
+
+This provided a nice overview of what needed completing or improving.
+
+\subsection{Commits}
+Commit messages were also carefully structured with informative messages that allow the progress of the project to be easily viewed. Figure~\ref{ref:githubCommits} contains an example of commits used in the real project.
+
+\begin{center}
+	\includegraphics[scale=0.5]{github_commits}
+	\begin{figure}[h]
+		\caption{Sample of some commit messages used in the GitHub project}
+		\label{ref:githubCommits}
+	\end{figure}
+\end{center}
+
 %Further work:
 %You should identify any specific areas of the existing product where further work is required, either to address known bugs or omissions, or to improve the system – for example an area you developed at an early stage may in hindsight have been structured in a better way, although it is still perfectly functional.
 %You should also provide an outline of any additional areas of potential development you can envisage beyond the initial goals, where the system might be extended in future for greater functionality.
 \section{Further work}
-%TODO
+The project could however be continued and improved the the way discussed below.
+
+\subsection{More protocols}
+In the background there was discussion into the inclusion of other transport protocols or other TCP and UDP based protocols. This would give this project a much more in-depth analysis of more types of network traffic. QUIC would be a great addition to future goals of the project due to it being incredibly new along with the backing of Google gives it a higher chance of being adopted. 
+
+Testing and experiments could be performed to detect the effects of degradation like latency and packet loss of this young protocol and could even contribute to the infant knowledge base.
+
+
+\subsection{More platform support}
+The tool is currently only supported on Linux. Therefore, further work could be to create version that run on Windows or Mac OS. This would allow the tool to be used to many more situations and on many more systems. This however would involve a large amount of work due to the differing ways that each OS would deal with firewall based packet filtering.
+
+
+\subsection{Larger test network}
+Another further improvement would be to use a more powerful router to host the script, this would allow support for a larger synthetic test network with more clients and therefore would provide very valuable feedback because of the further improved realism and size. This improvement is mainly limited by the processing power of the computer used to host the script. 
+
+This also touches on the possible improvement of the efficiency of the script, the use of a more embedded orientated language would provided the biggest increase, a language similar to C or C++ would be suitable, this however would be time consuming and library may not be a comprehensive as Python therefore further increase the time required to port the tool.

@@ -21,11 +21,11 @@
 \usepackage{longtable}
 \tcbuselibrary{listings,skins}
 \usetikzlibrary{calc}
-
-
 \usetikzlibrary{arrows.meta}
 \usetikzlibrary{chains}
 \usepackage{epstopdf}
+\usepackage{colortbl}
+\usepackage{hhline}
 \newcommand{\comments}[1]{\textcolor{OliveGreen}{[\emph{#1}]}}
 
 \graphicspath{{images/}}
@@ -113,6 +113,9 @@
 
 \begin{document}
 
+	
+	\input{tables/testing_correctness}
+
 	%Title Page
 	\title{Compromised and Degraded Network Simulation}
 	\newcommand{\reporttype}{Final Report}
@@ -124,14 +127,16 @@
 	% Document format
 	%\input{title_page/page}		
 	\newpage
-	%\tableofcontents
+	\tableofcontents
 	\input{chapters/introduction}
 	\input{chapters/aim_objectives}
 	\input{chapters/background}
 	\input{chapters/technical_development}
 	\input{chapters/evaluation}
 	\input{chapters/conclusion}
-	%\input{chapters/appendix}
+	\input{chapters/appendix}
+	
+	
 	
 	\bibliographystyle{hull}
 	%\bibliography{report}

@@ -1,63 +1,63 @@
 \small
-\begin{longtable}{| p{2cm} | p{0.5cm} | p{4cm} | p{5cm} | p{3cm} |}
+\begin{longtable}{| p{1.5cm} | p{1.5cm} | p{4cm} | p{5cm} | p{3cm} |}
 	\hline
 		%HEADER
-		\bf{Section} & \bf{Test No} & \bf{Test Name} & \bf{Description} & \bf{Expected} \\ \hline
+		\bf{Section} & \bf{Test Code} & \bf{Test Name} & \bf{Description} & \bf{Expected} \\ \hline
 		
 		%--- UDP CLIENT
 		\bf{UDP Client}&&&& \\ \hline
 		
 		% Business Logic
 		Logic &&&& \\ \hline
-		&& TestStartUp() & Creates a client object before each test & n/a\\ \hline
-		&& TestCleanUp() & No clean-up needed & n/a \\ \hline
-		&1& Connect-Disconnect() & The client connects performs no action then disconnects & n/a \\ \hline
-		&2& CreateClientObj() & A client object is created & n/a \\ \hline
-		&3& SendPacket() & Sends a single UDP packet & n/a\\ \hline
-		&4& CheckGridSend() & Checks the method sends out the correct number this depends on grid size & n/a \\ \hline
+		&UC-L1& TestStartUp() & Creates a client object before each test & n/a\\ \hline
+		&UC-L2& TestCleanUp() & No clean-up needed & n/a \\ \hline
+		&UC-L3& Connect-Disconnect() & The client connects performs no action then disconnects & n/a \\ \hline
+		&UC-L4& CreateClientObj() & A client object is created & n/a \\ \hline
+		&UC-L5& SendPacket() & Sends a single UDP packet & n/a\\ \hline
+		&UC-L6& CheckGridSend() & Checks the method sends out the correct number this depends on grid size & n/a \\ \hline
 		
 		% UI
 		UI &&&& \\ \hline
-		&& TestStartUp() & Loads up a fresh window from the command line & n/a \\ \hline
-		&& TestCleanUp() & Clicks the X in the top right corner & n/a \\ \hline
-		&5& ConnectClick() & Clicks the "Connect" button & n/a \\ \hline
-		&6& RestartClick() & Clicks the "Connect" button then the "Restart" button & n/a \\ \hline
-		&7& Connect-InvertCheck() & Clicks the "Connect" button and checks all the buttons invert their "Enabled" property correctly & Connect(Disabled), Restart(Enabled) \\\hline
-		&8& Restart-InvertCheck() & Clicks the "Connect" button, then the "Reset" button and checks the "Enabled" properties for all buttons are correct & Connect(Enabled), Restart(Disabled) \\\hline
-		&9& TextEntry() & Enters text into the text box and then "Connect" is clicked & n/a \\ \hline
+		&UC-U1& TestStartUp() & Loads up a fresh window from the command line & n/a \\ \hline
+		&UC-U2& TestCleanUp() & Clicks the X in the top right corner & n/a \\ \hline
+		&UC-U3& ConnectClick() & Clicks the "Connect" button & n/a \\ \hline
+		&UC-U4& RestartClick() & Clicks the "Connect" button then the "Restart" button & n/a \\ \hline
+		&UC-U5& Connect-InvertCheck() & Clicks the "Connect" button and checks all the buttons invert their "Enabled" property correctly & Connect(Disabled), Restart(Enabled) \\\hline
+		&UC-U6& Restart-InvertCheck() & Clicks the "Connect" button, then the "Reset" button and checks the "Enabled" properties for all buttons are correct & Connect(Enabled), Restart(Disabled) \\\hline
+		&UC-U7& TextEntry() & Enters text into the text box and then "Connect" is clicked & n/a \\ \hline
 				
 		%--- UDP SERVER
 		\bf{UDP Server} &&&& \\ \hline		
 		
 		%Business 
 		Logic &&&& \\ \hline
-		&& TestStartUp() & Creates the client object & n/a \\ \hline
-		&& TestCleanUp() & n/a & n/a  \\ \hline
-		&10& CreateObject() & Tests that the server object can be created successfully & n/a \\ \hline
-		&11& WaitForTimeout() & Starts the server and checks it closes cleanly after time-out & n/a \\ \hline
+		&US-L1& TestStartUp() & Creates the client object & n/a \\ \hline
+		&US-L2& TestCleanUp() & n/a & n/a  \\ \hline
+		&US-L3& CreateObject() & Tests that the server object can be created successfully & n/a \\ \hline
+		&US-L4& WaitForTimeout() & Starts the server and checks it closes cleanly after time-out & n/a \\ \hline
 		
 		% UI
 		UI &&&& \\ \hline
-		&& TestStartUp() & Loads up a fresh window from the CMD line & n/a \\ \hline
-		&& TestCleanUp() & Clicks the X in the top right hand corner & n/a  \\ \hline
-		&12& StartClick() & Click the "Start" button & n/a \\ \hline
-		&13& RandomiseClick() & Click the "Randomise" button & n/a \\ \hline
-		&14& Start-ResetClick() & Clicks the "Start" button then resets and checks it returns to it's default state & n/a \\ \hline
-		&15& Randomise-ResetClick() & Clicks the "Randomise" button, the resets and checks it returns to it's default state & n/a \\ \hline
-		&16& Start-CheckInvert() & "Start" button clicked and then the test checks for "Enabled" property is inverted & n/a \\ \hline
-		&17& RestartCheckInvert() & "Start" then "Restart" button clicked and the test then checks for the correct inverting of the buttons "Enabled" property Start = Enabled, Restart = Disabled & n/a \\ \hline
-		&18& Stat-PacketLossReset() & Checks when the restart button is clicked the statistics is returned to default & "-" \\ \hline
-		&19& Stat-TotalPacketLossReset() & Checks when the restart button is clicked the statistics is returned to default & "-" \\ \hline
-		&20& Stat-TotalPacketSentReset() & Checks when the restart button is clicked the statistics is returned to default & "-" \\ \hline
-		&21& Stat-CheckDeafult() & "Start" is clicked and the test then waits for a time-out, it then checks the default values of the statistics & PacketLoss(100) \\ \hline
+		&US-U1& TestStartUp() & Loads up a fresh window from the CMD line & n/a \\ \hline
+		&US-U2& TestCleanUp() & Clicks the X in the top right hand corner & n/a  \\ \hline
+		&US-U3& StartClick() & Click the "Start" button & n/a \\ \hline
+		&US-U4& RandomiseClick() & Click the "Randomise" button & n/a \\ \hline
+		&US-U5& Start-ResetClick() & Clicks the "Start" button then resets and checks it returns to it's default state & n/a \\ \hline
+		&US-U6& Randomise-ResetClick() & Clicks the "Randomise" button, the resets and checks it returns to it's default state & n/a \\ \hline
+		&US-U7& Start-CheckInvert() & "Start" button clicked and then the test checks for "Enabled" property is inverted & n/a \\ \hline
+		&US-U8& RestartCheckInvert() & "Start" then "Restart" button clicked and the test then checks for the correct inverting of the buttons "Enabled" property Start = Enabled, Restart = Disabled & n/a \\ \hline
+		&US-U9& Stat-PacketLossReset() & Checks when the restart button is clicked the statistics is returned to default & "-" \\ \hline
+		&US-U10& Stat-TotalPacketLossReset() & Checks when the restart button is clicked the statistics is returned to default & "-" \\ \hline
+		&US-U11& Stat-TotalPacketSentReset() & Checks when the restart button is clicked the statistics is returned to default & "-" \\ \hline
+		&US-U12& Stat-CheckDeafult() & "Start" is clicked and the test then waits for a time-out, it then checks the default values of the statistics & PacketLoss(100) \\ \hline
 		
 		%--- UDP COMBINED		
 		Live Tests &&&& \\ \hline
-		&& TestStartUp() & Both windows were opened on the command line & n/a \\ \hline
-		&& TestCleanUp() & Both windows are closed by automated actions & n/a \\ \hline
-		&22& SendAndRecieve-Valid() & The client sends packages to the server and the server accepts packets & n/a \\ \hline
-		&23& SendAndRecive-Valid-Twice() & The performs the same action at the above test but does the whole loop an extra time to check if the reset works correctly & n/a \\ \hline
-		&24& SendAndRecieve-Invalid() & This test doesn't connect the client to the server but a random IP on the network, this is to check the server will act accordingly & n/a \\ \hline
+		&U-1& TestStartUp() & Both windows were opened on the command line & n/a \\ \hline
+		&U-2& TestCleanUp() & Both windows are closed by automated actions & n/a \\ \hline
+		&U-3& SendAndRecieve-Valid() & The client sends packages to the server and the server accepts packets & n/a \\ \hline
+		&U-4& SendAndRecive-Valid-Twice() & The performs the same action at the above test but does the whole loop an extra time to check if the reset works correctly & n/a \\ \hline
+		&U-5& SendAndRecieve-Invalid() & This test doesn't connect the client to the server but a random IP on the network, this is to check the server will act accordingly & n/a \\ \hline
 
 		\bf{FTP Server} &&&& \\ \hline
 		
