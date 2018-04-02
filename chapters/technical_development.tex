@@ -458,6 +458,16 @@ Appendix A contains the test plan for the program, each separate program has had
 \subsection{Packet Script}
 It was decided that a separate test plan was needed for the script that will be run on the router. This was because its design is considerably different to that of the traffic simulation programs. Each individual effect needs a basic test that uses a loopback ping test to simulate incoming traffic where a criteria is looked for, for example to test packet loss, the test pings the script until a packet is lost or a time-out is reached, this can perform a basic test on the functionality of the effect. Each effect will also require validation for the passed parameters, there will be a test created that will test various values inside and outside of the validation range.
 
+\subsection{Testing correctness}
+\begin{wrapfigure}{r}{5cm}
+	\small
+	\includegraphics[scale=0.4, width=5cm]{testexplore}
+	\caption{Test explorer}
+	\label{ref:visualstudiotest}
+\end{wrapfigure}
+
+Figure~\ref{ref:testingUDP} in the Appendix contains the correctness table for the UDP Client and Server. Each test was run and the outcome was compare to what was expected. Out of 25 tests 100\% passed and produced the correct results. These tests are implemented into Visual Studio \footnote{TODO} and are run every time a change is implemented into the server or client. Figure~\ref{ref:visualstudiotest} contains a screen shot of the test window after all tests have completed.
+
 \subsection{Testing methodology considerations}
 Initially the methodology chosen to start development of the traffic simulation programs was ``Test Driven Development" \citep{beck2003test}, this was a tight methodology that increased development time and gave the added benefit of showing that new changes have not broken older functionality. This methodology was good to start off the project and allowed for a tight structure to be created where no time was wasted debugging previously working code, but as mentioned this methodology slowed development time down, this was chosen to be abandoned after 3-4 weeks to an ad-hoc approach. 
 This change was due to time restraints on the project and the less-important role that the traffic simulation programs had on the project compared to the degradation simulation script. The degradation script was developed in the ad-hoc approach, this was due to issue stated previously about the unknown aspects of the script and how it would be operating that it was decided that the time invested to write up test scripts would assume too much and would risk them having the be completely rewritten, tests therefore was added alongside new functionality.

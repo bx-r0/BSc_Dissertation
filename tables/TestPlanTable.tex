@@ -38,8 +38,12 @@
 		
 		% UI
 		UI &&&& \\ \hline
-		&US-U1& TestStartUp() & Loads up a fresh window from the CMD line & n/a \\ \hline
-		&US-U2& TestCleanUp() & Clicks the X in the top right hand corner & n/a  \\ \hline
+		&US-U1& TestStartUp() & 
+		Loads up a fresh window from the CMD line & n/a \\ \hline
+
+		&US-U2& TestCleanUp() & 
+		Clicks the X in the top right hand corner & n/a  \\ \hline
+		
 		&US-U3& StartClick() & Click the "Start" button & n/a \\ \hline
 		&US-U4& RandomiseClick() & Click the "Randomise" button & n/a \\ \hline
 		&US-U5& Start-ResetClick() & Clicks the "Start" button then resets and checks it returns to it's default state & n/a \\ \hline
@@ -58,26 +62,6 @@
 		&U-3& SendAndRecieve-Valid() & The client sends packages to the server and the server accepts packets & n/a \\ \hline
 		&U-4& SendAndRecive-Valid-Twice() & The performs the same action at the above test but does the whole loop an extra time to check if the reset works correctly & n/a \\ \hline
 		&U-5& SendAndRecieve-Invalid() & This test doesn't connect the client to the server but a random IP on the network, this is to check the server will act accordingly & n/a \\ \hline
-
-		\bf{FTP Server} &&&& \\ \hline
-		
-		%--- FTP Logic
-		Logic &&&& \\ \hline
-		&& TestStartUp() & Creates the server object & n/a \\ \hline
-		&& TestCleanUp() & n/a & n/a \\ \hline
-		&25& CreateObject() & Creates a version of the server object & n/a \\ \hline
-		&26& ServerSetup() & Performs the server set-up & n/a \\ \hline
-		&27& ServerStart() & Sets up the server and starts it & n/a \\ \hline
-		&28& ServerStartStop() & Does a fully cycle for the server & n/a \\ \hline
-		
-		%--- FTP Combined
-		&& TestStartUp() & Loads up FTP Server and FileZilla & n/a \\ \hline
-		&& TestCleanUp() & Closes each window with automated actions & n/a \\ \hline
-		&& ValidConnection() & Automated UI test that simulates a valid connection and checks elements on the UI for signs of a valid connection & n/a \\ \hline
-		&& InvalidConnection() & Test that attempts to connect to a non working server & n/a \\ \hline
-		&& DownloadFile() & A test that simulates a download of a file and checks it completes fully & n/a \\ \hline
-		&& InteruptDownload() & Test that starts a download and interrupts it before completion & n/a \\ \hline
-	\hline
 \end{longtable}
 
 Packet Script Test Plan for the default effects.
@@ -95,9 +79,9 @@ Packet Script Test Plan for the default effects.
 	Bandwidth &&&& \\\hline
 	&5& StartBandwidth() &  Starts the script with the expected parameters (e.g. -rl 100) & Script should start in Bandwidth limit mode \\ \hline
 	&6& BandwidthEffect() & Starts bandwidth mode and starts pinging the localhost, after a certain amount of packets the rate is calculated and checked against the rate limit value & n/a \\\hline
-	Script &&&& \\ \hline
+	Validation &&&& \\ \hline
 	&7& LatencyValidation() & Check that the validation works for the latency mode & Range = 1-1000ms \\\hline
 	&8& PacketLossValidation() & Check that the validation works for the packet loss mode & Range = 1-100\%\\\hline
-	&9& BandwidthValidation() & Checks that validation works for bandwidth mode & Range =  1-10000B/s\\\hline
+	&9& BandwidthValidation() & Checks that validation works for bandwidth mode & Range = 1-10000B/s\\\hline
 	
 \end{longtable}
