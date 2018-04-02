@@ -70,18 +70,38 @@ Packet Script Test Plan for the default effects.
 	\hline	
 	\bf{Section} & \bf{Test No} & \bf{Test Name} & \bf{Description} & \bf{Expected} \\ \hline
 	\bf{Effects} &&&& \\ \hline
+	
+	% -- 	
 	PacketLoss &&&& \\ \hline
-	&1& StartPacketLoss() & Starts the script with the expected parameter (e.g. -pl 10) &  Script should start PacketLoss mode \\ \hline
-	&2& PacketLossEffect() & Pings the script and checks the effect on the ping packets, the test pings until one packet is lost. Checking for exact percentages isn't reliable enough & Some packet loss \\ \hline	
+	&P-1	& StartPacketLoss() 
+	& Starts the script with the expected parameter (e.g. -pl 10) &  Script should start PacketLoss mode \\ \hline
+	
+	&P-1	& PacketLossEffect() 
+	& Pings the script and checks the effect on the ping packets, the test pings until one packet is lost. Checking for exact percentages isn't reliable enough & Some packet loss \\ \hline	
+	
+	% -- 	
 	Latency &&&& \\ \hline
-	&3& StartLatency() & Starts the script with valid parameters for latency (e.g. -l 10) & Script should start in Latency mode \\ \hline
-	&4& LatencyEffect() & Pings the script and checks the latency value within a margin of error & Latency effect on ping packets \\ \hline	
+	&L-1& StartLatency() 	& Starts the script with valid parameters for latency (e.g. -l 10) & Script should start in Latency mode \\ \hline
+	&L-2& LatencyEffect() 	& Pings the script and checks the latency value within a margin of error & Latency effect 		on ping packets \\ \hline
+	
+	% -- 
 	Bandwidth &&&& \\\hline
-	&5& StartBandwidth() &  Starts the script with the expected parameters (e.g. -rl 100) & Script should start in Bandwidth limit mode \\ \hline
-	&6& BandwidthEffect() & Starts bandwidth mode and starts pinging the localhost, after a certain amount of packets the rate is calculated and checked against the rate limit value & n/a \\\hline
+	&B-1& StartBandwidth() &  Starts the script with the expected parameters (e.g. -rl 100) & Script should start in Bandwidth limit mode \\ \hline
+	&B-2& BandwidthEffect() & Starts bandwidth mode and starts pinging the localhost, after a certain amount of packets the rate is calculated and checked against the rate limit value & n/a \\\hline
+	
+	Out-Of-Order &&&& \\\hline
+	&O-1& StartOrder() & Starts the script and checks the effect initialises correctly & n/a \\\hline
+	&O-2& OutOfOrderEffect() & Starts the effect and checks using the localhost that the packet sequence numbers are not in sequential order when they return & n/a \\\hline
+	
+	Jitter &&&& \\\hline
+	&J-1& StartJitter() & Starts the script in the mode and checks all initialisation finishes correctly & n/a \\\hline
+	&J-2& JitterEffect() & Ping packets are sent on the localhost and a difference in packet latency is looked for  & n/a\\\hline
+	
+	% -- 	
 	Validation &&&& \\ \hline
-	&7& LatencyValidation() & Check that the validation works for the latency mode & Range = 1-1000ms \\\hline
-	&8& PacketLossValidation() & Check that the validation works for the packet loss mode & Range = 1-100\%\\\hline
-	&9& BandwidthValidation() & Checks that validation works for bandwidth mode & Range = 1-10000B/s\\\hline
+	&V-1& LatencyValidation() & Check that the validation works for the latency mode & Range = 1-1000ms \\\hline
+	&V-2& PacketLossValidation() & Check that the validation works for the packet loss mode & Range = 1-100\%\\\hline
+	&V-3& BandwidthValidation() & Checks that validation works for bandwidth mode & Range = 1-10000B/s\\\hline
+	&V-4& JitterValidation & Checks that validation works for difference values & Range = 10ms-100ms \\\hline	
 	
 \end{longtable}

@@ -27,6 +27,7 @@
 \usepackage{colortbl}
 \usepackage{hhline}
 \usepackage{wrapfig}
+\usepackage[font=footnotesize,labelfont=bf]{caption}
 \newcommand{\comments}[1]{\textcolor{OliveGreen}{[\emph{#1}]}}
 
 \graphicspath{{images/}}
@@ -44,6 +45,11 @@
 \definecolor{codegray}{rgb}{0.5,0.5,0.5}
 \definecolor{codepurple}{rgb}{0.58,0,0.82}
 \definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\newcommand{\Fail}{\cellcolor{red!15} Fail}
+\newcommand{\Pass}{\cellcolor{green!15} Pass}
+\newcommand{\header}[1]{\cellcolor{blue!10} #1 & \cellcolor{blue!10} & \cellcolor{blue!10} \\ \lineend}
+\newcommand{\lineend}{\hhline{|-|-|-|}}
  
 \lstdefinestyle{mystyle}{
     commentstyle=\color{codegreen},
@@ -133,8 +139,6 @@
 	\input{chapters/evaluation}
 	\input{chapters/conclusion}
 	\input{chapters/appendix}
-	
-	
 	
 	\bibliographystyle{hull}
 	%\bibliography{report}

@@ -460,13 +460,14 @@ It was decided that a separate test plan was needed for the script that will be 
 
 \subsection{Testing correctness}
 \begin{wrapfigure}{r}{5cm}
-	\small
-	\includegraphics[scale=0.4, width=5cm]{testexplore}
+	\includegraphics[width=4cm]{testexplore}
 	\caption{Test explorer}
 	\label{ref:visualstudiotest}
 \end{wrapfigure}
 
 Figure~\ref{ref:testingUDP} in the Appendix contains the correctness table for the UDP Client and Server. Each test was run and the outcome was compare to what was expected. Out of 25 tests 100\% passed and produced the correct results. These tests are implemented into Visual Studio \footnote{TODO} and are run every time a change is implemented into the server or client. Figure~\ref{ref:visualstudiotest} contains a screen shot of the test window after all tests have completed.
+
+The degradation tool also required testing for the various effects. The effects all has a basic test that checks for a successful start up and a more in-depth test that checks the effects functionality against ping packets sent over the localhost. The two attacks also needed testing, these however do not include a test on their functionality as it would be very difficult and time consuming to create a test that tests the effectiveness of the attack. Figure~\ref{ref:testingScript} contains the testing correctness table for the script tools; all test passed.
 
 \subsection{Testing methodology considerations}
 Initially the methodology chosen to start development of the traffic simulation programs was ``Test Driven Development" \citep{beck2003test}, this was a tight methodology that increased development time and gave the added benefit of showing that new changes have not broken older functionality. This methodology was good to start off the project and allowed for a tight structure to be created where no time was wasted debugging previously working code, but as mentioned this methodology slowed development time down, this was chosen to be abandoned after 3-4 weeks to an ad-hoc approach. 
@@ -498,22 +499,18 @@ Below the results are visualised in a single graph. Please note - the relatively
 As you can see from the Figure~\ref{ref:latencyAccuracy} the dynamic form of issuing latency is overall more accurate in simulation, but however, it is still not perfect and there seems to be a small overall error present. This performance is however more than suitable for the scope of this project.
 
 \subsection{Visualising effects}
+\begin{wrapfigure}{r}{5cm}
+	\includegraphics[scale=0.5]{SpeedNoEffect}
+	\caption{The initial connection speed}
+	\paragraph{}
+	\includegraphics[scale=0.5]{Speed100ms}
+	\caption{Network speed with a latency of 100ms}
+\end{wrapfigure}
+
 The most effective way to visualise real world connections were running tests on SpeedTest.net \footnote{\url{http://beta.speedtest.net/}}. This is very useful to quickly visualise a certain effect on the network.
 
 Below are two images showing the effect of a 100ms latency on a networks speed. Both tests were performed on the same empty network and the best result was taken from 5 runs on each.
 
-\begin{center}
-	\includegraphics[scale=0.5]{SpeedNoEffect}
-	\begin{figure}[h]
-		\caption{The initial connection speed}
-	\end{figure}
-\end{center}
 
-\begin{center}
-	\includegraphics[scale=0.5]{Speed100ms}
-	\begin{figure}[h]
-		\caption{Network speed with a latency of 100ms}
-	\end{figure}
-\end{center}
 
 As you can see from both images, the 100ms has evidently been applied effectively and the speed of the connection has dropped by around 10Mbps. This means in real world terms the time taken to download a 1GB file would take 35 seconds longer to download. This is not a considerable reduction but the latency is having a obvious effect on the network quality.
