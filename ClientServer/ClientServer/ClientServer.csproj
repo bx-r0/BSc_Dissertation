@@ -74,13 +74,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="FTP\FTP-Server-Code\FTP_Connection.cs" />
-    <Compile Include="FTP\FTP-Server-Code\FTP_Responses.cs" />
     <Compile Include="Logging\Log_Manager.cs" />
-    <Compile Include="FTP\FTPServer.cs" />
-    <Compile Include="FTP\FTPServer.xaml.cs">
-      <DependentUpon>FTPServer.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Program.xaml.cs">
       <DependentUpon>Program.xaml</DependentUpon>
     </Compile>
@@ -93,10 +87,6 @@
     <Compile Include="UDP\UDPServer.xaml.cs">
       <DependentUpon>UDPServer.xaml</DependentUpon>
     </Compile>
-    <Page Include="FTP\FTPServer.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>

@@ -1,5 +1,4 @@
-﻿using ClientServer.FTP;
-using ClientServer.UDP;
+﻿using ClientServer.UDP;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -45,16 +44,7 @@ namespace ClientServer
             {
                 switch (args[1])
                 {
-                    //# FTP
-                    case "-f":
-                        switch (ServerOrClient(args[2]))
-                        {
-                            //# FTP Server
-                            case WindowToShow.Server:
-                                ShowWindow(new FTPServerWindow());
-                                break;
-                        } 
-                        break;
+                   
                     //#UDP
                     case "-u":
                         switch (ServerOrClient(args[2]))
