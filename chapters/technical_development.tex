@@ -51,7 +51,7 @@ The parameter handling as stated previously is only required if the command line
 \end{center}
 
 
-Choosing a mode for the program gives the ability to switch between degradation effect and arrangement of effects. This process is exactly the same for GUI and CLI. This is due to the shared code between the different user interfaces, all the CLI does is add a wrapper on top that allows control of the concealed code by the way of parsed arguments and the GUI just directly calls these methods when buttons are clicked.
+Choosing a mode for the program gives the ability to switch between degradation effect and arrangement of effects. This process is exactly the same for GUI and CLI. This is due to the shared code between the different user interfaces, all the CLI does is parse arguments and calls the correct methods and the GUI just directly calls these methods when buttons are clicked.
 
 \subsection{Incoming Packets}
 \begin{center}
@@ -91,16 +91,20 @@ Figure~\ref{ref:ToolAD} above is the activity diagram for the tool that will imp
 % Section Description:
 %
 \section{Tool UI Design}
+\begin{wrapfigure}{R}{5cm}
+\begin{center}
+	\includegraphics[scale=0.3]{Packet_UI_Design}
+	\caption{Initial user interface design for the Degradation GUI}
+	\paragraph{}
+	\includegraphics[scale=0.3]{live_packet_ui}
+	\caption{Actual working Packet user interface}
+	\label{ref:workingUI}
+\end{center}	
+\end{wrapfigure}
+
 One of the ways mentioned before to control the degradation effects is by a user interface. It needs to have a way to easily add new buttons and text entries that link up to parameters in the script to make the interface scalable and easy to maintain, it also needs a window to display the same output as the terminal window, this can be achieved by `piping' the stdout to a custom section of the user interface. The `stdout' is the data stream that links up to a Linux terminal window, if the stdout points to somewhere else it will display where it is needed. Below is the initial drafted design for the user interface.
 
-\begin{center}
-	\includegraphics[scale=0.5]{Packet_UI_Design}
-	\begin{figure}[h]
-		\caption{Initial user interface design for the Degradation GUI}
-	\end{figure}
-\end{center}
-
-
+Figure~\ref{ref:workingUI} contains the actual working user interface for the script. The design has been followed to some extent with only changes occurring in the layout of the controls on the left side designed to make it much easier to include new effects in the future. The inclusion of a window and output text box designed to allow ARP spoofing to occur has also been included in the working user interface.
 
 % Section Description:
 %
@@ -390,7 +394,7 @@ Hostapd has been used very simply to create a single WPA2 protected access point
 Below in Figure~\ref{ref:Hostapd} is the configuration script used:
 
 \begin{center}
-	{\bf TODO - Hostapd Script}
+	{\bf  - Hostapd Script}
 	\begin{figure}[h]
 		\caption{Hostapd script used to create the access point}
 		\label{ref:Hostapd}
@@ -460,12 +464,14 @@ It was decided that a separate test plan was needed for the script that will be 
 
 \subsection{Testing correctness}
 \begin{wrapfigure}{r}{5cm}
+\begin{center}
 	\includegraphics[width=4cm]{testexplore}
 	\caption{Test explorer}
 	\label{ref:visualstudiotest}
+\end{center}
 \end{wrapfigure}
 
-Figure~\ref{ref:testingUDP} in the Appendix contains the correctness table for the UDP Client and Server. Each test was run and the outcome was compare to what was expected. Out of 25 tests 100\% passed and produced the correct results. These tests are implemented into Visual Studio \footnote{TODO} and are run every time a change is implemented into the server or client. Figure~\ref{ref:visualstudiotest} contains a screen shot of the test window after all tests have completed.
+Figure~\ref{ref:testingUDP} in the Appendix contains the correctness table for the UDP Client and Server. Each test was run and the outcome was compare to what was expected. Out of 25 tests 100\% passed and produced the correct results. These tests are implemented into Visual Studio \footnote{https://www.visualstudio.com/} and are run every time a change is implemented into the server or client. Figure~\ref{ref:visualstudiotest} contains a screen shot of the test window after all tests have completed.
 
 The degradation tool also required testing for the various effects. The effects all has a basic test that checks for a successful start up and a more in-depth test that checks the effects functionality against ping packets sent over the localhost. The two attacks also needed testing, these however do not include a test on their functionality as it would be very difficult and time consuming to create a test that tests the effectiveness of the attack. Figure~\ref{ref:testingScript} contains the testing correctness table for the script tools; all test passed.
 
@@ -500,17 +506,27 @@ As you can see from the Figure~\ref{ref:latencyAccuracy} the dynamic form of iss
 
 \subsection{Visualising effects}
 \begin{wrapfigure}{r}{5cm}
-	\includegraphics[scale=0.5]{SpeedNoEffect}
+\begin{center}
+	\includegraphics[scale=0.3]{SpeedNoEffect}
 	\caption{The initial connection speed}
-	\paragraph{}
-	\includegraphics[scale=0.5]{Speed100ms}
+	\includegraphics[scale=0.3]{Speed100ms}
 	\caption{Network speed with a latency of 100ms}
+\end{center}
 \end{wrapfigure}
 
 The most effective way to visualise real world connections were running tests on SpeedTest.net \footnote{\url{http://beta.speedtest.net/}}. This is very useful to quickly visualise a certain effect on the network.
 
-Below are two images showing the effect of a 100ms latency on a networks speed. Both tests were performed on the same empty network and the best result was taken from 5 runs on each.
-
-
-
 As you can see from both images, the 100ms has evidently been applied effectively and the speed of the connection has dropped by around 10Mbps. This means in real world terms the time taken to download a 1GB file would take 35 seconds longer to download. This is not a considerable reduction but the latency is having a obvious effect on the network quality.
+
+
+\subsection{UDP Flooding}
+\begin{wrapfigure}{r}{5cm}
+\begin{center}
+	\includegraphics[scale=0.3]{before_udp}
+	\caption{Initial speed without UDP flooding active}
+	\includegraphics[scale=0.3]{after_udp}
+	\caption{Speed test with UDP Flooding active}
+\end{center}
+\end{wrapfigure}
+
+The effect of the UDP flooding required experimentation. A single target was selected on a network just containing the attacker and victim and like previous tests SpeedTest.Net was used to obtain bandwidth results. Each test was run with the same computers on the same network. As you can see from the two images the effect of the UDP flooding is devastating on a connections speed, taking a fast internet connection and reverting it to a crawl. If more computer running the script were active the internet connection could be easily fully blocked.

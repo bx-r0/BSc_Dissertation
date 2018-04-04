@@ -20,10 +20,10 @@
 	xshift=7cm
 ] {\includegraphics[scale=\ciscoImageScale]{\cisco/workstation}};
 
+\coordinate (CENTER) at ($(Victim)!0.5!(Router)$);
 \node (Attacker)[
 	label=below:Eve,
-	below of=Victim,
-	xshift=-4cm,
+	below of=CENTER,
 	yshift=-3.5cm
 ] {\includegraphics[scale=\ciscoImageScale]{\cisco/laptop}};
 

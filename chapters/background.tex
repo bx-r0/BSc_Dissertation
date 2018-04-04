@@ -23,12 +23,12 @@ It is also necessary to mention in more detail the protocols that are to be used
 \subsubsection{Transport Control Protocol (TCP)}
 TCP's main design choices are centred around reliability, where it has a few techniques designed to make sure packets arrive correctly. 
 
+
 \begin{center}
 	\includegraphics[scale=0.7]{TCP_header}
 	\begin{figure}[h]
 		\caption{TCP Header (RFC 793)}
 	\end{figure}	
-	
 \end{center}
 
 \subsubsection*{Initiating a connection}
@@ -114,13 +114,6 @@ NewReno \citep{newReno} as the name suggests is the successor to TCP Reno that w
 TCP NewReno's uses further heuristics to recover from multiple packet loss without the need for time-outs, this therefore means it outperforms Reno at higher error rates and is the algorithm used in the later experimentation section of this report.
 
 
-\subsubsection*{TCP Cubic}
-TCP Cubic is an algorithm designed for high bandwidth networks with {\bf high latency}. TCP Reno as explained increase the Cwnd value per window full of successful transmissions, this is indirectly depended on round trip time (Latency) meaning high latency networks slowly increase the Cwnd value in algorithms that additivity increase in this RTT based fashion. TCP Cubic additive increase is a cubic function of the {\bf time} since the last congestion event, this means the latency and size of a network does not affect the gradual increase of the networks transfer speed.
-
-TCP Cubic is therefore much fairer across networks sizes due to the RTT not being a factor in speed increases, this however means that it may not be suitable for networks with a very small RTT as they will be able to increase there speed faster with another RTT based algorithm.
-
-
-
 \clearpage
 \subsubsection{User Data Protocol (UDP)}
 \begin{center}
@@ -191,14 +184,15 @@ Another widely used set of protocols are the email based family of protocols. SM
 
 
 \subsubsection{UDP Based Protocols}
+\begin{wrapfigure}{R}{5cm}
+\begin{center}
+	\includegraphics[scale=0.4]{UDP-Demo}
+	\caption{Initial draft of the UDP user interface}
+\end{center}
+\end{wrapfigure}
+
 UDP due to its speed but inherent unreliability, UDP is hugely affected by packet loss. Therefore, the effects on UDP has decided to be visualised by a program that simulates image transfer by assigning an individual UDP packet a number that corresponds to a single pixel, this packet is then sent. Once the server receives the packet, it reads the pixel number stored in the packet and changes that specific pixel to green. This creates a matrix of red (lost) and green (received) pixels. This therefore, gives a simple but effective visualisation of packet loss. 
 
-\begin{center}
-\includegraphics[scale=0.7]{UDP-Demo}
-	\begin{figure}[h]
-		\caption{Initial draft of the UDP user interface}
-	\end{figure}
-\end{center}
 
 Other effects can also be performed on UDP to simulate degradation, latency and the arrival order of the packets are big signs of hostile transfer conditions. The monitoring of the latency and order can be performed by the UDP interface and could provide a much more detailed overview of the current health of the connection.
 
@@ -206,9 +200,6 @@ Other effects can also be performed on UDP to simulate degradation, latency and 
 UDP is used for situations where speed is required but reliability is not. Media streaming is a common example, lots of data needs to arrive to the client quickly where a small number of missed frames can go unnoticed. However, this kind of implementation would be a huge overhead and even if a 3rd party application was used set-up and debugging would utilise time while providing not much more insight into what is happening to the protocol when degradation is active. This is why UDP had been left as bare boned as possible and the protocol has been left relatively exposed to allow an effective way to visualise the effects.
 
 \subsubsection{Other protocols}
-\subsubsection*{SPDY}
-SPDY \citep{belshe2012spdy} is a Google created transport protocol designed to transfer web content. Its name is not an acronym and is pronounced "Speedy". SPDY works by manipulating HTTP traffic with the goals of reducing web load, latency and improving web security. However, in 2015 the protocol was deprecated by Google \citep{blog2015hello}, this was mainly due to the timing of the release of HTTP/2 where the improvements of SPDY were present in the upcoming version of HTTP. Fully support for SPDY was removed in 2016. Due to SPDYs depreciation it was discarded as an option for this project.
-
 \subsubsection*{QUIC}
 QUIC \citep{hamilton2016quic} is an early stage transport layer protocol developed by Google where it was announced in 2013. QUIC is built upon UDP and is designed to provide faster transfer speed in web applications that utilise TCP.
 It has a multitude of extra features, involving bandwidth estimation to reduce congestion, movement of congestion control into the application space rather than having the control embedded into the kernel meaning applications can adapt quicker and provide more bespoke decisions. QUIC also attempts to reduce latency by the simple inclusion of performing less transfers from that of an equivalent TCP connection. QUIC also includes techniques to attempt the handling of packet loss better than that of TCP. Techniques like: proactive speculative retransmissions ('Important' data is sent more than once).
@@ -216,6 +207,9 @@ It has a multitude of extra features, involving bandwidth estimation to reduce c
 There were initally concerns about UDP connectivity and the possibility that many uses would be behind systems that block UDP traffic was mitigated by Chromium connectivity experiments \citep{roskind2013quic} where 91-94\% of Google users could make a UDP connection outbound.
 
 QUIC wasn't chosen as an addition to this project due to it being in its infancy, where its adoption is still within the early stages. There are however available open source client and servers pairs available and the inclusion of this transport protocol would be a good addition in potential future work.
+
+\subsubsection*{SPDY}
+SPDY \citep{belshe2012spdy} is a Google created transport protocol designed to transfer web content. Its name is not an acronym and is pronounced "Speedy". SPDY works by manipulating HTTP traffic with the goals of reducing web load, latency and improving web security. However, in 2015 the protocol was deprecated by Google \citep{blog2015hello}, this was mainly due to the timing of the release of HTTP/2 where the improvements of SPDY were present in the upcoming version of HTTP. Fully support for SPDY was removed in 2016. Due to SPDYs depreciation it was discarded as an option for this project.
 
 \subsection{Operating Systems}
 
@@ -227,7 +221,7 @@ Linux was chosen for this project for its open source element that allows easy a
 \subsubsection{Windows}
 Linux was chosen over the other possible alternative; Windows. The Windows OS is distributed as closed source software under proprietary licences meaning to understand what is happening under the hood is far more difficult. The operating system is documented well and there is support for this form of functionality. Windows does provide a solution to the packet filtering in the same way that NetFilter does, it's called Windows Filtering Platform (WFP) and it is a an API that allows access to the systems services in order to create packet filtering applications. Its functionality is very similar to that of NetFilter.
 
-Windows however was not used because of the size of the Windows OS. Below is the minimum system requirements for Windows 10 \footnote{\url{https://www.microsoft.com/en-US/windows/windows-10-specifications}}
+Windows however was not used because of the size of the Windows OS. Figure~\ref{ref:windowsRequire} contains the minimum system requirements for Windows 10 \footnote{\url{https://www.microsoft.com/en-US/windows/windows-10-specifications}}
 
 %Windows Min System Requirements Table
 
@@ -240,14 +234,16 @@ Windows however was not used because of the size of the Windows OS. Below is the
 	Hard Disk Space & 16 GB for 32-bit OS 20 GB for 64-bit OS \\
 	\hline
 \end{tabular}
-\vspace{5mm} 
+\begin{figure}[h]
+		\caption{Windows System Requirements}
+	\label{ref:windowsRequire}
+	\end{figure}
 \end{center}
 
-This compared with the full Debian \footnote{\url{https://www.debian.org/releases/stable/i386/ch03s04.html.en}} OS that the striped down version of the Raspberry Pi's OS is based off:
-
+\clearpage
+\begin{wrapfigure}{r}{5cm}
 \begin{center}
 No Desktop\\
-\vspace{1mm} 
 \begin{tabular}{| l | l |}
 	\hline
 	Processor & 1GHZ Pentium 4 \\
@@ -257,8 +253,8 @@ No Desktop\\
 \end{tabular}
 
 \vspace{2.5mm}
+
 With Desktop\\
-\vspace{1mm}
 \begin{tabular}{| l | l |}
 	\hline
 	Processor & 1GHZ Pentium 4 \\
@@ -266,12 +262,16 @@ With Desktop\\
 	Hard Disk Space & 10 GB \\
 	\hline
 \end{tabular}
-\vspace{5mm}
+\caption{Debian system requirements}
+\label{ref:debianRequire}
 \end{center}
+\end{wrapfigure}
+
+This compared with the full Debian \footnote{\url{https://www.debian.org/releases/stable/i386/ch03s04.html.en}} OS that the striped down version of the Raspberry Pi's OS is based off:
 
 The Raspberry Pi in this instance will be run with no desktop.
 
-As you can see from the comparison above the Linux based OS has a much smaller set of requirements where RAM usage for example is 8 times smaller and therefore due to Linux's transparency and overall efficiency the OS is far more suited for us in conjunction with the Raspberry Pi.
+As you can see from Figure~\ref{ref:debianRequire} the Linux based OS has a much smaller set of requirements where RAM usage for example is 8 times smaller and therefore due to Linux's transparency and overall efficiency the OS is far more suited for us in conjunction with the Raspberry Pi.
 
 %Alternative Solutions:
 %If others have produced solutions or addressed similar problems to those addressed by your project you should describe those alternative solutions here. Similarly, if several possible approaches suggest themselves as ways of solving the problems inherent in your project you should discuss those here. You should provide a comparative analysis and critical appraisal of each alternative solution approach or existing solution, identifying their key features and their strengths and weaknesses in relation to your project.
@@ -279,12 +279,12 @@ As you can see from the comparison above the Linux based OS has a much smaller s
 \subsection{clumsy}
 A more modern application of network degradation is clumsy 0.2 \footnote{\url{http://jagt.github.io/clumsy/index.html}}. It provides various options (that can run in parallel) that effect network conditions. 
 
+\begin{wrapfigure}{r}{5cm}
 \begin{center}
-	\includegraphics[scale=0.5]{clumsy}
-	\begin{figure}[h]
-		\caption{Main UI of clumsy}
-	\end{figure}
+	\includegraphics[scale=0.3]{clumsy}
+	\caption{UI of clumsy}
 \end{center}
+\end{wrapfigure}
 
 The tool provides a way to affect network conditions. It solves issues involved with simulating harsh network conditions. It does allow for filtering and has a couple of filter pre-sets, it however doesn't provide options to simulate live traffic and options to capture or visualise traffic is not part of the main package.
 

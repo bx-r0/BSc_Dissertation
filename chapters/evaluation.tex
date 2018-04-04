@@ -8,9 +8,8 @@
 	\subsection{Effect of Packet Loss on Download Speeds}
 	\input{experiments/packetloss_downloadspeed}
 
-	%TODO - Comparason between congestion algos 
-	%			- Reno
-	%			- Cubic
+	\subsection{Latency effect on Slow Start}
+	\input{experiments/slowstart_latency}
 
 %Project Achievements:
 %You should consider your original goals and statewh clearly ich have or have not been fully or partially met, and discuss reasons for any significant variance.
@@ -25,27 +24,23 @@
 \newcommand{\firefoxUrl}{\url{https://www.mozilla.org/en-US/firefox/new/}}
 \newcommand{\fileZillaUrl}{\url{https://filezilla-project.org/}}
 
-\subsection{Objective One}
+\subsection{Objective One - {\it Achieved}}
 {\it Develop a fully working clients and servers that communicate using HTTP/1.1 and FTP over the TCP protocol alongside a client and server that use the UDP protocol}
 
 This objective initially involved the creation of custom client server solution for HTTP, FTP and UDP. This involved a lengthy development period where each client and server would require the implementation of required features for the project. It was decided after a period of 3.5 weeks that the simulated network having a custom solution created no added value to the initial goal of the project, this is why HTTP has been replaced by pre-existing browsers such as Google Chrome \footnote{\chromeUrl} or Mozilla Firefox \footnote{\firefoxUrl} and and FTP solution replaced by FileZilla's \footnote{\fileZillaUrl} server and client pair. These are all projects that have had multiple years invested into their development and offer increased stability and selection of features with next to zero investment in time development time for this project and they have all the features required to meet the goal of this project. UDP on the other hand was left as a custom solution, for the sacrifice of realism the UDP client and server show a easy to view visualisation of UDP packet loss and is very effective at what it does.
 
 However, even with the changes each sub point of the object has been met.
 
-\subsection{Objective Two}
+\subsection{Objective Two - {\it Achieved}}
 {\it Create a program that runs on a Linux based OS that can be used to simulate degradation and attacks. This program will then be run on the router.}
 
 In the aims and objectives section lists out the criteria required to meet this objective. The created solution meets all of these criteria. It provides the functionality to simulate packet loss, latency and bandwidth plus a selection of other effects. The other effects were chosen to provide more depth to the project and allow the possibility to chain effects together to simulate more sophisticated degradation. The script also allows UDP flooding and ARP spamming. It contains a mode to increment the TTL but this mode was discarded from the main advertised functionality due to its inherit difficulty in displaying its effect on a connection due to the hard task for forming loops in a networks structure. This script is also functional on the set-up Raspberry Pi Router.
 
 
-\subsection{Objective Three}
+\subsection{Objective Three - {\it Achieved}}
 {\it Create a working custom router that can be used to simulate degradation in conjunction with the program outlined in Objective 2}
 
 The project has met the requirements of this objective. The router can be used in place of a commercial router and can handle around 3 clients at a single time while still providing acceptable transfer speeds. A client can connect to the router by wireless or wired means.
-
-\subsection{Overall}
-%TODO - Explain how the overall goal has been met
-
 
 \section{Project Management}
 The implementation of the degradation tool required planning and structure to ease the process of developing the software. This project used GitHub \footnote{\url{https://github.com/}} and its various tools available to provide structure to the project.

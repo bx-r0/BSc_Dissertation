@@ -56,10 +56,12 @@ Attacker\\
 	xshift=7cm
 ] {\includegraphics[scale=\ciscoImageScale]{\cisco/workstation}};
 
+
+%Find the middle between the two nodes
+\coordinate (CENTER) at ($(Victim)!0.5!(Router)$);		
 \node (Attacker)[
 	label=below:\AttackerLabel,
-	below of=Victim,
-	xshift=-3.5cm,
+	below of=CENTER,
 	yshift=-3.5cm
 ] {\includegraphics[scale=\ciscoImageScale]{\cisco/laptop}};
 

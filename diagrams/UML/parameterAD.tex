@@ -8,7 +8,7 @@
 	\node (correctParam) [decision, below of=parse, yshift=\width * -1]{Parameters Correct?};
 	\node (showUsage) [normal, below of=correctParam, yshift=-\width, fill=red!15]{Show Usage and quit};
 	\node (saveParam) [normal, left of=correctParam, xshift=-\width * 2]
-	{Call coresponding argument method with arguments};
+	{Call coresponding 'Mode' with parsed arguments};
 
 	\node (end) [shape=circle, fill=black, below of=saveParam, yshift=-\width]{};
 
