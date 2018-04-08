@@ -5,11 +5,34 @@
 %The tool is used to create results and there're discussed here
 \section{Experimentation Results}
 
-	\subsection{Effect of Packet Loss on Download Speeds}
-	\input{experiments/packetloss_downloadspeed}
+\subsection{Test Environment}
+The test environment used to create these experiments has been kept exactly the same for every experiment. TCP transfer has been simulated over the localhost using a tool called Iperf \citep{gates2003iperf} that allows the creation of a client server pair where information such as Cwnd and RTT can be obtained from the output of the tool.
 
-	\subsection{Latency effect on Slow Start}
-	\input{experiments/slowstart_latency}
+The specification of the computer used for these experiments is contained in Figure~\ref{ref:testmachine}.
+
+\begin{center}
+\begin{tabular}{| l | l |}
+	\hline
+	Model	& Lenovo ThinkPad x240			\\
+	OS 		& Linux 4.14.13-1-ARCH			\\
+	CPU 	& Intel i5-4300U @ 1.90GHz		\\
+	NIC		& Intel Wireless 7260			\\
+	RAM		& 4GB							\\
+	\hline
+\end{tabular}
+\begin{figure}[h]
+	\caption{Test machine technical specifications}
+	\label{ref:testmachine}
+\end{figure}
+\end{center}
+
+% -- 1
+\subsection{Effect of Packet Loss on Download Speeds}
+\input{experiments/packetloss_downloadspeed}
+
+% -- 2
+\subsection{Latency effect on Slow Start}
+\input{experiments/slowstart_latency}
 
 %Project Achievements:
 %You should consider your original goals and statewh clearly ich have or have not been fully or partially met, and discuss reasons for any significant variance.

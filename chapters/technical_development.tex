@@ -138,7 +138,7 @@ Below is code for the creation of the NFQUEUE object along side the iptable rule
 \begin{Code}[]{NFQUEUE}
 # iptables
 os.system("iptables -A INPUT -j NFQUEUE")
-os.system("iptables -A OUTPUT -j NFQUEUE")
+os.system("iptables -t nat -A POSTROUTING -j NFQUEUE")
 
 # Setup for the NQUEUE
 nfqueue = NetfilterQueue()
@@ -155,6 +155,8 @@ nfqueue.run()
 \end{figure}
 
 In the code above the variable {\code mode} contains a method that performs effects on the packets. An example below shows what {\code mode} would equal if the effect chosen was latency:
+
+The two NFQUEUE rules were chosen due to their coverage; They cover all incoming packets to the router (INPUT) and all packets being routed and coming directly from the router. These rule also don't cause the same packet to be pushed into the queue more than once.
 
 \begin{Code}{Latency Packet Mode}
 def packet_latency(packet):
@@ -273,6 +275,8 @@ This effect changes the order of packets coming into the script, this can be use
 \subsubsection{Connection Simulation}
 Connection simulation isn't quite a degradation effect but its intent is to simulate the effect of degradation on a common connection like `WiFi` or a 3G connection to see how these are effected by said degradation. This can be useful in some situations where for example testing a mobile applications performance over 3G with heavy latency, the mobile would connect to the script and the script would effect any traffic entering or leaving the handset.
 
+The types of connections were simulated using common values for latency and packet loss. 3G and 4G values were obtained from Ofcom \footnote{\url{https://www.ofcom.org.uk/about-ofcom/latest/media/media-releases/2014/3g-4g-bb-speeds}} and good and bad WiFi connections from online sources\footnote{\url{https://www.ispreview.co.uk/index.php/2017/04/ofcom-2017-study-average-uk-home-broadband-speeds-rise-36-2mbps.html}}. 
+
 \subsubsection{Jitter}
 Jitter mode clumps and separates packets in their transmission, with some it waits a small period of time other it will clump up delay as a total and then send them all at once. This is to test how the protocol deals with jitter in the connection. Jitter as explained in the background is the intra-packet latency i.e. the difference in time between arrivals of packets.
 
@@ -286,9 +290,10 @@ Below is the process visualised:
 \input{diagrams/ARP/arp_diagram_before}
 \begin{figure}[h]
 	\caption{Diagram displaying ARP Cache of a small network}
+	\label{ref:arp_before}
 \end{figure}
 
-As you can see both ends are connected and have gone through the process to resolve the IP addresses to MAC addresses, you can see above each device their corresponding IP, MAC and ARP Cache. The ARP cache as mentioned previously is a record linking IP addresses to MAC addresses.
+Figure~\ref{ref:arp_before} shows both connected ends have gone through the process to resolve the IP addresses to MAC addresses, you can see above each device their corresponding IP, MAC and ARP Cache. The ARP cache as mentioned previously is a record linking IP addresses to MAC addresses.
 
 \input{diagrams/ARP/arp_diagram_after}
 \begin{figure}[h]
