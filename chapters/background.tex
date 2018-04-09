@@ -217,6 +217,7 @@ Linux is the broad definition of a family of computer operating systems. The def
 
 Linux was chosen for this project for its open source element that allows easy access to low-level features in the kernel. The section of the kernel that deals with the filtration of packets for uses like firewalls and packet sniffers is referred to as the ``NetFilter". This acts as an API of sorts where packets can be routed to the net-filter queue to await a verdict (accept or drop) before being moved on. This is the basis for the functionality of the program, the program will run on the Raspberry Pi and route all packets that enter the box to the queue where the effects can be applied.
 
+
 \subsubsection{Windows}
 \label{ref:Windows}
 Linux was chosen over the other possible alternative; Windows. The Windows OS is distributed as closed source software under proprietary licences meaning to understand what is happening under the hood is far more difficult. Windows does provide a solution to the packet filtering in the same way that NetFilter does, it is called Windows Filtering Platform (WFP) and it is a an API that allows access to the systems services in order to create packet filtering applications.
@@ -271,7 +272,7 @@ This compared with the full Debian \footnote{\url{https://www.debian.org/release
 
 The Raspberry Pi in this instance will be run with no desktop.
 
-As you can see from Figure~\ref{ref:debianRequire} the Linux based OS has a much smaller set of requirements. RAM usage for example, is 8 times smaller. Therefore, due to Linux's transparency and overall efficiency the OS is far more suited for use in conjunction with the Raspberry Pi.
+As you can see from Figure~\ref{ref:debianRequire} the Linux based OS has a much smaller set of requirements. RAM usage for example, is 8 times smaller. Therefore, due to Linux's transparency and overall efficiency the OS is far more suited for use in conjunction with the Raspberry Pi. 
 
 %Alternative Solutions:
 %If others have produced solutions or addressed similar problems to those addressed by your project you should describe those alternative solutions here. Similarly, if several possible approaches suggest themselves as ways of solving the problems inherent in your project you should discuss those here. You should provide a comparative analysis and critical appraisal of each alternative solution approach or existing solution, identifying their key features and their strengths and weaknesses in relation to your project.
