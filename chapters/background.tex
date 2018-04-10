@@ -19,6 +19,7 @@ Other small signs of poor network conditions are Jitter and Error rate. Jitter i
 
 It is also necessary to mention in more detail the protocols that are to be used in the network simulation section. TCP \citep{TCP} and UDP \citep{UDP} are the transport layer protocols up for discussion. 
 
+\clearpage
 \subsection{Protocols}
 \subsubsection{Transport Control Protocol (TCP)}
 TCP's main design choices are centred around reliability, where it has a few techniques designed to make sure packets arrive correctly. 
@@ -84,6 +85,7 @@ Later this report will discuss the effects of packet loss, latency and other deg
 AIMD, standing for \underline{A}dditive \underline{I}ncrease \underline{M}ultiplicative \underline{D}ecline, is a feedback control algorithm known for its use in TCP's congestion control. It works by having a linear increase and exponential decline and it will naturally mean that if set up correctly all entities using AIMD will converge on equal usage of a shared resource - in this case network bandwidth. This famously produces a 'saw-tooth' pattern when the maximum capacity is reached \citep{huston2006gigabit}.
 
 \subsubsection*{Slow Start}
+\label{ref:slowstart}
 Slow start is designed for defining suitable initial transfer rates of a TCP connection. The slow start mechanism is required because a initial huge transfer rate will have a high chance to cause buffer to overflow and will revert the connection to a crawl. Therefore, the solution to this is to start with a small-medium transfer rate and increase it per acknowledgement received.
 
 \subsubsection*{Congestion Algorithms}
@@ -93,10 +95,10 @@ There are various algorithms used to manage congestion on a network and they wor
 \subsubsection*{Congestion Algorithm - TCP Reno}
 TCP Reno was first released in the 4.3BSD OS and is normally grouped up with TCP Tahoe as they share many features. TCP Reno uses AIMD  where it performs its additive increase when a full window is transferred correctly and its multiplicative decline when a packet is lost. It introduces two new ideas "Fast Retransmit" and "Fast Recovery":
 
-{\bf Fast Retransmit}\\
+{\it Fast Retransmit}\\
 This mechanism uses 3 duplicated acknowledgements (These can be caused by re-ordered or missing segments) to signal the need for a retransmission. Fast Retransmit can repair single segment loss and does not involve the use of any time-outs, this lack of time-outs can involve a lot less idle link time. After this the congestion window size is reduced by half because of detection of loss.
 
-{\bf Fast Recovery}\\
+{\it Fast Recovery}\\
 For every duplicate ACK a segment must arrive, this can therefore be used to assume that the receiving of a segment means the buffer in the receiving end has more space available. Therefore, the sending of more packets has a high chance not to cause the buffer on the receiving end to overflow - new segments are then therefore put onto the network when acknowledgement are received (Even duplicated). 
 
 These techniques are both used together and can result in effective mitigation of packet loss.
@@ -112,7 +114,6 @@ Reno defines congestion problems in terms of packet loss and can be defined eith
 NewReno \citep{newReno} as the name suggests is the successor to TCP Reno that was discussed in the previous section. It is the version of Reno used in recent versions of the Linux Kernel.
 
 TCP NewReno's uses further heuristics to recover from multiple packet loss without the need for time-outs, this therefore means it outperforms Reno at higher error rates and is the algorithm used in the later experimentation section of this report.
-
 
 \clearpage
 \subsubsection{User Data Protocol (UDP)}
@@ -241,7 +242,6 @@ Windows, however, was not used because of the size of the Windows OS. Figure~\re
 	\end{figure}
 \end{center}
 
-\clearpage
 \begin{wrapfigure}{r}{5cm}
 \begin{center}
 No Desktop\\
@@ -274,6 +274,7 @@ The Raspberry Pi in this instance will be run with no desktop.
 
 As you can see from Figure~\ref{ref:debianRequire} the Linux based OS has a much smaller set of requirements. RAM usage for example, is 8 times smaller. Therefore, due to Linux's transparency and overall efficiency the OS is far more suited for use in conjunction with the Raspberry Pi. 
 
+\clearpage
 %Alternative Solutions:
 %If others have produced solutions or addressed similar problems to those addressed by your project you should describe those alternative solutions here. Similarly, if several possible approaches suggest themselves as ways of solving the problems inherent in your project you should discuss those here. You should provide a comparative analysis and critical appraisal of each alternative solution approach or existing solution, identifying their key features and their strengths and weaknesses in relation to your project.
 \section{Alternative Solutions}

@@ -1,10 +1,10 @@
-Slow start as mentioned in the background section is used to slowly ramp up the congestion window size until a suitable level is found. The most recent RFC 5681 \citep{allman2009tcp} that defines the Slow Start mechanism defines the behaviour as:
+Slow start (See ~\ref{ref:slowstart} is used to slowly ramp up the congestion window size until a suitable level is found. The most recent RFC 5681 \citep{allman2009tcp} that defines the Slow Start mechanism defines the behaviour as:
 
 {\it During slow start, a TCP increments cwnd by at most SMSS bytes for	each ACK received that cumulatively acknowledges new data. }
 
 Each ACKs frequency therefore is determined by the RTT, i.e. the time it takes for a segment to be sent plus the time required to acknowledge that segment.
 
-A test has be devised to demonstrate the ability of the tool to simulate a certain RTT and therefore effect the slow start thus showing how the protocol functions.
+A test has be devised to demonstrate the ability of the tool to simulate a certain RTT and therefore affect the slow start thus showing how the protocol functions.
 
 %Graph
 \begin{center}
