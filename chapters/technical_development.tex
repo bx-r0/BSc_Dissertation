@@ -500,6 +500,40 @@ This change was due to time restraints on the project and the less-important rol
 % Section Description
 %
 \section{Experiential design}
+
+\subsection{Protocol Degradation}
+The tests devised to demonstrate the effect of latency and packet loss on the test network protocols will involve: 
+
+\begin{itemize}
+	\item Localhost test
+	\item LAN test
+\end{itemize}
+
+The use of the localhost test is designed reduce the background noise and provide a clear view into exactly how the degradation alters the protocol. The LAN test will involved a client and server pair both connected to the router running the tool. The aim of this test is to provide an insight into the effect of the degradation in realistically simulated environment.
+
+\subsubsection{HTTP Experiments}
+For each test Firefox version X was used and after each test cache was fully cleared to prevent issues of faster loading time due to saved content.
+
+\subsubsection*{HTTP localhost test}
+%TODO - Test results
+
+\subsubsection*{HTTP real-world test}
+%TODO - Test results
+
+\subsubsection{FTP Experiments}
+
+\subsubsection*{FTP localhost test}
+
+\subsubsection*{FTP real-world test}
+%TODO - Test results
+
+\subsubsection{UDP Experiments}
+Due to the incompatibility of the UDP client and server and the degradation tool, they are unable to be run on the same machine, and thus cannot be run together on the localhost. This is because the UDP client and server is a windows application while the degradation only works with aspects of the Linux kernel.
+
+\subsubsection*{UDP real-world test}
+%TODO - Test results
+
+
 \subsection{Latency Accuracy}
 In the initial stages of the project there were experiments that tested the effects of the degradation on the network. The tests were performed on the loopback (Internal network 127.0.0.1) with ICMP ping packets.
 
