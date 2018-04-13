@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net;
+using System.Threading.Tasks;
 using ClientServer.UDP;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -31,7 +32,9 @@ namespace UDP.Server.Bussiness_Logic
         [TestMethod]
         public void StartAndWaitForTimeout()
         {
-            server.Start();
+            var t = new Task(new Action(() => server.Start()));
+            t.Start();
+            t.Wait();
         }
     }
 }
