@@ -1,50 +1,38 @@
-#region Imports
+# region Imports
 import os
 import sys
-import subprocess
+
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", ".."))
 from BaseClasses.Base_Test import Base_Test
-from Effects.PacketLossTimeDrop import PacketLossTimeDrop
-from Effects.PacketLoss import PacketLoss
+from Effects.Latency import Latency
 from TcpCongestionControl import TcpCongestionControl
-#endregion Imports
+
+# endregion Imports
 
 """
 # ============================= # TEST SCRIPT # ============================= # 
 Description:
-    Test that uses PacketLossTimeDrop.py to drop packets and measure stats 
-    around that connection.
     
-    The run_test() method can be used to run multiple tests per script and 
-    change values like congestion algorithm and values to be saved
-
 Testing Method:
     IPERF 
         - Local 
         - Public server
-        
+
 Values obtained:
-    - Interval
-    - Transfer
-    - Bandwidth
-    - Write
-    - Err
-    - Rtry
-    - Cwnd
-    - RTT
+    
 # =========================================================================== # 
 """
 
 
-class PacketLossTransferRateTestOverTime(Base_Test):
+class Latency_CongestionAlgo(Base_Test):
     """Test that increases the packet loss and obtains the values for retransmissions"""
 
     def __init__(self):
-        super().__init__('PacketLoss_Stats_OverTime',
-                         max_effect_value=0,
-                         start_effect_value=0,
-                         effect_step=1,
+        super().__init__('Latency_CongestionAlgo',
+                         max_effect_value=195,
+                         start_effect_value=195,
+                         effect_step=100,
                          repeat_tests=1,
                          data_headers=[],
                          max_test_time=120,
@@ -53,15 +41,14 @@ class PacketLossTransferRateTestOverTime(Base_Test):
         # Time gap between intervals
         # Note: Anything below: 0.5 pushes the output into a different format
         self.UPDATE_INTERVAL = 0.05
-        self.PACKET_LOSS_INTERVAL = 1
-        self.TEST_TIME = 10
+        self.TEST_TIME = 3
 
-        self.CONGESTION_ALGO = 'cubic'
+        self.CONGESTION_ALGO = 'reno'
 
-        #self.IPERF_ADDRESS = '127.0.0.1'
-        self.IPERF_ADDRESS = 'ping.online.net'
+        self.IPERF_ADDRESS = '127.0.0.1'
+        #self.IPERF_ADDRESS = 'ping.online.net'
 
-    def custom_test_behavior(self, packet_loss_value, data):
+    def custom_test_behavior(self, latency_value, data):
         """
         This is run from the start() method in the Base_Test.py
         :param packet_loss_value: - The value of the effect
@@ -79,18 +66,16 @@ class PacketLossTransferRateTestOverTime(Base_Test):
             'Err',
             'Rtry',
             'RTT'
-            ]
+        ]
 
         # NOTE: Command is needed to stop tcp from saving session stats
-        os.system('sysctl -w net.ipv4.tcp_no_metrics_save=0')
-
-        packet_loss_obj = PacketLossTimeDrop(self.PACKET_LOSS_INTERVAL, gather_stats=False, show_output=False)
-        self.run_test(packet_loss_obj, requested_info, 'cubic')
-        #self.run_test(None, requested_info, 'reno')
-
+        os.system('sysctl -w net.ipv4.tcp_no_metrics_save=1')
+        latency_obj = Latency(latency_value, gather_stats=False, show_output=False)
+        self.run_test(latency_obj, requested_info, self.CONGESTION_ALGO)
 
         return data
 
+    # TODO: Make these methods general
     def run_test(self, effect_obj, requested_info, congestion_algo):
         """
         Runs the test with required data and congestion algorithm used
@@ -127,5 +112,5 @@ class PacketLossTransferRateTestOverTime(Base_Test):
         self.save_csv(cwnd_list)
 
 
-test = PacketLossTransferRateTestOverTime()
+test = Latency_CongestionAlgo()
 test.start()

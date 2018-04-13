@@ -155,7 +155,7 @@ class TestResult:
             # time_range returns the end time
             return \
             [
-                ['Interval', time_range[0]],
+                ['Interval', time_range[1]],
                 ['Transfer', transferred],
                 ['Bandwidth', bandwidth]
             ]
@@ -202,14 +202,14 @@ class TestResult:
 
             return \
             [
-                ['Interval', time_range[0]],
+                ['Interval', time_range[1]],
                 ['Transfer', transferred],
                 ['Bandwidth', bandwidth],
                 ['Write', write],
                 ['Err', error],
                 ['Rtry', retry_part],
                 ['Cwnd', congestion_window],
-                ['RTT', round_trip_time]
+                ['RTT', round_trip_time.split(' ')[0]]
             ]
         else:
             print('Error: extract_stats_line() invalid line format' )

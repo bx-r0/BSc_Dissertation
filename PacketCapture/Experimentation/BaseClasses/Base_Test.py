@@ -85,14 +85,11 @@ class Base_Test():
     def save_csv(self, data):
         """Used when saving data to a .csv file"""
 
-        print('## Saving.....', end='')
-
         # Saves the data
         with open('../CSV/{}_{}.csv'.format(self.file_name_id, self.time_str), 'a') as csvfile:
             writer = csv.writer(csvfile, delimiter=',')
             writer.writerow(data)
 
-        print('[X]')
 
     def run_packet_script(self, obj, target_type='ALL'):
         """Used to run the Packet.py script with any object that is passed to this method"""
@@ -217,6 +214,8 @@ class Base_Test():
 
         result = TestResult()
         result.run_single_test()
+
+        #self.pool.close()
 
         Terminal.clear_line()
         self.printing(True)

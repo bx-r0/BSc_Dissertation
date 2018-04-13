@@ -276,11 +276,11 @@ def run_packet_manipulation():
         # Packets for this machine
         os.system("iptables -A INPUT -j NFQUEUE")
 
-        #TODO: Need to collect packets coming from the out section
-        #os.system("iptables -A OUTPUT -j NFQUEUE")
+        # Packets created from this machine
+        os.system("iptables -A OUTPUT -j NFQUEUE")
 
         # Packets for forwarding or other routes
-        #os.system("iptables -t nat -A PREROUTING -j NFQUEUE")
+        os.system("iptables A FORWARD -j NFQUEUE")
 
         print_force("[*] Mode is: " + mode.__name__)
 
