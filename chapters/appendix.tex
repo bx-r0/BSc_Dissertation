@@ -5,6 +5,95 @@
 \label{ref:testplan}
 \input{tables/TestPlanTable}
 
+\chapter{HTTP Testing}
+\label{ref:httpTesting}
+%TODO - Results for these tests
+
+\chapter{FTP Testing}
+\label{ref:ftpTesting}
+\begin{center}
+
+\begin{tabular}{| l | l |}
+	\hline
+	{\bf Description} 	& {\bf Download Time (Minutes:Seconds)} \\\hline
+	No script			& 0:15 \\\hline
+	0m/s				& 0:17 \\\hline
+	10 	m/s				& 0:34 \\\hline
+	50 	m/s				& 0:41 \\\hline
+	100 m/s				& 1:29 \\\hline
+	150 m/s				& 2:02 \\\hline
+	200 m/s				& 2:46 \\\hline
+		
+\end{tabular}
+\begin{figure}[h]
+		\caption{Time to download a 5MB file when latency is being simulated by the tool}
+	\end{figure}	
+
+\begin{tabular}{| l | l |}
+	\hline
+	{\bf Description} 	& {\bf Download Time (Minutes:Seconds)} \\\hline
+	1\%					& 0:35 \\\hline
+	5\%					& 0:38 \\\hline
+	10\%				& 1:02 \\\hline
+	15\%				& 1:45 \\\hline
+	20\%				& 2:38 \\\hline
+	25\%				& 4:34 \\\hline
+\end{tabular}
+\begin{figure}[h]
+		\caption{Time to download a 5MB file when packet loss is being simulated by the tool}
+\end{figure}	
+\end{center}
+
+%
+\chapter{UDP Testing}
+\label{ref:udpTesting}
+\newcommand{\udpScale}{0.5}
+\newcommand{\figureText}[1]{#1\% packet loss}
+
+\begin{figure}[!htb]
+\minipage{0.32\textwidth}
+  \includegraphics[width=\linewidth]{PacketLoss5}
+  \caption{\figureText{5}}
+\endminipage\hfill
+\minipage{0.32\textwidth}
+  \includegraphics[width=\linewidth]{PacketLoss10}
+  \caption{\figureText{10}}
+\endminipage\hfill
+\minipage{0.32\textwidth}
+  \includegraphics[width=\linewidth]{PacketLoss15}
+  \caption{\figureText{15}}
+\endminipage
+\end{figure}
+
+\begin{figure}[!htb]
+\minipage{0.32\textwidth}
+  \includegraphics[width=\linewidth]{PacketLoss20}
+  \caption{\figureText{20}}
+\endminipage\hfill
+\minipage{0.32\textwidth}
+  \includegraphics[width=\linewidth]{PacketLoss25}
+ \caption{\figureText{25}}
+\endminipage\hfill
+\minipage{0.32\textwidth}
+  \includegraphics[width=\linewidth]{PacketLoss50}
+  \caption{\figureText{50}}
+\endminipage
+\end{figure}
+
+\begin{figure}[!htb]
+\minipage{0.32\textwidth}
+  	\includegraphics[width=\linewidth]{PacketLoss95}
+  	\caption{\figureText{95}}
+\endminipage\hfill
+\minipage{0.32\textwidth}
+  	\includegraphics[width=\linewidth]{PacketLoss100}
+  	\caption{\figureText{100}}
+\endminipage\hfill
+\minipage{0.32\textwidth}
+  	\hfill
+\endminipage
+\end{figure}
+
 %
 \chapter{GitHub Issues}
 \begin{center}
