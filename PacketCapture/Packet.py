@@ -280,7 +280,7 @@ def run_packet_manipulation():
         os.system("iptables -A OUTPUT -j NFQUEUE")
 
         # Packets for forwarding or other routes
-        os.system("iptables A FORWARD -j NFQUEUE")
+        os.system("iptables -A FORWARD -j NFQUEUE")
 
         print_force("[*] Mode is: " + mode.__name__)
 

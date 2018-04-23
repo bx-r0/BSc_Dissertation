@@ -28,12 +28,15 @@ class Base_Test():
                  repeat_tests,
                  max_test_time,
                  data_headers,
-                 print_time_estimate=True):
+                 print_time_estimate=True,
+                 csv_path='../CSV/'):
 
         self.pool = ThreadPool(1000)
         self.time_str = self.grab_time_str()
 
         self.file_name_id = file_name_id
+
+        self.CSV_PATH = csv_path
 
         self.START_EFFECT_VALUE = start_effect_value
         self.MAX_EFFECT_VALUE = max_effect_value
@@ -86,10 +89,9 @@ class Base_Test():
         """Used when saving data to a .csv file"""
 
         # Saves the data
-        with open('../CSV/{}_{}.csv'.format(self.file_name_id, self.time_str), 'a') as csvfile:
+        with open('{}{}_{}.csv'.format(self.CSV_PATH, self.file_name_id, self.time_str), 'a') as csvfile:
             writer = csv.writer(csvfile, delimiter=',')
             writer.writerow(data)
-
 
     def run_packet_script(self, obj, target_type='ALL'):
         """Used to run the Packet.py script with any object that is passed to this method"""
@@ -215,7 +217,7 @@ class Base_Test():
         result = TestResult()
         result.run_single_test()
 
-        #self.pool.close()
+        self.pool.close()
 
         Terminal.clear_line()
         self.printing(True)
