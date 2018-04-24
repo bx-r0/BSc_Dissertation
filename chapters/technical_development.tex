@@ -512,9 +512,11 @@ This change was due to time restraints on the project and the less-important rol
 The tool was tested against the various protocols and rough results were obtained to validate the correct function of the degradation tool. 
 
 \subsubsection{HTTP Experiment}
-HTTP traffic was tested through the measurement of load times of pages. A single client with a web browser connected to the Raspberry Pi router running the degradation script. Latency and packet were increased and the load times were recorded for each effect. 
+HTTP traffic was tested through an automated script. The degradation tool was activated for packet loss and latency and the website was downloaded using the {\it wget} command. The website chosen was the Wikipedia page for the Univeristy of Hull \footnote{\url{https://en.wikipedia.org/wiki/University_of_Hull}}. This page was chosen due to it being a good example of a simple web page.
 
-%TODO - Explain results
+Appendix~\ref{ref:httpTesting} contains the results for the HTTP testing. Figure~\ref{ref:latencyHttp} contains the latency results. The page load time value is the average taken over a series of 5 repeat test. The results were as expected; the increase in load times is linear with the increase of latency.
+
+
 \subsubsection{FTP Experiment}
 FTP traffic was tested in a similar way to HTTP. Two hosts connected to the Raspberry Pi router; one host the client and the other the server. Transfer speed of a 5MB file were tracked and recorded.
 
