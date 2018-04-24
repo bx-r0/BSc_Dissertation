@@ -401,19 +401,28 @@ The router also needs a couple of tools to manage the assigning of IPs (DHCP ser
 
 
 \subsection{Router Implementation}
-Hostapd has been used very simply to create a single WPA2 protected access point, this however requires a WiFi dongle that supports Access Point Mode - the WiFi dongle used for this project was the TP-LINK TL-WN722N and was strong enough to provide ample range.
+Hostapd has been used very simply to create a single protected access point, this however requires a WiFi dongle that supports Access Point Mode - the WiFi dongle used for this project was the TP-LINK TL-WN722N and was strong enough to provide ample range.
 
 Figure~\ref{ref:Hostapd} contains the configuration script used:
 
 \begin{center}
-	{\bf  TODO - Hostapd Script}
+\begin{Scripts}{}
+interface=wlan0
+driver=rtl871xdrv
+ssid=NETWORK_NAME
+hw_mode=g
+channel=3
+wpa=2
+wpa_passphrase=PASSWORD
+wpa_key_mgmt=WPA-PSK
+\end{Scripts}
 	\begin{figure}[h]
 		\caption{Hostapd script used to create the access point}
 		\label{ref:Hostapd}
 	\end{figure}
 \end{center}
 
-%TODO - Explain aspects of scripts
+This script is used to define the password, SSID and any other configuration regarding the WiFi access point.
 
 The router also needs to assign IP addresses to newly connected devices, it does this by utilising DHCP. DHCP stands for Dynamic Host Configuration Protocol and as the name suggests configures connected hosts. A DHCP server is created on the Raspberry Pi that will automatically assign a local IP to that device and allow it to communicate with other devices on the LAN and the internet.
 
@@ -500,37 +509,21 @@ This change was due to time restraints on the project and the less-important rol
 \section{Experiential design}
 
 \subsection{Protocol Degradation}
-The tests devised to demonstrate the effect of latency and packet loss on the test network protocols will involve: 
+The tool was tested against the various protocols and rough results were obtained to validate the correct function of the degradation tool. 
 
-\begin{itemize}
-	\item Localhost test
-	\item LAN test
-\end{itemize}
+\subsubsection{HTTP Experiment}
+HTTP traffic was tested through the measurement of load times of pages. A single client with a web browser connected to the Raspberry Pi router running the degradation script. Latency and packet were increased and the load times were recorded for each effect. 
 
-The use of the localhost test is designed reduce the background noise and provide a clear view into exactly how the degradation alters the protocol. The LAN test will involved a client and server pair both connected to the router running the tool. The aim of this test is to provide an insight into the effect of the degradation in realistically simulated environment.
+%TODO - Explain results
+\subsubsection{FTP Experiment}
+FTP traffic was tested in a similar way to HTTP. Two hosts connected to the Raspberry Pi router; one host the client and the other the server. Transfer speed of a 5MB file were tracked and recorded.
 
-\subsubsection{HTTP Experiments}
-For each test Firefox version X was used and after each test cache was fully cleared to prevent issues of faster loading time due to saved content.
+Appendix~\ref{ref:ftpTesting} contains the results for the experiment. As expected as the degradation becomes more violent the transfer time increases. Latency seemed to have a linear relationship to the increase in transfer speed.
 
-\subsubsection*{HTTP localhost test}
-%TODO - Test results
+\subsubsection{UDP Experiment}
+UDP was tested using the custom server client created for visualising the packet loss, therefore, only packet was tested for UDP. In a similar way to FTP a server and client both connected to the router running the tool. The state of the user interface was recorded as significant packet loss values.
 
-\subsubsection*{HTTP real-world test}
-%TODO - Test results
-
-\subsubsection{FTP Experiments}
-
-\subsubsection*{FTP localhost test}
-
-\subsubsection*{FTP real-world test}
-%TODO - Test results
-
-\subsubsection{UDP Experiments}
-Due to the incompatibility of the UDP client and server and the degradation tool, they are unable to be run on the same machine, and thus cannot be run together on the localhost. This is because the UDP client and server is a windows application while the degradation only works with aspects of the Linux kernel.
-
-\subsubsection*{UDP real-world test}
-%TODO - Test results
-
+Appendix~\ref{ref:udpTesting} contains the progression of the interface as the packet loss value becomes more extreme. The clear representation of arrived and lost packets makes it immediately apparent of the effect of packet loss on a UDP connection. UDP does not resend when packets are lost, so in situations with abnormally large packet loss values an application relying on UDP can be completely incapacitated.
 
 \subsection{Latency Accuracy}
 In the initial stages of the project there were experiments that tested the effects of the degradation on the network. The tests were performed on the loopback (Internal network 127.0.0.1) with ICMP ping packets.
