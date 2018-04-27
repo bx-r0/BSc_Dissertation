@@ -204,10 +204,12 @@ def custom_effect(self, packet):
 		wait_time = self.latency_value - elapsed
 
 		if wait_time < 0:
+			# No waiting			
 			pass
 		else:
 			time.sleep(wait_time)
-			self.accept(packetObj)
+			
+		self.accept(packetObj)
 			
 	# # Static time mode
 	else:
@@ -225,8 +227,8 @@ Packet loss is simulated by first assigning a target value, lets say for this ex
 \begin{Code}{Packet Loss}
 def custom_effect(self, packet):
         """This function will issue packet loss,
-           a percentage is defined and anything
-           lower is dropped and anything higher is accepted"""
+           a percentage is defined where lower 
+           values are dropped and higher values are accepted"""
 
         if self.packet_loss_percentage != 0:
 
@@ -237,7 +239,6 @@ def custom_effect(self, packet):
                 self.dropped_packets += 1
                 packet.drop()
 
-            # Accept the packet
             else:
                 self.accept(packet)
         else:
@@ -356,19 +357,14 @@ def start(self):
        # Talks to every machine and changes the ARP value
        # The list of hosts is obtained by an NMAP scan
        for host_dst in self.active_hosts:
-           count = 0
-
            for host_src in self.active_hosts:
-           if host_dst != host_src:
+           	  if host_dst != host_src:
                  
-           # Send the ARP packet - rnd_mac_addresses() creates
-           # a fully random  MAC address
-           self.send_arp_packet(host_dst, 
-                                host_src, 
-                                self.rnd_mac_addresses[count])
-                                         
-           count += 1
-
+           	  	# Send the ARP packet - rnd_mac_addresses() creates
+           	  	# a fully random  MAC address
+           	  	self.send_arp_packet(host_dst, 
+                                    host_src, 
+                                    self.rnd_mac_addresses[count])
 
 
 def send_arp_packet(self, dst, src, mac, op_code=2):
