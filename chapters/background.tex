@@ -57,6 +57,7 @@ In the TCP header there is a two byte value that represents the receiving window
 Flow control is a mechanism used by the protocol to ensure that the receiving party does not become overwhelmed by the incoming transmission of packets. TCP has two types of buffers the `send' and `receive', where the send buffer collects what data is going out and the receive buffer collects what is coming in. The purpose of the flow control is to prevent the sending of packets that will not fit in the destination receive buffer and therefore will prevent these packets from being dropped. The protocol achieves this by allowing each party to advertise its available receive buffer space through the `Window Size' section in the header (This is included in each ACK packet) and is commonly known as the `Advertised Window`. Once the receive buffer is full the receiving party will advertise what is known as a `zero window' where it sets the window size to zero and transfer will stop halt until there is adequate space in the receive buffer.
 
 \subsubsection*{Sliding Window}
+\label{ref:window}
 To control the number of packets the protocol has in flight at any one time the protocol utilises the `sliding window. The size of the sliding window is altered by two factors: The size of the send buffer and the size of the destinations receive buffer. Therefore, the maximum amount of data the protocol can send is the smallest of the two previous values. 
 \begin{center}
 	$SlidingWindowSize = Min(LocalSendBuffer, DestinationRecieveBuffer)$
