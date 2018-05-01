@@ -179,7 +179,7 @@ There are a couple of aspect to note in the above code listing:
 {\code affect\_packet} is the method that checks the packet against the active filters. 
 {\code assign\_thread} is the method that assigns the object effect method ({\code latency\_obj.effect}) to an idle thread in the pool and {\code packet.accept()} and {\code packet.drop()} are the ways the packet is assigned a verdict. This verdict can be assigned at any point in the code and becomes instantly active.
 
-
+\clearpage
 \subsection{Degradation Effects}
 The script contains the functionality to simulate a plethora of effects. Each effects functionality will be described below. It is of note that any of these effects can be chained together in any order.
 

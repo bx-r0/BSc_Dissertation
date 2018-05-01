@@ -42,7 +42,7 @@ The connection is initiated with a series of signals carried as packets. These s
 	\end{figure}
 \end{center}
 
-
+\clearpage
 \subsubsection*{Sequence Numbers and Acknowledgement Numbers}
 One of the main mechanisms for detecting missing and incorrect packets is the sequence and acknowledgement numbers. The sequence number is increased by the `length' of every correctly transmitted packet. A packet's length can be calculated by taking the total size of the packet and subtracting the size of the header. For example, if a packet with a length of 100 was sent it would move the sequence value up by 100, this gives the protocol the information to judge what it should be expecting and what it has received, if these values do not add up, TCP can flag for an error and retransmit.
 
@@ -83,7 +83,7 @@ Later this report will discuss the effects of packet loss, latency and other deg
 
  
 \subsubsection*{AIMD}
-AIMD, standing for \underline{A}dditive \underline{I}ncrease \underline{M}ultiplicative \underline{D}ecline, is a feedback control algorithm known for its use in TCP's congestion control. It works by having a linear increase and exponential decline and it will naturally mean that if set up correctly all entities using AIMD will converge on equal usage of a shared resource - in this case network bandwidth. This famously produces a 'saw-tooth' pattern when the maximum capacity is reached \citep{huston2006gigabit}.
+AIMD, standing for Additive Increase Multiplicative Decline, is a feedback control algorithm known for its use in TCP's congestion control. It works by having a linear increase and exponential decline and it will naturally mean that if set up correctly all entities using AIMD will converge on equal usage of a shared resource - in this case network bandwidth. This famously produces a 'saw-tooth' pattern when the maximum capacity is reached \citep{huston2006gigabit}.
 
 \subsubsection*{Slow Start}
 \label{ref:slowstart}
@@ -116,7 +116,6 @@ NewReno \citep{newReno} as the name suggests is the successor to TCP Reno that w
 
 TCP NewReno's uses further heuristics to recover from multiple packet loss without the need for time-outs, this therefore means it outperforms Reno at higher error rates and is the algorithm used in the later experimentation section of this report.
 
-\clearpage
 \subsubsection{User Data Protocol (UDP)}
 \begin{center}
 	\includegraphics[scale=0.7]{udp_header}
@@ -166,6 +165,7 @@ A commercial out-of-the-box router could be used with a custom version of OpenWr
 
 %Comparison of Technologies:
 %If there are several possible technologies that could be used in your project work you should present a comparative analysis and critical appraisal of each of these technologies. You should create a subsection for each of the technologies you discuss and title each subsection with the name of the technology it describes (e.g. object-oriented databases, XML ). Within each subsection you should provide an overview of the technology, its key features and its strengths and weaknesses in relation to your project.
+\clearpage
 \section{Comparison of Technologies}
 \subsection{Protocol Comparison}
 \subsubsection{TCP Based Protocols}
@@ -202,7 +202,7 @@ UDP is used for situations where speed is required but reliability is not. Media
 
 \subsubsection{Other protocols}
 \subsubsection*{QUIC}
-QUIC - \underline{Q}uick \underline{U}DP \underline{I}nternet \underline{C}onnections \citep{hamilton2016quic} is an early stage transport layer protocol developed by Google where it was announced in 2013. QUIC is built upon UDP and is designed to provide faster transfer speed in web applications that utilise TCP.
+Quick UDP Internet Connections \citep{hamilton2016quic} is an early stage transport layer protocol developed by Google where it was announced in 2013. QUIC is built upon UDP and is designed to provide faster transfer speed in web applications that utilise TCP.
 It has a multitude of extra features, involving bandwidth estimation to reduce congestion, movement of congestion control into the application space rather than having the control embedded into the kernel meaning applications can adapt quicker and provide more bespoke decisions. QUIC also attempts to reduce latency by the simple inclusion of performing less transfers from that of an equivalent TCP connection. QUIC also includes techniques to attempt the handling of packet loss better than that of TCP. Techniques like: proactive speculative retransmissions ('Important' data is sent more than once).
 
 There were initially concerns about UDP connectivity and the possibility that many uses would be behind systems that block UDP traffic. This was mitigated by Chromium connectivity experiments \citep{roskind2013quic} where 91-94\% of Google users could make a UDP connection outbound.
