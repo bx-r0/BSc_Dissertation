@@ -1,15 +1,13 @@
 # Dissertation_Project
-[![asciicast](https://asciinema.org/a/KtyqI8rwuqKefuhRddmsshKOX.png)](https://asciinema.org/a/KtyqI8rwuqKefuhRddmsshKOX)
-
 # Required Packages
 
 ## Ubuntu or Debian
 
-  ```apt-get install build-essential python-dev libnetfilter-queue-dev```
+  ```sudo apt-get install build-essential python-dev libnetfilter-queue-dev```
   
 ## Arch
 
-  ```TODO ```
+  ```sudo pacman -Sy build-essential python-dev libnetfilter-queue-dev ```
   
 # Install for Python
 
@@ -19,6 +17,8 @@ Note: Python 3.6 is required
   sudo pip install NetfilerQueue
   sudo pip install scapy
   sudo pip install python-nmap
+  sudo pip install matplotlib
+  sudi pip install gi
   ```
 
 # Configuring PI as a router
