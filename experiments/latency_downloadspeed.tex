@@ -1,0 +1,40 @@
+Figure~\ref{ref:LatencyDownload} shows the impact of latency on the connections throughput. The data was collated using an iperf server and client pair running over the host machine's localhost.
+
+%Graph
+\begin{center}
+	\begin{tikzpicture}[ every axis plot/.append style={thick}]
+		\begin{axis}[
+			width=\linewidth,
+			height=10cm,
+			grid=major,
+			xmin=10, xmax=100,
+			ymin=0,
+			xlabel=Latency (ms),
+			ylabel=Throughput (Mbps)]
+			\addplot table [mark=none, search path=csv_data, col sep=comma]{LatencyDownload.csv};
+		 \end{axis}
+ 	\end{tikzpicture}
+\end{center}
+\begin{figure}[h]
+	\caption{Graph displaying Latency (ms) against Throughput (Mbps)}
+	\label{ref:LatencyDownload}
+\end{figure}
+
+As it is evident, latency has an inverse relationship with that of the throughput. The reason for the reduction in throughput is due to the need to wait for acknowledgements. When TCP has sent a full window size (See~\ref{ref:window} Sliding Window) it will wait until acknowledgements have been received before sending more packets. This requirement to wait therefore means higher latency values increase the idle time of a TCP connection where extended periods of time are spent waiting for acknowledgements.
+
+Inconsistency in the latency value also has an adverse effect on the throughput of the connection due to packets being deemed as ``lost" because they take longer than the time defined in the $RTO$ value. The $RTO$ variable defines the amount of time to wait before issuing a retransmission and deeming a packet as lost, this can be deemed as packet loss and the TCP protocol will act accordingly. RFC 6298 \citep{paxson2011computing} defines the calculation of $RTO$ to involve the two state variables: $RTTVAR$ (Round-trip time variation) and $SRTT$ (Smoothed round-trip time). These values are updated each time there is a new RTT measurement.
+
+\clearpage
+\begin{center}
+\[RTO = SRTT + MAX(G, K * RTTVAR)\]
+\end{center}
+where: \\
+\hspace*{1cm} $K$ is 4 \\
+\hspace*{1cm} $G$ is Time Granularity
+
+\begin{figure}[h]
+	\caption{Equation for calculating $RTO$}
+	\label{ref:RTO} 
+\end{figure}
+
+Figure~\ref{ref:RTO} contains the main equation for calculating the $RTO$ value. This equation is used to take into the residual RTT of a network when calculating the expected retransmission time. This means large networks with large latency values are taken into account.
