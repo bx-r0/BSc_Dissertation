@@ -1,8 +1,11 @@
 # "Compromised and Degraded Network Simulation"
-Project code for final year dissitation project. 
+Project code for final year dissertation project. 
 
   - /PacketCapture - Contains the script that perfoms different degradation effects on a network connection
   - /ClientServer - Contains the programs used in the test network
+
+# Report download
+The dissertation report that this project is based of can be downloaded [here](https://github.com/AidanFray/Dissertation_Report)
 
 # Required Packages and Install
 
