@@ -1,5 +1,10 @@
-# Dissertation_Project
-# Required Packages
+# "Compromised and Degraded Network Simulation"
+Project code for final year dissitation project. 
+
+  - /PacketCapture - Contains the script that perfoms different degradation effects on a network connection
+  - /ClientServer - Contains the programs used in the test network
+
+# Required Packages and Install
 
 ## Ubuntu or Debian
 
