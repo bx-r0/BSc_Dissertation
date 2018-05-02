@@ -5,7 +5,7 @@ Project code for final year dissertation project.
   - /ClientServer - Contains the programs used in the test network
 
 # Report download
-The dissertation report that this project is based of can be downloaded [here](https://github.com/AidanFray/Dissertation_Report)
+The dissertation report that this project is based of can be downloaded [here](https://github.com/AidanFray/Dissertation_Report/releases)
 
 # Required Packages and Install
 
