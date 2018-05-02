@@ -8,7 +8,8 @@ Create a custom simulated network that can demonstrate and visualise network deg
 The above aim will be achieved by reaching these targets:
 
 %---------------------- OBJECTTIVE 1 ----------------------- %
-\paragraph{Objective One}
+\section{Objective One}
+\label{ref:obj1}
 Develop a fully working client server pair that communicate using HTTP/1.1 \citep{HTTP} and FTP over the TCP protocol alongside a client and server that use the UDP protocol
 
 \begin{itemize}
@@ -24,9 +25,11 @@ The functionality above with be contained in one executable that will take param
 
 Note: Authentication for any of these channels is outside the scope of this project
 
-\label{sec:obj2}
+
 %---------------------- OBJECTTIVE 2 ----------------------- %
-\paragraph{Objective 2}
+\section{Objective Two}
+\label{sec:obj2}
+\label{ref:obj2}
 Create a program that runs on a Linux based OS that can be used to simulate degradation and attacks. This program will then be run on the router.
 
 \begin{itemize}
@@ -36,7 +39,7 @@ Create a program that runs on a Linux based OS that can be used to simulate degr
 	\item Latency
 	\item Rate of transfer (Bandwidth)
 	\end{itemize}
-\item Attacks will compose of some small and simple attacks; Possible attacks could be:
+\item Attacks will compose of some small and simple attacks; possible attacks could be:
 	\begin{itemize}
 	\item UDP Flooding \citep{xiaoming2010denial}, where the network is filled with erroneous packets that will attempt to clog up the network.
 	\item ARP (Address Resolution Protocol) spamming and poison, the network is filled with ever changing ARP requests that cause computers to not be able to correctly resolve the 	valid locations of each other (Whalen, S., 2001).
@@ -45,7 +48,8 @@ Create a program that runs on a Linux based OS that can be used to simulate degr
 \end{itemize}
 
 %---------------------- OBJECTTIVE 3 ----------------------- %
-\paragraph{Objective 3}
+\section{Objective Three}
+\label{ref:obj3}
 Create a working custom router that can be used to simulate degradation in conjunction with the program outlined in Objective 2
 
 \begin{itemize}

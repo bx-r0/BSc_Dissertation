@@ -1,4 +1,4 @@
-Slow start (See ~\ref{ref:slowstart} is used to slowly ramp up the congestion window size until a suitable level is found. The most recent RFC 5681 \citep{allman2009tcp} that defines the Slow Start mechanism defines the behaviour as:
+Slow start (See Section~\ref{ref:slowstart}) is used to slowly ramp up the congestion window size until a suitable level is found. The most recent RFC 5681 \citep{allman2009tcp} that defines the Slow Start mechanism defines the behaviour as:
 
 {\it During slow start, a TCP increments cwnd by at most SMSS bytes for	each ACK received that cumulatively acknowledges new data. }
 
@@ -34,4 +34,4 @@ Figure~\ref{ref:CwndSlowStart} shows the result of the experiment. The RTT was s
 
 As you can see from both lines the increase in Cwnd value occurs in intervals of the respective RTT values, this is as expected due to the statement contained in the RFC document. Doubling the value of the RTT increases the time taken to finish the slow start of a connection by double thus the increase is a linear relationship.
 
-The over error in simulating RTT was also recorded and the overall error was 1.258\% and 1.151\% respectively for each plot. The error was calculated using the average RTT.
+The overall error in simulating RTT was also recorded and the overall error was 1.258\% and 1.151\% respectively for each plot. The error was calculated using the average RTT.

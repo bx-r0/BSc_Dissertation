@@ -44,21 +44,21 @@ The connection is initiated with a series of signals carried as packets. These s
 
 \clearpage
 \subsubsection*{Sequence Numbers and Acknowledgement Numbers}
-One of the main mechanisms for detecting missing and incorrect packets is the sequence and acknowledgement numbers. The sequence number is increased by the `length' of every correctly transmitted packet. A packet's length can be calculated by taking the total size of the packet and subtracting the size of the header. For example, if a packet with a length of 100 was sent it would move the sequence value up by 100, this gives the protocol the information to judge what it should be expecting and what it has received, if these values do not add up, TCP can flag for an error and retransmit.
+One of the main mechanisms for detecting missing and incorrect packets is the sequence and acknowledgement numbers. The sequence number is increased by the length of every correctly transmitted packet. A packet's length can be calculated by taking the total size of the packet and subtracting the size of the header. For example, if a packet with a length of 100 was sent it would move the sequence value up by 100, this gives the protocol the information to judge what it should be expecting and what it has received, if these values do not add up, TCP can flag for an error and retransmit.
 
-To guarantee arrival of a packet the sender needs to know when packets have been received, this is where the acknowledgement number comes in. Packets carrying acknowledgements are known as ``ACKs". For a packet with a sequence number of 100 being sent, it will require a packet to be returned containing the ACK number of 100 to verify that exact packet has been transferred correctly. If the corresponding ACK packet is not received before the the time-out value has been reached the packet is resent, this is how TCP guarantees retransmission of packets. TCP's guaranteed arrival is one of the reasons why packet loss doesn't have the same devastating effect it does on UDP with TCP.
+To guarantee arrival of a packet the sender needs to know when packets have been received, this is where the acknowledgement number comes in. Packets carrying acknowledgements are known as ``ACKs". For a packet with a sequence number of 100 being sent, it will require a packet to be returned containing the ACK number of 100 to verify that exact packet has been transferred correctly. If the corresponding ACK packet is not received before the the time-out value has been reached the packet is resent, this is how TCP guarantees retransmission of packets. TCP's guaranteed arrival is one of the reasons why packet loss does not have the same devastating effect it does on UDP with TCP.
 
-In situations where connections are created and recreated quickly in succession or are being quickly re-established after errors there cannot be initial sequence numbers (ISN) that clash with previous segment that may still exist on a network connection. Therefore TCP solves this issue by generating new ISNs using a ISN Generator that uses a 32 bit clock. The 32 bit clock has a life cycle of 4.55 hours where this time period is commonly known as the Maximum Segment Lifetime (MSL). If an ISN is generated within this MSL is can be guaranteed to be unique.
+In situations where connections are created and recreated quickly in succession or are being quickly re-established after errors there cannot be initial sequence numbers (ISN) that clash with previous segment that may still exist on a network connection. Therefore TCP solves this issue by generating new ISNs using a ISN Generator that uses a 32 bit clock. The 32 bit clock has a life cycle of 4.55 hours where this time period is commonly known as the Maximum Segment Lifetime (MSL). If an ISN is generated within this MSL, it can be guaranteed to be unique.
 
 \subsubsection*{Receiving Window}
-In the TCP header there is a two byte value that represents the receiving window size, this value defines the maximum size of unacknowledged packets the receiving end has space for. If a client sends a packet with a 65535 window size value it tells the receiving computer not to send more than 65535 bytes before receiving corresponding acknowledgements. This value can also be extended using a value in the area allocated in the `TCP Options' called `Window Scaling', this allows the value in the window size to be multiplied by this scale value. For example, a window size of 65535 with a window scale of 5 would have a total window size of 327675 Bytes. A larger window size means more data can be sent before the protocol needs to wait for acknowledgements and can normally mean faster transfer speeds. It is worth nothing, this exchange of window scaling values is only performed in the handshake and can only be present in the initial exchange of packets.
+In the TCP header there is a two byte value that represents the receiving window size, this value defines the maximum size of unacknowledged packets the receiving end has space for. If a client sends a packet with a 65535 window size value it tells the receiving computer not to send more than 65535 bytes before receiving corresponding acknowledgements. This value can also be extended using a value in the area allocated in the `TCP Options' called `Window Scaling', this allows the value in the window size to be multiplied by this scale value. For example, a window size of 65535 with a window scale of 5 would have a total window size of 327675 Bytes. A larger window size means more data can be sent before the protocol needs to wait for acknowledgements and can normally mean faster transfer speeds. It is worth noting; this exchange of window scaling values is only performed in the handshake and can only be present in the initial exchange of packets.
 
 \subsubsection*{Flow Control}
 Flow control is a mechanism used by the protocol to ensure that the receiving party does not become overwhelmed by the incoming transmission of packets. TCP has two types of buffers the `send' and `receive', where the send buffer collects what data is going out and the receive buffer collects what is coming in. The purpose of the flow control is to prevent the sending of packets that will not fit in the destination receive buffer and therefore will prevent these packets from being dropped. The protocol achieves this by allowing each party to advertise its available receive buffer space through the `Window Size' section in the header (This is included in each ACK packet) and is commonly known as the `Advertised Window`. Once the receive buffer is full the receiving party will advertise what is known as a `zero window' where it sets the window size to zero and transfer will stop halt until there is adequate space in the receive buffer.
 
 \subsubsection*{Sliding Window}
 \label{ref:window}
-To control the number of packets the protocol has in flight at any one time the protocol utilises the `sliding window. The size of the sliding window is altered by two factors: The size of the send buffer and the size of the destinations receive buffer. Therefore, the maximum amount of data the protocol can send is the smallest of the two previous values. 
+To control the number of packets the protocol has in flight at any one time the protocol utilises the `sliding' window. The size of the sliding window is altered by two factors: The size of the send buffer and the size of the destinations receive buffer. Therefore, the maximum amount of data the protocol can send is the smallest of the two previous values. 
 \begin{center}
 	$SlidingWindowSize = Min(LocalSendBuffer, DestinationRecieveBuffer)$
 \end{center}
@@ -71,6 +71,7 @@ The closing of a TCP connection is very similar to the initial construction \cit
 
 
 \subsubsection*{Congestion control}
+\label{ref:tcpCongestion}
 When there are situations where multiple clients are connected to a single receiver, the bandwidth needs to be split equally between the clients, this is performed by the inbuilt TCP congestion control. The clients send data and keep increasing their transfer rate until they loose a packet. Packet loss is therefore a sign of congestion - this is because it assumes that the packets are being lost due to the router having insufficient packet buffering space. When the number of clients drops, more bandwidth then becomes available and the congestion algorithm utilises this naturally because it has been periodically probing the network to check for available bandwidth. This probing is done by increasing its transfer rate until packet loss is encountered, where it then quickly slows its transfer rate and repeats the process. This results in TCP auto balancing when new clients are introduced and removed and thus utilizing as much bandwidth as is available.
 
 The rate of transfer is indirectly defined by two values "Congestion Window" (Cwnd) and "Advertised Window". The congestion window is the amount of packets a connection stream allows in flight and the advertised window is used to inform the sending end how much buffer space is available to hold incoming packets. These both define the overall "WinSize" where a small value means less packets can be sent without waiting for corresponding acknowledgements and therefore reducing the transfer speed. The equation below is used to define window size: 
@@ -87,10 +88,10 @@ AIMD, standing for Additive Increase Multiplicative Decline, is a feedback contr
 
 \subsubsection*{Slow Start}
 \label{ref:slowstart}
-Slow start is designed for defining suitable initial transfer rates of a TCP connection. The slow start mechanism is required because a initial huge transfer rate will have a high chance to cause buffer to overflow and will revert the connection to a crawl. Therefore, the solution to this is to start with a small-medium transfer rate and increase it per acknowledgement received.
+Slow start is designed for defining suitable initial transfer rates of a TCP connection. The slow start mechanism is required because a initial huge transfer rate will have a high chance to cause buffers to overflow and will revert the connection to a crawl. Therefore, the solution to this is to start with a small-medium transfer rate and increase it per acknowledgement received.
 
 \subsubsection*{Congestion Algorithms}
-There are various algorithms used to manage congestion on a network and they work in slightly different way and all have situations where they work more effectively.
+There are various algorithms used to manage congestion on a network and they work in slightly different ways. All algorithms have situations where they work most effectively.
 
 
 \subsubsection*{Congestion Algorithm - TCP Reno}
@@ -100,7 +101,7 @@ TCP Reno was first released in the 4.3BSD OS and is normally grouped up with TCP
 This mechanism uses 3 duplicated acknowledgements (These can be caused by re-ordered or missing segments) to signal the need for a retransmission. Fast Retransmit can repair single segment loss and does not involve the use of any time-outs, this lack of time-outs can involve a lot less idle link time. After this the congestion window size is reduced by half because of detection of loss.
 
 {\it Fast Recovery}\\
-For every duplicate ACK a segment must arrive, this can therefore be used to assume that the receiving of a segment means the buffer in the receiving end has more space available. Therefore, the sending of more packets has a high chance not to cause the buffer on the receiving end to overflow - new segments are then therefore put onto the network when acknowledgement are received (Even duplicated). 
+For every duplicate ACK a segment must arrive, this can therefore be used to assume that the receiving of a segment means the buffer in the receiving end has more space available. Therefore, the sending of more packets has a high chance not to cause the buffer on the receiving end to overflow - new segments are then therefore put onto the network when acknowledgements are received (even duplicated acknowledgements). 
 
 These techniques are both used together and can result in effective mitigation of packet loss.
 
@@ -108,13 +109,13 @@ Reno defines congestion problems in terms of packet loss and can be defined eith
 
 \begin{itemize}
 	\item 3 duplicated acknowledgements is considered non-severe and the algorithm moves into congestion avoidance with Fast Retransmission and fast recovery coming into effect.
-	\item Retransmission defined by a time out is defined as {\bf severe} and will set the Congestion Window to the minimum value and start a Slow Start. Time outs are usually caused by multiple occurrences of packet loss.
+	\item Retransmission defined by a time out is defined as {\bf severe} and will set the Congestion Window to the minimum value and initiate a Slow Start. Time outs are usually caused by multiple occurrences of packet loss.
 \end{itemize}
 
 \subsubsection*{TCP NewReno}
 NewReno \citep{newReno} as the name suggests is the successor to TCP Reno that was discussed in the previous section. It is the version of Reno used in recent versions of the Linux Kernel.
 
-TCP NewReno's uses further heuristics to recover from multiple packet loss without the need for time-outs, this therefore means it outperforms Reno at higher error rates and is the algorithm used in the later experimentation section of this report.
+TCP NewReno uses further heuristics to recover from multiple packet loss without the need for time-outs, this therefore means it outperforms Reno at higher error rates and is the algorithm used in the later experimentation section of this report.
 
 \subsubsection{User Data Protocol (UDP)}
 \begin{center}
@@ -128,17 +129,18 @@ UDP is by design the opposite of TCP and often you'll find the two protocols com
 
 This lack of error-checking overhead, however, greatly improves the speed of UDP protocols. UDP is not used in situations where communication is vital, but does find itself implemented in examples like voice or video chat because errors in these services are not catastrophic to operation and these imperfections can even go unnoticed.
 
-As the very small UDP header shows, it is a very simple protocol and is effectively a thin wrapper on top of the IP layer. UDP allows for very quick transfers but with the cost to reliability. Packet loss therefore, effects UDP massively where this overall effect will be fully disused later.
+As the very small UDP header shows, it is a very simple protocol and is effectively a thin wrapper on top of the IP layer. UDP allows for very quick transfers but with the cost to reliability. Packet loss therefore, effects UDP massively where this overall effect will be fully discussed later.
 
 \clearpage
 \subsubsection{Address Resolution Protocol (ARP)}
+\label{ref:arp_background}
 The tool will be deployed either by having it run on a small custom computer set up to act as a router for the synthetic test network or by jumping between a user and an actual router on a live network. The program will achieve this jumping between a user and the router by utilising a long term vulnerability in the Address Resolution Protocol (ARP) \citep{arp2001}, before this is explained further it is first important to understand the relevant parts of a local network.
 
-Each computer on a Local Area Network (LAN) has an IP assigned to it, this is the identifier on the local network. Each computer's wireless card has a MAC address, a MAC address is a unique identifier for a computer and is used to link up this non-unique local address (IP) to a real computer on a network. The combination of IP address and MAC address allow for the reuse of local IP numbers over many LANs. The ARP protocol is therefore used to find out what MAC address is associated with a local IP address and visa versa. This is achieved via an entire network broadcast where computers that don't match ignore the ARP request, and the one being requested sends back a reply containing its MAC address. Each computer maintains its own version of the ARP data known as its 'ARP cache'.
+Each computer on a Local Area Network (LAN) has an IP assigned to it, this is the identifier on the local network. Each computer's wireless card has a MAC address, a MAC address is a unique identifier for a computer and is used to link up this non-unique local address (IP) to a real computer on a network. The combination of IP address and MAC address allow for the reuse of local IP numbers over many LANs. The ARP protocol is therefore used to find out what MAC address is associated with a local IP address and visa versa. This is achieved via an entire network broadcast where computers that do not match ignore the ARP request, and the one being requested sends back a reply containing its MAC address. Each computer maintains its own version of the ARP data known as its 'ARP cache'.
 
 An ARP packet is a very simple message format that contains an operation code that can either can be a request (1 opcode) or a response (2 opcode) where the packet also contains 4 addresses; two pairs of hardware and protocol addresses for the sender and target.
 
-The ARP protocol contains no form of authentication verification thus allowing a malicious computer to send out faked custom ARP requests to change specific values in the routers ARP table. The results in any computer running the software appearing as the router to the victim, while also appearing as the victim to the router, thus having all the traffic between the two routed through the attacking computer. 
+The ARP protocol contains no form of authentication thus, allowing a malicious computer to send out faked custom ARP requests to change specific values in the routers ARP table. The results in any computer running the software appearing as the router to the victim, while also appearing as the victim to the router, thus having all the traffic between the two routed through the attacking computer. 
 
 \begin{center}
 \input{diagrams/ARP/arp_diagram_basic}
@@ -149,14 +151,14 @@ The ARP protocol contains no form of authentication verification thus allowing a
 
 \subsubsection{Custom Router - Raspberry Pi}
 As mentioned previously the effects will be performed on a custom computer acting as the router, because the network will be set-up to pass all traffic through this router, it will be able to simulate degradation on the entire networks traffic.
-The Raspberry Pi \citep{upton2014raspberry} has been decided as the choice for the small custom computer. Originally designed to teach children to code on an inexpensive (less than £30) computer, the Pi has now found itself involved in a multitude of uses ranging from NAS (Network Attached Server) to robot controllers. The Pi's versatility is useful in this project due to its ease to set-up as a router, this is because of the easy access of low level asects of the operating system due to it running a Linux based OS. The Raspberry Pi will be run with its default Raspbian OS \citep{pi2014raspbian} that is built upon Debian \citep{murdock1994overview}. This is a optimised OS for the internal ARM CPU that allows the Raspberry Pi to run modern stripped down programs on its very limited hardware, where however, it will have plenty of power to easily handle traffic as a router.
+The Raspberry Pi \citep{upton2014raspberry} has been decided as the choice for the small custom computer. Originally designed to teach children to code on an inexpensive (less than £30) computer, the Pi has now found itself involved in a multitude of uses ranging from NAS (Network Attached Server) to robot controllers. The Pi's versatility is useful in this project due to its ease to set-up as a router, this is because of the easy access of low level aspects of the operating system due to it running a Linux based OS. The Raspberry Pi will be run with its default Raspbian OS \citep{pi2014raspbian} that is built upon Debian \citep{murdock1994overview}. This is a optimised OS for the internal ARM CPU that allows the Raspberry Pi to run modern stripped down programs on its very limited hardware, where however, it will have plenty of power to easily handle traffic as a router.
 
 
 
 \subsubsection{Router alternatives}
 
 \subsubsection*{MinnowBoard}
-MinnowBoard \footnote{\url{https://minnowboard.org/}} is a company specialising in open source custom made processing units designed to remain compact while still being able to perform relatively heavy computation. Even their basic options have more RAM and processing speeds compared to that of the Raspberry Pi, but this comes at a higher cost, the basic model retails in at £110 more than 3 times to price of the Raspberry Pi. The increased processing speed would mean the total bandwidth capacity of the router could increase and would even allow the use of the GUI as an alternative to the command line, but this extra cost and increased processing speed does not add any extra value to the goal of the project and therefore the option was discarded.
+MinnowBoard \footnote{\url{https://minnowboard.org/}} is a company specialising in open source custom made processing units designed to remain compact while still being able to perform relatively heavy computation. Even their basic options have more RAM and processing speeds compared to that of the Raspberry Pi, but this comes at a higher cost, the basic model retails in at £110, more than 3 times to price of the Raspberry Pi. The increased processing speed would mean the total bandwidth capacity of the router could increase and would even allow the use of the GUI as an alternative to the command line, but this extra cost and increased processing speed does not add any extra value to the goal of the project and therefore the option was discarded.
 
 \subsubsection*{Commercial router}
 A commercial out-of-the-box router could be used with a custom version of OpenWrt \footnote{\url{https://openwrt.org/}}. OpenWrt is a custom version of Linux that is designed for embedded devices. To install this version of Linux on a router would require `flashing' the software. Flashing is the process of overwriting the embedded EEPROM or other type of embedded memory with the firmware of your choice, this process is lengthy and has no guarantee of working. This process however would provide the project with a device that could run the degradation script that is fully designed to function within a network, this could possibly mean faster processing speeds and a smoother experience. However, due to the uncertain set-up time compared to that of the Raspberry Pi this option was decided against. However, the option could be an aspect to implement in the long term improvements, this will be further discussed later in the report.
@@ -205,7 +207,7 @@ UDP is used for situations where speed is required but reliability is not. Media
 Quick UDP Internet Connections \citep{hamilton2016quic} is an early stage transport layer protocol developed by Google where it was announced in 2013. QUIC is built upon UDP and is designed to provide faster transfer speed in web applications that utilise TCP.
 It has a multitude of extra features, involving bandwidth estimation to reduce congestion, movement of congestion control into the application space rather than having the control embedded into the kernel meaning applications can adapt quicker and provide more bespoke decisions. QUIC also attempts to reduce latency by the simple inclusion of performing less transfers from that of an equivalent TCP connection. QUIC also includes techniques to attempt the handling of packet loss better than that of TCP. Techniques like: proactive speculative retransmissions ('Important' data is sent more than once).
 
-There were initially concerns about UDP connectivity and the possibility that many uses would be behind systems that block UDP traffic. This was mitigated by Chromium connectivity experiments \citep{roskind2013quic} where 91-94\% of Google users could make a UDP connection outbound.
+There were initially concerns about UDP connectivity and the possibility that many users would be behind systems that block UDP traffic. This was mitigated by Chromium connectivity experiments \citep{roskind2013quic} where 91-94\% of Google users could make a UDP connection outbound.
 
 QUIC was not chosen as an addition to this project due to it being in its infancy, where its adoption is still within the early stages. There are however, available open source client and server pairs available and the inclusion of this transport protocol would be a good addition in potential future work.
 
@@ -217,7 +219,7 @@ SPDY \citep{belshe2012spdy} is a Google created transport protocol designed to t
 \subsubsection{Linux}
 Linux is the broad definition of a family of computer operating systems. The defining characteristics of a ``Linux" OS is the free and open source approach and the use of the Linux Kernel. Android, for example, has the largest market share in the mobile OS market \citep{share2015desktop}, Android utilises the Linux kernel as the centre for its operating system.
 
-Linux was chosen for this project for its open source element that allows easy access to low-level features in the kernel. The section of the kernel that deals with the filtration of packets for uses like firewalls and packet sniffers is referred to as the ``NetFilter". This acts as an API of sorts where packets can be routed to the net-filter queue to await a verdict (accept or drop) before being moved on. This is the basis for the functionality of the program, the program will run on the Raspberry Pi and route all packets that enter the box to the queue where the effects can be applied.
+Linux was chosen for this project for its open source element that allows easy access to low-level features in the kernel. The section of the kernel that deals with the filtration of packets for uses like firewalls and packet sniffers is referred to as the ``NetFilter". This acts as an API of sorts where packets can be routed to the net-filter queue to await a verdict (accept or drop) before being moved on. This is the basis for the functionality of the program. The program will run on the Raspberry Pi and route all packets that enter the box to the queue where the effects can be applied.
 
 
 \subsubsection{Windows}
@@ -269,7 +271,7 @@ With Desktop\\
 \end{center}
 \end{wrapfigure}
 
-This compared with the full Debian \footnote{\url{https://www.debian.org/releases/stable/i386/ch03s04.html.en}} OS that the striped down version of the Raspberry Pi's OS is based off:
+This compared with the full Debian \footnote{\url{https://www.debian.org/releases/stable/i386/ch03s04.html.en}} OS that the stripped down version of the Raspberry Pi's OS is based off:
 
 The Raspberry Pi in this instance will be run with no desktop.
 
@@ -280,7 +282,7 @@ As you can see from Figure~\ref{ref:debianRequire} the Linux based OS has a much
 %If others have produced solutions or addressed similar problems to those addressed by your project you should describe those alternative solutions here. Similarly, if several possible approaches suggest themselves as ways of solving the problems inherent in your project you should discuss those here. You should provide a comparative analysis and critical appraisal of each alternative solution approach or existing solution, identifying their key features and their strengths and weaknesses in relation to your project.
 \section{Alternative Solutions}
 \subsection{clumsy}
-A more modern application of network degradation is clumsy 0.2 \footnote{\url{http://jagt.github.io/clumsy/index.html}}. It provides various options (can run in parallel) that affect network conditions. 
+A more modern application of network degradation is clumsy 0.2 \footnote{\url{http://jagt.github.io/clumsy/index.html}}. It provides various options (that can run in parallel) that affect network conditions. 
 
 \begin{wrapfigure}{r}{5cm}
 \begin{center}
@@ -301,6 +303,6 @@ This tool includes very complex ways of simulating realistic degradation with ``
 \subsection{Comcast}
 Comcast \footnote{\url{https://github.com/tylertreat/comcast}} is a tool designed to test systems in non-critical ways. It is only a thin wrapper around tools such as `iptables`, `tc', `ipfw' and `pfctl'. It makes it very easy to add latency, packet loss and error to a data stream. The script is written in Go and runs terminal instances for each command.
 
-The script allows very basic degradation to be performed but because it is strongly coupled to other tools it means it is not very dynamic and new effects cannot be quickly added to the program.
+The script allows very basic degradation to be performed but, because it is strongly coupled to other tools it means it is not very dynamic and new effects cannot be quickly added to the program.
 
 This solution is very useful in applying quick and easy degradation to a single client but because of its lack off malleability the tool would be hard to apply to many situations.

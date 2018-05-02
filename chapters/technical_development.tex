@@ -117,7 +117,7 @@ The tool performs the degradation effect on the computer it is running on, the s
 
 \subsection{NFQUEUE}
 \label{ref:nfqueue}
-The script utilises a section in the Linux kernel referred to as the ``NFQUEUE". This is as the name suggests a queue that is stored in kernel memory that will store up packets until the user provides one of the two verdicts: `Drop' or `Accept'. The packets are pushed into this queue by the use of `iptable' rules. Iptabales is a tool designed to filter packets by criteria. Below is a flow diagram for the path a packet might take, each table can have filtering rules embedded into to it:
+The script utilises a section in the Linux kernel referred to as the ``NFQUEUE". This is as the name suggests a queue that is stored in kernel memory that will store up packets until the user provides one of the two verdicts: `Drop' or `Accept'. The packets are pushed into this queue by the use of `iptable' rules. Iptabales is a tool designed to filter packets by criteria. Figure~\ref{ref:iptables} contains a flow diagram for the path a packet might take through a system, each table can have filtering rules embedded into to it:
 
 % Diagram
 \input{diagrams/iptables}
@@ -160,7 +160,7 @@ nfqueue.run()
 
 In the code above, the variable {\code mode} contains a method that performs effects on the packets. Figure~\ref{ref:latencyMode} shows what {\code mode} would equal if the effect chosen was latency.
 
-The two NFQUEUE rules were chosen due to their coverage; they cover all incoming packets to the router (INPUT) and all packets being routed and coming directly from the router (POST-ROUTING). These rule also don't cause the same packet to be pushed into the queue more than once.
+The two iptable rules were chosen due to their coverage; they cover all incoming packets to the router (INPUT) and all packets being routed and coming directly from the router (POST-ROUTING). These rule also don't cause the same packet to be pushed into the queue more than once.
 
 \begin{Code}{Latency Packet Mode}
 def packet_latency(packet):
@@ -175,7 +175,7 @@ def packet_latency(packet):
 	\label{ref:latencyMode}
 \end{figure}
 
-There are a couple of aspect to note in the above code listing:
+There are a couple of aspects to note in the above code listing:
 {\code affect\_packet} is the method that checks the packet against the active filters. 
 {\code assign\_thread} is the method that assigns the object effect method ({\code latency\_obj.effect}) to an idle thread in the pool and {\code packet.accept()} and {\code packet.drop()} are the ways the packet is assigned a verdict. This verdict can be assigned at any point in the code and becomes instantly active.
 
@@ -288,7 +288,7 @@ Jitter mode clumps and separates packets in their transmission. Therefore, causi
 
 \subsection{ARP Spoofing}
 \label{ref:arpSpoof}
-The script also supports an ARP spoofing mode that allows it to sit between a gateway and a specified target. This means the script can perform all its functions on a single target with a very quick deployment time. As touched on in the background the ARP protocol performs no authentication on any changes to the ARP cache meaning that you can perform a man in the middle attack and route traffic through a machine of your choice.
+The script also supports an ARP spoofing mode that allows it to sit between a gateway and a specified target. This means the script can perform all its functions on a single target with a very quick deployment time. As touched on in the background (See Section ~\ref{ref:arp_background}) the ARP protocol performs no authentication on any changes to the ARP cache meaning that you can perform a man in the middle attack and route traffic through a machine of your choice.
 
 The script begins by grabbing the MAC addresses connected to the provided gateway and target IP addresses. Two ARP reply packets (denoted by the `2' opcode) are sent out. One packet telling the victim that the current machines MAC address maps to the gateway, and the other packet telling the gateway that the victims IP maps to the current machines MAC address.
 
@@ -316,7 +316,7 @@ After both spoofed packets have been sent out, the ARP cache for each receiving 
 Two network attacks were implemented into the script, these served the purpose of providing very heavy artificial traffic designed to create heavy loads or interfere with integral protocols. Not many attacks were added as they do not provide much purpose apart from stress testing and they reside on the edge of the scope of this project. There will also be a brief discussion into possible techniques to mitigate the effects. 
 
 \subsubsection{UDP Flooding}
-UDP flooding is a very simple attack, lots of UDP packets are created and sent over a network stream very quickly. This attack is designed to `flood' the buffers in the receiving machine and slow down a internet connection. The script creates 10 or so threads that create and send packet concurrently, this amount of threads easily reaches the max throughput of the test machines NIC card and massively reduces internet connection on the receiving end.
+UDP flooding is a very simple attack, lots of UDP packets are created and sent over a network stream very quickly. This attack is designed to `flood' the buffers in the receiving machine and slow down an internet connection. The script creates 10 or so threads that create and send packets concurrently, this amount of threads easily reaches the max throughput of the test machines NIC card and massively reduces internet connection on the receiving end.
 
 The attack could be detected and prevented by a script that monitors the network transfers rates, this attack will create a huge spike in the transfer rate that can be detected and all traffic would be blocked from the sending party.
 
@@ -348,7 +348,7 @@ The attack could be detected and prevented by a script that monitors the network
 Figure~\ref{ref:UdpFloodingFigure} above is a section of code from the UDP flooding attack script. As mentioned previously around 10 threads will run the code at the same time in an attempt to maximise the throughput of UDP packets. The effects of the attack are visible on the target end and causes a visual degradation in the connection speed.
 
 \subsubsection{ARP Spamming}
-This attack works by once again exploiting the lack of authentication of the ARP protocol. In the entire network mode the script starts by detecting all active hosts on a network, it then starts sending out falsified ARP reply packets with randomly generated MAC addresses inside. This results in all computers on the networking having incorrect ARP cache values and resulting in computers incorrectly resolving IP and MAC address combinations and traffic not being allowed through.
+This attack works by once again exploiting the lack of authentication of the ARP protocol. In the entire network mode the script starts by detecting all active hosts on a network, it then starts sending out falsified ARP reply packets with randomly generated MAC addresses inside. This results in all computers on the networking having incorrect ARP cache values and resulting in computers incorrectly resolving IP and MAC address combinations and traffic being blocked.
 
 \begin{Code}{ARP Spamming}
 def start(self):
@@ -422,6 +422,7 @@ This script is used to define the password, SSID and any other configuration reg
 
 The router also needs to assign IP addresses to newly connected devices, it does this by utilising DHCP. DHCP stands for Dynamic Host Configuration Protocol and as the name suggests configures connected hosts. A DHCP server is created on the Raspberry Pi that will automatically assign a local IP to that device and allow it to communicate with other devices on the LAN and the internet.
 
+\clearpage
 \begin{center}
 \begin{Scripts}{}
 subnet 192.168.10.0 netmask 255.255.255.0 {
@@ -451,7 +452,7 @@ There are various sections of the project that require a separate testing plan:
 \begin{itemize}
 
 	\item Traffic simulation programs\\
-	These are the client server programs that will simulate traffic over the synthetic net. These tests will need to 	make 	sure each client and server performs its role correctly.
+	These are the client server programs that will simulate traffic over the synthetic net. These tests will need to 	make sure each client and server performs its role correctly.
 	
 	\item Packet script and effects\\
 	This is the script that will run on the custom router. Tests will be checking effects do their basic jobs and the script can be controlled effectively.
@@ -490,7 +491,7 @@ It was decided that a separate test plan was needed for the script that will be 
 
 Figure~\ref{ref:testingUDP} in the appendix contains the correctness table for the UDP Client and Server. Each test was run and the outcome was compare to what was expected. Out of 25 tests 100\% passed and produced the correct results. These tests are implemented into Visual Studio \footnote{https://www.visualstudio.com/} and are run every time a change is implemented into the server or client. Figure~\ref{ref:visualstudiotest} contains a screen shot of the test window after all tests have completed.
 
-The degradation tool also required testing for the various effects. The effects all have a basic test that checks for a successful start up and a more in-depth test that checks the effects functionality against ping packets sent over the localhost. The two attacks also needed testing, these however do not include a test on their functionality as it would be very difficult and time consuming to create a test that tests the effectiveness of the attack. Figure~\ref{ref:testingScript} in the appendix contains the testing correctness table for the script tools; all test passed.
+The degradation tool also required testing for the various effects. The effects all have a basic test that checks for a successful start up and a more in-depth test that checks the effects functionality against ping packets sent over the localhost. The two attacks also needed testing, these however do not include a test on their functionality as it would be very difficult and time consuming to create a test that tests the effectiveness of the attack. Figure~\ref{ref:testingScript} in the appendix contains the testing correctness table for the script tools; all tests passed.
 
 \subsection{Testing methodology considerations}
 Initially the methodology chosen to start development of the traffic simulation programs was ``Test Driven Development" \citep{beck2003test}, this was a tight methodology that increased development time and gave the added benefit of showing that new changes have not broken older functionality. This methodology was good to start off the project and allowed for a tight structure to be created where no time was wasted debugging previously working code, but as mentioned this methodology slowed development time down, this was chosen to be abandoned after 3-4 weeks to an ad-hoc approach. 
@@ -514,12 +515,12 @@ Appendix~\ref{ref:httpTesting} contains the results for the HTTP testing. Figure
 
 
 \subsubsection{FTP Experiment}
-FTP traffic was tested in a similar way to HTTP. Two hosts connected to the Raspberry Pi router; one host the client and the other the server. Transfer speed of a 5MB file were tracked and recorded.
+FTP traffic was tested with two hosts connected to the Raspberry Pi router; one host the client and the other the server. Transfer speed of a 5MB file were tracked and recorded.
 
-Appendix~\ref{ref:ftpTesting} contains the results for the experiment. As expected as the degradation becomes more violent the transfer time increases. Latency seemed to have a linear relationship to the increase in transfer speed.
+Appendix~\ref{ref:ftpTesting} contains the results for the experiment. As expected as the degradation becomes more violent the transfer time increases. As latency increased, transfer speed of the file decreased in a linear fashion.
 
 \subsubsection{UDP Experiment}
-UDP was tested using the custom server client created for visualising the packet loss, therefore, only packet was tested for UDP. In a similar way to FTP a server and client both connected to the router running the tool. The state of the user interface was recorded as significant packet loss values.
+UDP was tested using the custom server client created for visualising the packet loss, therefore, only packet loss was tested for UDP. In a similar way to FTP a server and client both connected to the router running the tool. The state of the user interface was recorded as significant packet loss values.
 
 Appendix~\ref{ref:udpTesting} contains the progression of the interface as the packet loss value becomes more extreme. The clear representation of arrived and lost packets makes it immediately apparent of the effect of packet loss on a UDP connection. UDP does not resend when packets are lost, so in situations with abnormally large packet loss values an application relying on UDP can be completely incapacitated.
 
@@ -566,4 +567,4 @@ As you can see from both images, the 100ms has evidently been applied effectivel
 \end{center}
 \end{wrapfigure}
 
-To test the effect of the UDP flooding required experimentation. A single target was selected on a network just containing the attacker and victim and, like previous tests, SpeedTest.Net was used to obtain bandwidth results. Each test was run with the same computers on the same network. As you can see from the two images the effect of the UDP flooding is devastating on a connections speed, taking a fast internet connection and reverting it to a crawl. If more computers running the script were active the internet connection could be easily fully blocked.
+To test the effect of the UDP flooding required experimentation. A single target was selected on a network just containing the attacker and victim and, like previous tests, SpeedTest.Net was used to obtain bandwidth results. Each test was run with the same computers on the same network. As you can see from the two images the effect of the UDP flooding is devastating on a connections speed, taking a fast internet connection and reverting it to a crawl. If more computers running the script were active the internet connection could easily be fully blocked.

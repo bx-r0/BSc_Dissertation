@@ -30,6 +30,7 @@ The specification of the computer used for these experiments is contained in Fig
 \subsection{Effect of Packet Loss on Download Speeds}
 \input{experiments/packetloss_downloadspeed}
 
+\clearpage
 % -- 2
 \subsection{Effect of Latency on Download Speeds}
 \input{experiments/latency_downloadspeed}
@@ -52,20 +53,20 @@ The specification of the computer used for these experiments is contained in Fig
 \newcommand{\fileZillaUrl}{\url{https://filezilla-project.org/}}
 
 \subsection{Objective One - {\it Achieved}}
-{\it Develop a fully working client server pair that communicate using HTTP/1.1 and FTP over the TCP protocol alongside a client and server that use the UDP protocol}
+{\it Develop a fully working client server pair that communicate using HTTP/1.1 and FTP over the TCP protocol alongside a client and server that use the UDP protocol} (See Section~\ref{ref:obj1})
 
 This objective initially involved the creation of a custom client server solution for HTTP, FTP and UDP. This involved a lengthy development period where each client and server would require the implementation of required features for the project. It was decided after a period of 3.5 weeks that the simulated network having a custom solution created no added value to the initial goal of the project, this is why HTTP has been replaced by pre-existing browsers such as Google Chrome \footnote{\chromeUrl} or Mozilla Firefox \footnote{\firefoxUrl} and and FTP solution replaced by FileZilla's \footnote{\fileZillaUrl} server and client pair. These are all projects that have had multiple years invested into their development and offer increased stability and selection of features. They have all the features required to meet the goal of this project. Therefore, were chosen as more suitable solutions. UDP on the other hand was left as a custom solution, for the sacrifice of realism the UDP client and server shows a clear visualisation of UDP packet loss.
 
-However, even with the changes each sub point of the object has been met.
+However, even with the changes each sub point of the objective has been met.
 
 \subsection{Objective Two - {\it Achieved}}
-{\it Create a program that runs on a Linux based OS that can be used to simulate degradation and attacks. This program will then be run on the router.}
+{\it Create a program that runs on a Linux based OS that can be used to simulate degradation and attacks. This program will then be run on the router.} (See Section~\ref{ref:obj2})
 
 In the aims and objectives section lists out the criteria required to meet this objective. The created solution meets all of these criteria. It provides the functionality to simulate packet loss, latency and bandwidth plus a selection of other effects. The other effects were chosen to provide more depth to the project and allow the possibility to chain effects together to simulate more sophisticated degradation. The script also allows UDP flooding and ARP spamming. It contains a mode to increment the TTL but this mode was discarded from the main advertised functionality due to its inherit difficulty in displaying its effect on a connection due to the hard task for forming loops in a networks structure. This script is also functional on the set-up Raspberry Pi Router.
 
 
 \subsection{Objective Three - {\it Achieved}}
-{\it Create a working custom router that can be used to simulate degradation in conjunction with the program outlined in Objective 2}
+{\it Create a working custom router that can be used to simulate degradation in conjunction with the program outlined in Objective 2} (See Section~\ref{ref:obj3})
 
 The project has met the requirements of this objective. The router can be used in place of a commercial router and can handle around 3 clients at a single time while still providing acceptable transfer speeds. A client can connect to the router by wireless or wired means.
 
@@ -92,7 +93,7 @@ Commit messages were also carefully structured with informative messages that al
 %You should identify any specific areas of the existing product where further work is required, either to address known bugs or omissions, or to improve the system – for example an area you developed at an early stage may in hindsight have been structured in a better way, although it is still perfectly functional.
 %You should also provide an outline of any additional areas of potential development you can envisage beyond the initial goals, where the system might be extended in future for greater functionality.
 \section{Further work}
-The project could however be continued and improved in the ways discussed below.
+The project could be continued and improved in the ways discussed below.
 
 \subsection{More protocols}
 In the background there was discussion into the inclusion of other transport protocols or other TCP and UDP based protocols. This would give this project a much more in-depth analysis of more types of network traffic. QUIC would be a great addition to future goals of the project. QUIC is and incredibly new protocol and with the backing of Google gives it a higher chance of being adopted as a standard transfer protocol.

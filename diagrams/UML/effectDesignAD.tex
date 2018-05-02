@@ -19,11 +19,11 @@
 	\draw[->] (parameters)--(validParam);
 	\draw[->] (startRunning)--(sigintSent);
 
-	\draw[red, ->] (validParam)\yesLink{startRunning};
-	\draw[red, ->] (validParam)\noLink{quit};	
-	\draw[red, ->] (sigintSent) edge [loop left] node[swap] {No}();
+	\draw[->] (validParam)\yesLink{startRunning};
+	\draw[->] (validParam)\noLink{quit};	
+	\draw[->] (sigintSent) edge [loop left] node[swap] {No}();
 	
-	\draw[red, ->] (sigintSent)\yesLink{showCleanQuit};
+	\draw[->] (sigintSent)\yesLink{showCleanQuit};
 	\draw[->] (showCleanQuit)--(end);
 	\draw[->] (quit)--(end);
 
