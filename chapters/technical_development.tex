@@ -26,7 +26,7 @@ The system design is split into two stages:
 This section involves the creation of the NFQUEUE object, the binding of effect method to the queue and initialisation of variables dictating preferences.
 
 \item {\bf NFQUEUE Running}\\
-Each packet that is placed into the queue triggers this section, the handler is called that assigns a task to run the selected effect on the packet to one of the worker threads in a previously created thread pool. This allows custom effects simulation with filtering dynamically applied to all the packets.
+Each packet that is placed into the queue triggers this section, the handler is called who assigns a task to run the selected effect on the packet to one of the worker threads in a previously created thread pool. This allows custom effects simulation with filtering dynamically applied to all the packets.
 \end{itemize}
 
 \subsection{Parameter Handling}
@@ -39,7 +39,7 @@ Parameter handling is only required on the CLI due to the unrestricted input of 
 	\end{figure}	
 \end{center}
 
-The parameter handling as stated previously, is only required if the command line interface is used, this adds a little overhead in processing when using the command line but it is an unavoidable process. The error section when the `Usage' is printed will stop the entire program from continuing and will print a structured help message with the required format of the command. For most errors, human readable output will be produced to aid in debugging.
+The parameter handling as stated previously, is only required if the command line interface is used. This adds a little overhead in processing when using the command line but it is an unavoidable process. The error section when the `Usage' is printed will stop the entire program from continuing and will print a structured help message with the required format of the command. For most errors, human readable output will be produced to aid in debugging.
 
 \subsection{Effect Choice \& NQUEUE Creation}
 
@@ -76,7 +76,7 @@ Figure~\ref{ref:incommingAD} shows the activity diagram for the process of runni
 	\end{figure}
 \end{center}
 
-The above design is for the various effects that will be implemented into the program. They will be self contained within separate modules encased in an object. This was chosen so each effect is modular and self contained from one another. The modularity will improve the potential readability and maintainability of the code base, it will also make the code base much more scalable where effects can be added with high speed because of the lack of repeated code.  Each effect will inherit from the base class ``Effect", where it will obtain methods and properties used for functionality and boolean variables for allowing printing and accepting packets. These boolean variables are necessary when `chaining' effects together, where a packet can only be accepted once and only a single print will be required.
+The above design is for the various effects that will be implemented into the program. They will be self contained within separate modules encased in an object. This was chosen so each effect is modular and separate from one another. The modularity will improve the potential readability and maintainability of the code base, it will also make the code base much more scalable so that effects can be added quickly due to the lack of repeated code.  Each effect will inherit from the base class ``Effect", where it will obtain methods and properties used for functionality and boolean variables for allowing printing and accepting packets. These boolean variables are necessary when `chaining' effects together, where a packet can only be accepted once and only a single print will be required.
 
 \clearpage
 \subsection{Tool Activity Diagram}
@@ -88,7 +88,7 @@ The above design is for the various effects that will be implemented into the pr
 	\end{figure}
 \end{center}
 
-Figure~\ref{ref:ToolAD} above is the activity diagram for the tool that will implement the effect classes above. This tool will be utilised directly from the command line or run by the GUI. The decision of having a single script that is controlled by multiple approaches allows for one central point of functionality and means code can be shared throughout the project. Figure~\ref{ref:ToolAD} shows the design choices for the direct control on the script. SIGINT is mentioned in the centre of the diagram, SIGINT is a built in signal in the Linux operating system that represents an interrupt signal, where it is triggered by pressing ``Control + C", this is the most common/clean way of stopping a script. The other alternatives to closing the script ``Control + Z" (SIGTSTP) and ``Control + /" (SIGQUIT) will be remapped to send a SIGINT signal and perform the same role, this will mean the program has one tidy point of closure.
+Figure~\ref{ref:ToolAD} above is the activity diagram for the tool that will implement the effect classes above. This tool will be utilised directly from the command line or run by the GUI. The decision to have a single script that is controlled by multiple approaches allows for one central point of functionality and means that code can be shared throughout the project. Figure~\ref{ref:ToolAD} shows the design choices for the direct control on the script. SIGINT is mentioned in the centre of the diagram, SIGINT is a built in signal in the Linux operating system that represents an interrupt signal, where it is triggered by pressing ``Control + C", this is the most common way of stopping a script. The other alternatives to closing the script ``Control + Z" (SIGTSTP) and ``Control + /" (SIGQUIT) will be remapped to send a SIGINT signal and perform the same role, this will mean the program has one tidy point of closure.
 
 % Section Description:
 %
@@ -105,7 +105,7 @@ Figure~\ref{ref:ToolAD} above is the activity diagram for the tool that will imp
 \end{center}	
 \end{wrapfigure}
 
-The UI is one of the ways to control the degradation. The UI needs to have a way to easily include new controls that link up to parameters in the script, thus making the interface scalable and easy to maintain. A text box is required to display the same output as the terminal window, this can be achieved by `piping' the stdout to a custom section of the user interface. The `stdout' is the data stream that links up to a Linux terminal window, if the stdout points to somewhere else it will display where it is needed. Figure~\ref{ref:planUI} shows the initial drafted design for the user interface.
+The UI is one of the ways to control the degradation. The UI needs to have a way to easily include new controls that link up to parameters in the script, thus making the interface scalable and easy to maintain. A text box is required to display the same output as the terminal window, this can be achieved by `piping' the stdout to a custom section of the user interface. The `stdout' is the data stream that links up to a Linux terminal window. If the stdout points to somewhere else it will display where it is needed. Figure~\ref{ref:planUI} shows the initial drafted design for the user interface.
 
 Figure~\ref{ref:workingUI} contains the actual working user interface for the script. The design has been followed to some extent with only changes occurring in the layout of the controls on the left side designed to make it much easier to include new effects in the future. The inclusion of a window and output text box designed to allow ARP spoofing to occur has also been included in the working user interface.
 
@@ -117,7 +117,7 @@ The tool performs the degradation effect on the computer it is running on, the s
 
 \subsection{NFQUEUE}
 \label{ref:nfqueue}
-The script utilises a section in the Linux kernel referred to as the ``NFQUEUE". This is as the name suggests a queue that is stored in kernel memory that will store up packets until the user provides one of the two verdicts: `Drop' or `Accept'. The packets are pushed into this queue by the use of `iptable' rules. Iptabales is a tool designed to filter packets by criteria. Figure~\ref{ref:iptables} contains a flow diagram for the path a packet might take through a system, each table can have filtering rules embedded into to it:
+The script utilises a section in the Linux kernel referred to as the ``NFQUEUE". This is as the name suggests a queue that is stored in kernel memory that will store packets until the user provides one of the two verdicts: `Drop' or `Accept'. The packets are pushed into this queue by the use of `iptable' rules. Iptabales is a tool designed to filter packets by criteria. Figure~\ref{ref:iptables} contains a flow diagram for the path a packet might take through a system, each table can have filtering rules embedded into to it:
 
 % Diagram
 \input{diagrams/iptables}
@@ -136,7 +136,7 @@ To move all packets entering from the network card into the NFQUEUE the iptable 
 \end{center}
 Where `-A tells iptables to append a rule onto the `INPUT' table and `-j' is the rule that affects the packet, in this case pushing it into the default queue.
 
-This forms the main component of the functionality of the script. A series of iptable rules that filter packets into the NFQUEUE and allow to script to perform verdicts on each packet separately. This per packet verdict allows for effects to be easily applied to packets entering and leaving the machine.
+This forms the main component of the functionality of the script. A series of iptable rules that filter packets into the NFQUEUE and allows the script to perform verdicts on each packet separately. This per packet verdict allows for effects to be easily applied to packets entering and leaving the machine.
 
 Below is code for the creation of the NFQUEUE object along side the iptable rules:
 \begin{Code}[]{NFQUEUE}
@@ -160,7 +160,7 @@ nfqueue.run()
 
 In the code above, the variable {\code mode} contains a method that performs effects on the packets. Figure~\ref{ref:latencyMode} shows what {\code mode} would equal if the effect chosen was latency.
 
-The two iptable rules were chosen due to their coverage; they cover all incoming packets to the router (INPUT) and all packets being routed and coming directly from the router (POST-ROUTING). These rule also don't cause the same packet to be pushed into the queue more than once.
+The two iptable rules were chosen due to their coverage; they cover all incoming packets to the router (INPUT) and all packets being routed and coming directly from the router (POST-ROUTING). These rules also don't cause the same packet to be pushed into the queue more than once.
 
 \begin{Code}{Latency Packet Mode}
 def packet_latency(packet):
@@ -184,7 +184,7 @@ There are a couple of aspects to note in the above code listing:
 The script contains the functionality to simulate a plethora of effects. Each effects functionality will be described below. It is of note that any of these effects can be chained together in any order.
 
 \subsubsection{Latency}
-Latency as described in the background section, is the delay in initiating a task and seeing its results. Latency is simulated by using a timing mechanism where the arrival time of the packet is saved. The packet is then pushed into the NFQUEUE that triggers a single thread that will hold the packet for a set amount of time. The holding time is calculated by subtracting the amount of time the packet has already been in the script away from the target time. The packet is then marked as `ACCEPTED' and pushed out of the queue.
+Latency as described in the background section, is the delay between initiating a task and seeing the results. Latency is simulated by using a timing mechanism where the arrival time of the packet is saved. The packet is then pushed into the NFQUEUE that triggers a single thread that will hold the packet for a set amount of time. The holding time is calculated by subtracting the amount of time the packet has already been in the script away from the target time. The packet is then marked as `ACCEPTED' and pushed out of the queue.
 
 \begin{Code}{Latency}
 def custom_effect(self, packet):
@@ -222,7 +222,7 @@ def custom_effect(self, packet):
 \end{figure}
 
 \subsubsection{Packet Loss}
-Packet loss is simulated by first assigning a target value, lets say for this example, 10\%. For each packet the script randomly generates a number between 1 and 100, if that value is less than the target value the packet is dropped, and if the value is larger the packet is accepted. This therefore, creates the effect of packet loss. It does, however, require a fair amount of packets to balance out statistically and reach the percentage target.
+Packet loss is simulated by first assigning a target value, for example 10\%. For each packet the script randomly generates a number between 1 and 100. If that value is less than the target value the packet is dropped, and if the value is larger the packet is accepted. This therefore, creates the effect of packet loss. It does, however, require a large amount of packets to balance out statistically and reach the percentage target.
 
 \begin{Code}{Packet Loss}
 def custom_effect(self, packet):
@@ -249,7 +249,7 @@ def custom_effect(self, packet):
 \end{figure}
 
 \subsubsection{Bandwidth}
-There are two modes created for bandwidth; rate limiting and a simple display. Rate limiting allows the script to limit the rate of bandwidth flowing through the machine and calculates the rate transferred over a period of 5 seconds, if the rate is higher it waits until the rate drops below the target. This gives it the ability to adjust quickly and allows the script to be run for a long period of time without the overall average of the bandwidth affecting future changes. Displaying the bandwidth works exactly the same but without the limit check, this is useful when checking the current download speeds or the max transfer rate.
+There are two modes created for bandwidth; rate limiting and a simple display. Rate limiting allows the script to limit the rate of bandwidth flowing through the machine and calculates the rate transferred over a period of five seconds. If the rate is higher it waits until the rate drops below the target. This gives it the ability to adjust quickly and allows the script to be run for a long period of time without the overall average of the bandwidth affecting future changes. Displaying the bandwidth works exactly the same but without the limit check. This is useful when checking the current download speeds or the max transfer rate.
 
 Limiting bandwidth is displayed in Figure~\ref{ref:BandwidthCode} below:
 
@@ -276,19 +276,16 @@ def custom_effect(self, packet):
 \end{figure}
 
 \subsubsection{Out-of-order}
-This effect changes the order of packets coming into the script, this can be used to check its effect on UDP and TCP and can test how quickly these issue can be rectified. It works by queuing up every packet into a list, then a single thread randomly picks an index of that list, accepts the packet and allows it to leave. This, therefore, means at its most extreme the order can be last in, first out.
+This effect changes the order of packets coming into the script, this can be used to check its effect on UDP and TCP and can test how quickly these issues can be rectified. It works by queuing up every packet into a list, then a single thread randomly picks an index of that list, accepts the packet and allows it to leave. This, therefore, means at its most extreme the order can be last in, first out.
 
 \subsubsection{Connection Simulation}
-Connection simulation isn't quite a degradation effect but its intent is to simulate the effect of degradation on a common connection like `WiFi` or a 3G connection to see how these are affected by the aforementioned degradation effects. This can be useful in some situations where, for example, testing a mobile applications performance over 3G with heavy latency, the mobile would connect to the script and the script would effect any traffic entering or leaving the handset.
+Connection simulation isn't quite a degradation effect but its intent is to simulate the effect of degradation on a common connection like `WiFi` or a 3G connection to see how these are affected by the aforementioned degradation effects. This can be useful in some situations where, for example, testing a mobile applications performance over 3G with heavy latency, the mobile would connect to the script and the script would affect any traffic entering or leaving the handset.
 
 The types of connections were simulated using common values for latency and packet loss. 3G, 4G and WiFi values were obtained from Ofcom studies \citep{ofcom} \citep{ofcomMobile}.
 
-\subsubsection{Jitter}
-Jitter mode clumps and separates packets in their transmission. Therefore, causing variation in inter packet timing. This is required test how the protocol deals with jitter in the connection. Jitter as explained in the background is the intra-packet latency i.e. the difference in time between arrivals of packets.
-
 \subsection{ARP Spoofing}
 \label{ref:arpSpoof}
-The script also supports an ARP spoofing mode that allows it to sit between a gateway and a specified target. This means the script can perform all its functions on a single target with a very quick deployment time. As touched on in the background (See Section ~\ref{ref:arp_background}) the ARP protocol performs no authentication on any changes to the ARP cache meaning that you can perform a man in the middle attack and route traffic through a machine of your choice.
+The script also supports an ARP spoofing mode that allows it to sit between a gateway and a specified target. This means the script can perform all its functions on a single target with a very quick deployment time. As mentioned in the background (See Section ~\ref{ref:arp_background}) the ARP protocol performs no authentication on any changes to the ARP cache meaning that a man in the middle attack can intercept and spoof traffic.
 
 The script begins by grabbing the MAC addresses connected to the provided gateway and target IP addresses. Two ARP reply packets (denoted by the `2' opcode) are sent out. One packet telling the victim that the current machines MAC address maps to the gateway, and the other packet telling the gateway that the victims IP maps to the current machines MAC address.
 
@@ -300,7 +297,7 @@ Below is the process visualised:
 	\label{ref:arp_before}
 \end{figure}
 
-Figure~\ref{ref:arp_before} shows both connected ends have gone through the process to resolve the IP addresses to MAC addresses, you can see above each device their corresponding IP, MAC and ARP Cache. The ARP cache, as mentioned previously, is a record linking IP addresses to MAC addresses.
+Figure~\ref{ref:arp_before} shows both connected ends have gone through the process to resolve the IP addresses to MAC addresses. Above each device and their corresponding IP, MAC and ARP Cache can be seen. The ARP cache, as mentioned previously, is a record linking IP addresses to MAC addresses.
 
 \input{diagrams/ARP/arp_diagram_after}
 \begin{figure}[h]
@@ -308,17 +305,17 @@ Figure~\ref{ref:arp_before} shows both connected ends have gone through the proc
 	\label{ref:arp_after}
 \end{figure}
 
-After the 3rd device connects to the network, both devices gain a record of its IP and MAC address in their ARP cache. 
+After the third device connects to the network, both devices gain a record of their IP and MAC address in their ARP cache. 
 
-After both spoofed packets have been sent out, the ARP cache for each receiving end gets updated. The text in red of Figure~\ref{ref:arp_after} shows the changes caused by the spoofed ARP packets. Now when either end wants to talk to each other it will resolve the MAC address and send it with the new MAC address in the table, this will therefore, get routed through the attacking PC and will allow the script to receive all the traffic between the two parties.
+After both spoofed packets have been sent out, the ARP cache for each receiving end gets updated. The text in red of Figure~\ref{ref:arp_after} shows the changes caused by the spoofed ARP packets. Now when either end wants to talk to each other it will resolve the MAC address and send it with the new MAC address in the table, this will result in traffic being routed through the attacking PC and will allow the script to receive all the communication between the two parties.
 
 \subsection{Network Attacks}
-Two network attacks were implemented into the script, these served the purpose of providing very heavy artificial traffic designed to create heavy loads or interfere with integral protocols. Not many attacks were added as they do not provide much purpose apart from stress testing and they reside on the edge of the scope of this project. There will also be a brief discussion into possible techniques to mitigate the effects. 
+Two network attacks were implemented into the script, these served the purpose of providing very heavy artificial traffic designed to create heavy loads or interfere with integral protocols. Not many attacks were added as they do not have much purpose apart from stress testing and they reside on the edge of the scope of this project. In later sections there will be a brief discussion into possible techniques to mitigate the effects. 
 
 \subsubsection{UDP Flooding}
-UDP flooding is a very simple attack, lots of UDP packets are created and sent over a network stream very quickly. This attack is designed to `flood' the buffers in the receiving machine and slow down an internet connection. The script creates 10 or so threads that create and send packets concurrently, this amount of threads easily reaches the max throughput of the test machines NIC card and massively reduces internet connection on the receiving end.
+UDP flooding is a very simple attack, lots of UDP packets are created and sent over a network stream very quickly. This attack is designed to `flood' the buffers in the receiving machine and slow down an internet connection. The script creates ten threads that create and send packets concurrently. This number of threads easily reaches the max throughput of the test machine's NIC card and massively reduces internet connection on the receiving end.
 
-The attack could be detected and prevented by a script that monitors the network transfers rates, this attack will create a huge spike in the transfer rate that can be detected and all traffic would be blocked from the sending party.
+The attack could be detected and prevented by a script that monitors transfers rates. This attack will create a huge spike in the transfer rate that can be detected and all traffic would be blocked from the sending party.
 
 \begin{Code}{UDP Flooding}
   def effect(self):
@@ -345,10 +342,10 @@ The attack could be detected and prevented by a script that monitors the network
 	\label{ref:UdpFloodingFigure}
 \end{figure}
 
-Figure~\ref{ref:UdpFloodingFigure} above is a section of code from the UDP flooding attack script. As mentioned previously around 10 threads will run the code at the same time in an attempt to maximise the throughput of UDP packets. The effects of the attack are visible on the target end and causes a visual degradation in the connection speed.
+Figure~\ref{ref:UdpFloodingFigure} above is a section of code from the UDP flooding attack script. As mentioned previously ten threads will run the code at the same time in an attempt to maximise the throughput of UDP packets. The effects of the attack are visible on the target end and causes a visual degradation in the connection speed.
 
 \subsubsection{ARP Spamming}
-This attack works by once again exploiting the lack of authentication of the ARP protocol. In the entire network mode the script starts by detecting all active hosts on a network, it then starts sending out falsified ARP reply packets with randomly generated MAC addresses inside. This results in all computers on the networking having incorrect ARP cache values and resulting in computers incorrectly resolving IP and MAC address combinations and traffic being blocked.
+This attack works by once again exploiting the lack of authentication of the ARP protocol. In the entire network mode the script starts by detecting all active hosts on a network, and then starts sending out falsified ARP reply packets with randomly generated MAC addresses inside. This results in all computers on the networking having incorrect ARP cache values. Therefore, all computers incorrectly resolve all IP and MAC address combinations, thus blocking all communication.
 
 \begin{Code}{ARP Spamming}
 def start(self):
@@ -385,13 +382,13 @@ def send_arp_packet(self, dst, src, mac, op_code=2):
 \end{figure}
 
 
-Figure~\ref{fig:ArpSpammingCode} above shows the attack effecting the entire network. The scan finds all active hosts and returns them as a list that is then used as source and destination IP addresses that ultimately end up affecting the entire local networks ARP cache.
+Figure~\ref{fig:ArpSpammingCode} above shows the attack effecting the entire network. The scan finds all active hosts and returns them as a list that is then used as source and destination IP addresses which ultimately affects the entire local networks ARP cache.
 
 This attack is relatively easy to execute but can simply be prevented by issuing static ARP tables for each machine, with a few authenticated machines allowed to perform changes. This static table prevents unsolicited ARP replies from changing IP and MAC address combinations and also prevents ARP Spoofing from occurring on that network.
 
 
 \subsection{Router Design}
-The router is required to create an access point and allow access to the internet. Traffic will be routed through the router that is destined for other location, this will mean traffic will flow through the "Forward" section of the iptables map (Refer to Figure ~\ref{ref:iptables}). Therefore, a rule is required to catch any traffic from flowing into the machine. 
+The router is required to create an access point and allow access to the internet. All traffic will pass through the router, even if it is destined for other locations. This will mean traffic will pass through the "Forward" section of the iptables map (Refer to Figure ~\ref{ref:iptables}). Therefore, a rule is required to catch any traffic from flowing into the machine. 
 
 The router also needs a couple of tools to manage the assigning of IPs (DHCP server) and creation of an access point (Hostapd \footnote{\url{https://w1.fi/hostapd/}}). The exact implementation of these tools will be explained in the next section.
 
@@ -420,7 +417,7 @@ wpa_key_mgmt=WPA-PSK
 
 This script is used to define the password, SSID and any other configuration regarding the WiFi access point.
 
-The router also needs to assign IP addresses to newly connected devices, it does this by utilising DHCP. DHCP stands for Dynamic Host Configuration Protocol and as the name suggests configures connected hosts. A DHCP server is created on the Raspberry Pi that will automatically assign a local IP to that device and allow it to communicate with other devices on the LAN and the internet.
+The router also needs to assign IP addresses to newly connected devices. It does this by utilising DHCP. DHCP, standing for Dynamic Host Configuration Protocol which as the name suggests configures connected hosts. A DHCP server is created on the Raspberry Pi that will automatically assign a local IP to that device and allow it to communicate with other devices on the LAN and the internet.
 
 \clearpage
 \begin{center}
@@ -478,7 +475,7 @@ The test plan for this section will need to check all the intended functionality
 Appendix~\ref{ref:testplan} contains the test plan for the program, each separate program has had its user interface and business logic tested and programs that are to be used together have had ``Live" tests created to check their interaction together. The automated tests have been achieved by using the CUIT (Coded User Interface Tests) \footnote{\url{https://msdn.microsoft.com/en-us/library/dd286726.aspx}} that are built into Visual Studio 2017. These allow clicks and movements to be recorded and repeated.
 
 \subsection{Packet Script}
-It was decided that a separate test plan was needed for the script that will be run on the router. This was because its design is considerably different to that of the traffic simulation programs. Each individual effect needs a basic test that uses a loopback ping test to simulate incoming traffic where a criteria is looked for. For example, to test packet loss, the test pings the script until a packet is lost or a time-out is reached, this can perform a basic test on the functionality of the effect. Each effect will also require validation for the passed parameters, there will be a test created that will test various values inside and outside of the validation range.
+It was decided that a separate test plan was needed for the script that will be run on the router. This was because its design is considerably different to that of the traffic simulation programs. Each individual effect needs a basic test that uses a loopback ping test to simulate incoming traffic where a criteria is looked for. For example, to test packet loss, the test pings the script until a packet is lost or a time-out is reached. This can perform a basic test on the functionality of the effect. Each effect will also require validation for the passed parameters, there will be a test created that will test various values inside and outside of the validation range.
 
 \subsection{Testing correctness}
 \begin{wrapfigure}{r}{5cm}
@@ -489,13 +486,13 @@ It was decided that a separate test plan was needed for the script that will be 
 \end{center}
 \end{wrapfigure}
 
-Figure~\ref{ref:testingUDP} in the appendix contains the correctness table for the UDP Client and Server. Each test was run and the outcome was compare to what was expected. Out of 25 tests 100\% passed and produced the correct results. These tests are implemented into Visual Studio \footnote{https://www.visualstudio.com/} and are run every time a change is implemented into the server or client. Figure~\ref{ref:visualstudiotest} contains a screen shot of the test window after all tests have completed.
+Figure~\ref{ref:testingUDP} in the appendix contains the correctness table for the UDP Client and Server. Each test was run and the outcome was compared to expectation. Out of 25 tests 100\% passed and produced the correct results. These tests are implemented into Visual Studio \footnote{https://www.visualstudio.com/} and are run every time a change is implemented into the server or client. Figure~\ref{ref:visualstudiotest} contains a screen shot of the test window after all tests have completed.
 
-The degradation tool also required testing for the various effects. The effects all have a basic test that checks for a successful start up and a more in-depth test that checks the effects functionality against ping packets sent over the localhost. The two attacks also needed testing, these however do not include a test on their functionality as it would be very difficult and time consuming to create a test that tests the effectiveness of the attack. Figure~\ref{ref:testingScript} in the appendix contains the testing correctness table for the script tools; all tests passed.
+The degradation tool also required testing for the various effects. They all have a basic test that checks for a successful start up and a more in-depth test that checks the effects' functionality against ping packets sent over the localhost. The two attacks also needed testing, these however do not include a test on their functionality as it would be very difficult and time consuming to create a test that tests the effectiveness of the attack. Figure~\ref{ref:testingScript} in the appendix contains the testing correctness table for the script tools; all tests passed.
 
 \subsection{Testing methodology considerations}
-Initially the methodology chosen to start development of the traffic simulation programs was ``Test Driven Development" \citep{beck2003test}, this was a tight methodology that increased development time and gave the added benefit of showing that new changes have not broken older functionality. This methodology was good to start off the project and allowed for a tight structure to be created where no time was wasted debugging previously working code, but as mentioned this methodology slowed development time down, this was chosen to be abandoned after 3-4 weeks to an ad-hoc approach. 
-This change was due to time restraints on the project and the less-important role that the traffic simulation programs had on the project compared to the degradation simulation script. The degradation script was developed in the ad-hoc approach. Ad-hoc was chosen due to issues stated previously about the unknown aspects of the script and how it would operate and it was decided that the time invested to write up test scripts would assume too much and would risk them having the be completely rewritten. Tests therefore, were added alongside new functionality.
+Initially the methodology chosen to start development of the traffic simulation programs was ``Test Driven Development" \citep{beck2003test}. This was a tight methodology that increased development time and gave the added benefit of showing that new changes have not broken older functionality. This methodology was good to start off the project and allowed for a tight structure to be created where no time was wasted debugging previously working code. As mentioned this methodology slowed down development time and was chosen to be abandoned after three to four weeks to an ad-hoc approach. 
+This change was due to time restraints on the project and the less-important role that the traffic simulation programs had compared to that of the degradation script. The degradation script was developed in the ad-hoc approach. Ad-hoc was chosen due to issues stated previously about the unknown aspects of the script and how it would operate and it was decided that the time invested to write up test scripts would assume too much and would risk them having the be completely rewritten. Tests therefore, were added alongside new functionality.
 
 
 
