@@ -500,26 +500,26 @@ This change was due to time restraints on the project and the less-important rol
 
 % Section Description
 %
-\section{Experiential design}
+\section{Experimental design}
 
 \subsection{Protocol Degradation}
-The tool was tested against the various protocols and rough results were obtained to validate the correct function of the degradation tool. 
+The tool was tested against the various protocols and rough results were obtained to validate the correct functioning.
 
 \subsubsection{HTTP Experiment}
-HTTP traffic was tested through an automated script. The degradation tool was activated for packet loss and latency and the website was downloaded using the {\it wget} command. The website chosen was the Wikipedia page for the Univeristy of Hull \footnote{\url{https://en.wikipedia.org/wiki/University_of_Hull}}. This page was chosen due to it being a good example of a simple web page.
+HTTP traffic was tested through an automated script. The degradation tool was activated for packet loss and latency and the website was downloaded using the {\it wget} command. The website chosen was the Wikipedia page for the University of Hull \footnote{\url{https://en.wikipedia.org/wiki/University_of_Hull}}. This page was chosen as a good example of a simple web page.
 
-Appendix~\ref{ref:httpTesting} contains the results for the HTTP testing. Figure~\ref{ref:latencyHttp} contains the latency results. The page load time value is the average taken over a series of 5 repeat test. The results were as expected; the increase in load times is linear with the increase of latency.
+Appendix~\ref{ref:httpTesting} contains the results for the HTTP testing. Figure~\ref{ref:latencyHttp} contains the latency results. The page load time value is the average taken over a series of five repeat tests. The results were as expected - the increase in load times is linear with the increase of latency.
 
 
 \subsubsection{FTP Experiment}
-FTP traffic was tested with two hosts connected to the Raspberry Pi router; one host the client and the other the server. Transfer speed of a 5MB file were tracked and recorded.
+FTP traffic was tested with two hosts connected to the Raspberry Pi router - one host the client and the other the server. The transfer speed of a 5MB file was tracked and recorded.
 
-Appendix~\ref{ref:ftpTesting} contains the results for the experiment. As expected as the degradation becomes more violent the transfer time increases. As latency increased, transfer speed of the file decreased in a linear fashion.
+Appendix~\ref{ref:ftpTesting} contains the results for the experiment. As expected as the degradation became more violent the transfer time increased. As latency increased, transfer speed decreased in a linear relationship.
 
 \subsubsection{UDP Experiment}
 UDP was tested using the custom server client created for visualising the packet loss, therefore, only packet loss was tested for UDP. In a similar way to FTP a server and client both connected to the router running the tool. The state of the user interface was recorded as significant packet loss values.
 
-Appendix~\ref{ref:udpTesting} contains the progression of the interface as the packet loss value becomes more extreme. The clear representation of arrived and lost packets makes it immediately apparent of the effect of packet loss on a UDP connection. UDP does not resend when packets are lost, so in situations with abnormally large packet loss values an application relying on UDP can be completely incapacitated.
+Appendix~\ref{ref:udpTesting} contains the progression of the interface as the packet loss value becomes more extreme. The clear representation of arrived and lost packets makes the effect of packet loss on a UDP connection immediately apparent. UDP does not resend when packets are lost, so in situations with abnormally large packet loss an application relying on UDP can be completely incapacitated.
 
 \subsection{Latency Accuracy}
 In the initial stages of the project there were experiments that tested the effects of the degradation on the network. The tests were performed on the loopback (Internal network 127.0.0.1) with ICMP ping packets.
@@ -549,9 +549,9 @@ Figure~\ref{ref:latencyAccuracy} shows the dynamic form of issuing latency is ov
 \end{center}
 \end{wrapfigure}
 
-The most effective way to visualise real world connections were running tests on SpeedTest.net \footnote{\url{http://beta.speedtest.net/}}. This is very useful to quickly visualise a certain effect on the network.
+The most effective way to visualise real world connections was to run tests on SpeedTest.net \footnote{\url{http://beta.speedtest.net/}}. This is a useful way to quickly visualise a certain effect on the network.
 
-As you can see from both images, the 100ms has evidently been applied effectively and the speed of the connection has dropped by around 10Mbps. This means in real world terms the time taken to download a 1GB file would take 35 seconds longer to download. This is not a considerable reduction but the latency is having an obvious effect on the network quality.
+As you can see from both images, the 100ms has evidently been applied effectively and the speed of the connection has dropped by around 10Mbps. In real world terms the time taken to download a 1GB file would take 35 seconds longer. This is not a considerable reduction but the latency is having an obvious effect on the network quality.
 
 
 \subsection{UDP Flooding}
@@ -564,4 +564,4 @@ As you can see from both images, the 100ms has evidently been applied effectivel
 \end{center}
 \end{wrapfigure}
 
-To test the effect of the UDP flooding required experimentation. A single target was selected on a network just containing the attacker and victim and, like previous tests, SpeedTest.Net was used to obtain bandwidth results. Each test was run with the same computers on the same network. As you can see from the two images the effect of the UDP flooding is devastating on a connections speed, taking a fast internet connection and reverting it to a crawl. If more computers running the script were active the internet connection could easily be fully blocked.
+Testing the effect of the UDP flooding required experimentation. A single target was selected on a network containing only the attacker and victim. Similar to previous tests, SpeedTest.Net was used to obtain bandwidth results. Each test was run with the same computers on the same network. As you can see from the two images the effect of the UDP flooding is devastating on a connections speed, taking a fast internet connection and reverting it to a crawl. If more computers running the script were active the internet connection could easily be fully blocked.

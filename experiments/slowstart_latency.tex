@@ -4,7 +4,7 @@ Slow start (See Section~\ref{ref:slowstart}) is used to slowly ramp up the conge
 
 Each ACKs frequency therefore is determined by the RTT, i.e. the time it takes for a segment to be sent plus the time required to acknowledge that segment.
 
-A test has be devised to demonstrate the ability of the tool to simulate a certain RTT and therefore affect the slow start thus showing how the protocol functions.
+A test has be devised to demonstrate the ability of the tool to simulate a certain RTT and therefore affect the slow start, thus showing how the protocol functions.
 
 %Graph
 \begin{center}
@@ -30,8 +30,8 @@ A test has be devised to demonstrate the ability of the tool to simulate a certa
 	\label{ref:CwndSlowStart}
 \end{figure}
 
-Figure~\ref{ref:CwndSlowStart} shows the result of the experiment. The RTT was simulated using the latency effect of the script where the latency is doubled when forming the RTT (Two equal distances). Therefore 200ms RTT was simulated using 100ms on the script.
+Figure~\ref{ref:CwndSlowStart} shows the result of the experiment. The RTT was simulated using the latency effect of the script where the latency is doubled when forming the RTT (two equal distances). Therefore 200ms RTT was simulated using 100ms on the script.
 
-As you can see from both lines the increase in Cwnd value occurs in intervals of the respective RTT values, this is as expected due to the statement contained in the RFC document. Doubling the value of the RTT increases the time taken to finish the slow start of a connection by double thus the increase is a linear relationship.
+As you can see from both lines the increase in Cwnd value occurs in intervals of the respective RTT values. This is as expected due to the statement contained in the RFC document. Doubling the value of the RTT doubles the time taken to finish the slow start of a connection. Thus the increase is a linear relationship.
 
 The overall error in simulating RTT was also recorded and the overall error was 1.258\% and 1.151\% respectively for each plot. The error was calculated using the average RTT.

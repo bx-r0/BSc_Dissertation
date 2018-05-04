@@ -25,19 +25,15 @@ The specification of the computer used for these experiments is contained in Fig
 \end{figure}
 \end{center}
 
-
-% -- 1
-\subsection{Effect of Packet Loss on Download Speeds}
-\input{experiments/packetloss_downloadspeed}
-
-\clearpage
-% -- 2
 \subsection{Effect of Latency on Download Speeds}
 \input{experiments/latency_downloadspeed}
 
-% -- 3
+\subsection{Effect of Packet Loss on Download Speeds}
+\input{experiments/packetloss_downloadspeed}
+
 \subsection{Latency effect on Slow Start}
 \input{experiments/slowstart_latency}
+
 
 %Project Achievements:
 %You should consider your original goals and statewh clearly ich have or have not been fully or partially met, and discuss reasons for any significant variance.
@@ -53,28 +49,28 @@ The specification of the computer used for these experiments is contained in Fig
 \newcommand{\fileZillaUrl}{\url{https://filezilla-project.org/}}
 
 \subsection{Objective One - {\it Achieved}}
-{\it Develop a fully working client server pair that communicate using HTTP/1.1 and FTP over the TCP protocol alongside a client and server that use the UDP protocol} (See Section~\ref{ref:obj1})
+{\it Develop a fully working client server pair that communicates using HTTP/1.1 and FTP over the TCP protocol alongside a client and server that use the UDP protocol} (See Section~\ref{ref:obj1})
 
-This objective initially involved the creation of a custom client server solution for HTTP, FTP and UDP. This involved a lengthy development period where each client and server would require the implementation of required features for the project. It was decided after a period of 3.5 weeks that the simulated network having a custom solution created no added value to the initial goal of the project, this is why HTTP has been replaced by pre-existing browsers such as Google Chrome \footnote{\chromeUrl} or Mozilla Firefox \footnote{\firefoxUrl} and and FTP solution replaced by FileZilla's \footnote{\fileZillaUrl} server and client pair. These are all projects that have had multiple years invested into their development and offer increased stability and selection of features. They have all the features required to meet the goal of this project. Therefore, were chosen as more suitable solutions. UDP on the other hand was left as a custom solution, for the sacrifice of realism the UDP client and server shows a clear visualisation of UDP packet loss.
+This objective initially involved the creation of a custom client server solution for HTTP, FTP and UDP. This involved a lengthy development period where each client and server would require the implementation of required features for the project. It was decided after a period of three and a half weeks that the simulated network provided with a custom solution created no added value to the initial goal of the project. This  is the reason why HTTP was replaced by pre-existing browsers such as Google Chrome \footnote{\chromeUrl} or Mozilla Firefox \footnote{\firefoxUrl} and the FTP solutions replaced by FileZilla's \footnote{\fileZillaUrl} server and client pair. These are all projects that have had multiple years invested into their development and offer increased stability and selection of features. They have all the features required to meet the goal of this project and were therefore chosen as more suitable solutions. UDP on the other hand was left as a custom solution. For the sacrifice of realism the UDP client and server shows a clear visualisation of UDP packet loss.
 
 However, even with the changes each sub point of the objective has been met.
 
 \subsection{Objective Two - {\it Achieved}}
 {\it Create a program that runs on a Linux based OS that can be used to simulate degradation and attacks. This program will then be run on the router.} (See Section~\ref{ref:obj2})
 
-In the aims and objectives section lists out the criteria required to meet this objective. The created solution meets all of these criteria. It provides the functionality to simulate packet loss, latency and bandwidth plus a selection of other effects. The other effects were chosen to provide more depth to the project and allow the possibility to chain effects together to simulate more sophisticated degradation. The script also allows UDP flooding and ARP spamming. It contains a mode to increment the TTL but this mode was discarded from the main advertised functionality due to its inherit difficulty in displaying its effect on a connection due to the hard task for forming loops in a networks structure. This script is also functional on the set-up Raspberry Pi Router.
+The criteria required to meet this objective are listed in the aims and objectives section. The created solution meets all of these criteria. It provides the functionality to simulate packet loss, latency and bandwidth plus a selection of other effects. These other effects were chosen to provide more depth to the project and allow the possibility of  chaining effects together to simulate more sophisticated degradation. The script also allows UDP flooding and ARP spamming. It contains a mode to increment the TTL but this mode was discarded from the main advertised functionality due to its inherent difficulty in displaying its effect on a connection. This was a hard task because of the complexity in forming loops in a network's structure naturally. TTL would only have adverse effects in these conditions. This script is also functional on the Raspberry Pi Router.
 
 
 \subsection{Objective Three - {\it Achieved}}
-{\it Create a working custom router that can be used to simulate degradation in conjunction with the program outlined in Objective 2} (See Section~\ref{ref:obj3})
+{\it Create a working custom router that can be used to simulate degradation in conjunction with the program outlined in Objective two} (See Section~\ref{ref:obj3})
 
-The project has met the requirements of this objective. The router can be used in place of a commercial router and can handle around 3 clients at a single time while still providing acceptable transfer speeds. A client can connect to the router by wireless or wired means.
+The project has met the requirements of this objective. The router can be used in place of a commercial router and can handle around three clients at a single time while still providing acceptable transfer speeds. A client can connect to the router by wireless or wired means.
 
 \section{Project Management}
 The implementation of the degradation tool required planning and structure to ease the process of developing the software. This project used GitHub \footnote{\url{https://github.com/}} and its various tools available to provide structure to the project.
 
 \subsection{Issues}
-Issues was one of the main ways problems and enhancements were recorded and tracked, comments were placed on there with information regarding how to fix the issue and what the issue requires for completion. Appendix~\ref{ref:GitHubAppendix} contains a snapshot of an actual issue that had been closed over the development of the project in Figure~\ref{ref:GitHubIssues}. An example of what was used for a description of the issue is displayed by Figure~\ref{ref:GitHubIssueExample}.
+Issues was one of the main ways problems and enhancements were recorded and tracked, comments were placed on there with information regarding how to fix the issue and what it requires for completion. Appendix~\ref{ref:GitHubAppendix} contains a snapshot of an actual issue that had been closed over the development of the project in Figure~\ref{ref:GitHubIssues}. An example of what was used for a description of the issue is displayed by Figure~\ref{ref:GitHubIssueExample}.
 
 This provided a nice overview of what needed completing or improving.
 
@@ -96,16 +92,16 @@ Commit messages were also carefully structured with informative messages that al
 The project could be continued and improved in the ways discussed below.
 
 \subsection{More protocols}
-In the background there was discussion into the inclusion of other transport protocols or other TCP and UDP based protocols. This would give this project a much more in-depth analysis of more types of network traffic. QUIC would be a great addition to future goals of the project. QUIC is and incredibly new protocol and with the backing of Google gives it a higher chance of being adopted as a standard transfer protocol.
+The background section contained a discussion into the possible inclusion of other transport protocols. There also was a discussion into implementing more protocols based on TCP and UDP. This would give this project a much more in-depth analysis of more types of network traffic. QUIC would be a valuable addition to future goals of the project. QUIC is a new protocol backed by Google. This gives it a higher chance of being adopted as a standard transfer protocol.
 
-Testing and experiments could be performed to detect the effects of degradation such as latency and packet loss of this young protocol and could even contribute to the infant knowledge base.
+Testing and experiments could be performed to record the effects of degradation on this young protocol and could even contribute to the infant knowledge base.
 
 
 \subsection{More platform support}
-The tool is currently only supported on Linux. Therefore, further work could be to create version that run on Windows or Mac OS. This would allow the tool to be used for many more situations and on many more systems. This however would involve a large amount of work due to the differing ways that each OS would deal with firewall based packet filtering.
+The tool is currently is only supported on Linux. Therefore, further work could be to create a version that run on Windows or Mac OS. This would allow the tool to be used in many more situations and on many more systems. This however would involve a large amount of work due to the differing ways that each OS would deal with packet filtering.
 
 
 \subsection{Larger test network}
-Another further improvement would be to use a more powerful router to host the script. Increased speed would allow support for a larger synthetic test network with more clients. Therefore, would provide more possible feedback because of the further improved realism and size of the test network. This improvement is mainly limited by the processing power of the computer used to host the script. 
+Another further improvement would be to use a more powerful router to host the script. Increased speed would allow support for a larger synthetic test network with more clients, and would therefore, provide more valuable feedback because of the improved realism and size of the test network. This improvement is mainly limited by the processing power of the computer used to host the script. 
 
-This also touches on the possible improvement of the efficiency of the script, the use of a more embedded orientated language would provide a sizeable increase. A language similar to C or C++ would be suitable, this however, would be time consuming and library support would not be a comprehensive as Python's. Therefore, resulting in more time required to port the tool.
+This also touches on the possible improvement of the efficiency of the script. The use of a more embedded orientated language would provide a sizeable increase. A language similar to C or C++ would be suitable, this however, would be time consuming and library support would not be a comprehensive as Python's, therefore, resulting in more time required to port the tool.
