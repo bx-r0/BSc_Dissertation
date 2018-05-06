@@ -15,8 +15,8 @@ buttons_values = \
 #TODO: Move buttons out of here when they're functional
 non_func_buttons = \
     [
-        'Button_Combination',
-        'Button_Simulate',
+        'Button_Combination_',
+        'Button_Simulate_',
     ]
 
 textbox_values = \

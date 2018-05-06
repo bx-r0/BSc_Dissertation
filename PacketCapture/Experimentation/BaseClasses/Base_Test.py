@@ -183,7 +183,7 @@ class Base_Test():
                 """
 
         self.pool = ThreadPool(1000)
-        self.printing(True)
+        self.printing(False)
 
         self.run_packet_script(obj, packet_type)
 

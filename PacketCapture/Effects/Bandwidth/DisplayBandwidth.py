@@ -14,5 +14,4 @@ class DisplayBandwidth(Bandwidth):
     def custom_effect(self, packet):
         """Used to display the bandwidth"""
 
-        self.print_stats()
         self.send_packet(packet)

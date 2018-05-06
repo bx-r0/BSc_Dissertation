@@ -49,13 +49,16 @@ class Bandwidth(Effect):
         self.start_rate_update()
 
     def print_stats(self):
+        pass
+
+    def print_stats_test(self):
         """Stat output"""
 
         # Displays totals and rate in more relevant units
         print_rate, unit_rate = self.recalculate_units(self.rate)
         print_total, unit_total = self.recalculate_units(self.total_size)
 
-        # Stops any
+        # Stops any stray characters
         self.print_clear()
 
         print_message = '[*] Total: {:.1f} {} - Rate: {:.1f} {}/s '
@@ -91,7 +94,7 @@ class Bandwidth(Effect):
         if elapsed > self.rate_update_period:
             self.rate = (self.transferred_since_check / elapsed)
 
-            self.print_stats()
+            self.print_stats_test()
 
             # Reset
             self.transferred_since_check = 0
@@ -104,7 +107,7 @@ class Bandwidth(Effect):
         elapsed = now - self.start
 
         self.rate = self.total_size / elapsed
-        self.print_stats()
+        self.print_stats_test()
 
     @staticmethod
     def calculate_packet_size(packet_name):

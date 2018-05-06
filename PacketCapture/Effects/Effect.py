@@ -54,7 +54,7 @@ class Effect:
 
         try:
 
-            if False:
+            if True:
                 # TCP tracking
                 if self.gather_stats:
                     self.track_TCP_stats(packet)

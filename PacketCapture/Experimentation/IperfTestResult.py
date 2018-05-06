@@ -18,7 +18,7 @@ class TestResult:
     RTT
     """
 
-    def __init__(self, update_interval=0, test_time=5, address='127.0.0.1'):
+    def __init__(self, update_interval=0, test_time=10, address='127.0.0.1'):
         """
         Bandwidth and Transfer are measured in :
                 MB (Transfer)
@@ -47,7 +47,9 @@ class TestResult:
         start_retransmission = TestResult.get_current_retransmission_value()
 
         # # # Runs script
+        server = subprocess.Popen('iperf -s', shell=True, stdout=subprocess.DEVNULL)
         output = subprocess.check_output(self.CMD.split(' '))
+        server.kill()
 
         # Calculates Retransmissions
         end_retransmission = TestResult.get_current_retransmission_value()
@@ -88,8 +90,8 @@ class TestResult:
         speed_line_values = list(filter(lambda item: str(item) != "", speed_line_parts))
 
         # Grabs from the specific positions
-        bandwidth = speed_line_values[-4].strip()
-        transfer = speed_line_parts[-2].strip()
+        bandwidth = speed_line_values[-2].strip()
+        transfer = speed_line_values[-4].strip()
 
         return float(bandwidth), float(transfer)
 
