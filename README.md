@@ -1,15 +1,21 @@
-# Dissertation_Project
-[![asciicast](https://asciinema.org/a/KtyqI8rwuqKefuhRddmsshKOX.png)](https://asciinema.org/a/KtyqI8rwuqKefuhRddmsshKOX)
+# "Compromised and Degraded Network Simulation"
+Project code for final year dissertation project. 
 
-# Required Packages
+  - /PacketCapture - Contains the script that perfoms different degradation effects on a network connection
+  - /ClientServer - Contains the programs used in the test network
+
+# Report download
+The dissertation report that this project is based of can be downloaded [here](https://github.com/AidanFray/Dissertation_Report/releases)
+
+# Required Packages and Install
 
 ## Ubuntu or Debian
 
-  ```apt-get install build-essential python-dev libnetfilter-queue-dev```
+  ```sudo apt-get install build-essential python-dev libnetfilter-queue-dev```
   
 ## Arch
 
-  ```TODO ```
+  ```sudo pacman -Sy build-essential python-dev libnetfilter-queue-dev ```
   
 # Install for Python
 
@@ -19,6 +25,8 @@ Note: Python 3.6 is required
   sudo pip install NetfilerQueue
   sudo pip install scapy
   sudo pip install python-nmap
+  sudo pip install matplotlib
+  sudi pip install gi
   ```
 
 # Configuring PI as a router
