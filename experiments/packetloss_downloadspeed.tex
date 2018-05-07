@@ -1,4 +1,4 @@
-Figure~\ref{ref:PacketLossDownload} below shows the download speed measured in Mbps against the increasing rate of packet loss caused by the degradation tool. As you can see the download rate only reaches around 25\%. This is due to the connection test failing at anything higher. The tests were performed on the localhost to reduce any residual degradation that may exist already in the current network.
+Figure~\ref{ref:PacketLossDownload} below shows the download speed measured in Mbps against the increasing rate of packet loss caused by the degradation tool. As you can see the download rate only reaches around 25\%. This is due to the connection test failing at anything higher. 
 
 %Graph
 \begin{center}
@@ -95,4 +95,4 @@ From the period of 3 seconds onwards is the main operation of the TCP protocol t
 	\label{ref:SlowStart}
 \end{figure}
 
-The initial increase in transfer rate in Figure~\ref{ref:PacketLossCwndExperiment}, is displayed in Figure~\ref{ref:SlowStart}. This is known as the TCP Slow Start and this is used by the protocol to naturally align itself into the network eco-system. The protocol starts off with a modest transfer rate to prevent situations where an initial abnormally large rate would fill buffers and cause network congestion. It adjusts by incorporating the techniques explained above to manually increase its transfer rate to fit naturally into the current network.
+The initial increase in transfer rate in Figure~\ref{ref:PacketLossCwndExperiment}, is displayed in Figure~\ref{ref:SlowStart}. This is known as the TCP Slow Start and this is used by the protocol to naturally align itself into the network eco-system (See Section~\ref{ref:slowstart}). The protocol starts off with a modest transfer rate to prevent situations where an initial abnormally large rate would fill buffers and cause network congestion. It adjusts by incorporating the techniques explained above to manually increase its transfer rate to fit naturally into the current network.

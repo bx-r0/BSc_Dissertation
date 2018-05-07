@@ -5,7 +5,7 @@
 %The tool is used to create results and there're discussed here
 \section{Experimentation Results}
 \subsection{Test Environment}
-The test environment used to create these experiments has been kept exactly the same for every experiment. TCP transfer has been simulated over the localhost using a tool called Iperf \citep{gates2003iperf} that allows the creation of a client server pair where information such as Cwnd and RTT can be obtained from the output of the tool.
+The test environment used to create these experiments has been kept exactly the same. TCP transfer has been simulated over the localhost using a tool called Iperf \citep{gates2003iperf} that allows the creation of a client server pair where information such as Cwnd and RTT can be obtained from the output of the tool.
 
 The specification of the computer used for these experiments is contained in Figure~\ref{ref:testmachine}.
 
@@ -93,13 +93,14 @@ Commit messages were also carefully structured with informative messages that al
 The project could be continued and improved in the ways discussed below.
 
 \subsection{More protocols}
-The background section contained a discussion into the possible inclusion of other transport protocols. There also was a discussion into implementing more protocols based on TCP and UDP. This would give this project a much more in-depth analysis of more types of network traffic. QUIC would be a valuable addition to future goals of the project. QUIC is a new protocol backed by Google. This gives it a higher chance of being adopted as a standard transfer protocol.
+The background section contained a discussion into the possible inclusion of other transport protocols 
+(See Section~\ref{ref:otherProtocols}). There also was a discussion into implementing more protocols based on TCP and UDP (See Section~\ref{ref:otherUDP} \& ~\ref{ref:otherTCP}). This would give this project a much more in-depth analysis of more types of network traffic. QUIC would be a valuable addition to future goals of the project. QUIC is a new protocol backed by Google. This gives it a higher chance of being adopted as a standard transfer protocol.
 
 Testing and experiments could be performed to record the effects of degradation on this young protocol and could even contribute to the infant knowledge base.
 
 
 \subsection{More platform support}
-The tool is currently is only supported on Linux. Therefore, further work could be to create a version that run on Windows or Mac OS. This would allow the tool to be used in many more situations and on many more systems. This however would involve a large amount of work due to the differing ways that each OS would deal with packet filtering.
+The tool is currently is only supported on Linux. Therefore, further work could be to create a version that could run on Windows or Mac OS. This would allow the tool to be used in many more situations and on many more systems. This however would involve a large amount of work due to the differing ways that each OS would deal with packet filtering.
 
 
 \subsection{Larger test network}
