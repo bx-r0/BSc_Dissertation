@@ -396,7 +396,7 @@ The router also needs a couple of tools to manage the assigning of IPs (DHCP ser
 
 
 \subsection{Router Implementation}
-Hostapd has been used very simply to create a single protected access point, this however requires a WiFi dongle that supports Access Point Mode - the WiFi dongle used for this project was the TP-LINK TL-WN722N and was strong enough to provide ample range.
+Hostapd has been used very simply to create a single protected access point, this however requires a WiFi dongle that supports Access Point Mode - the WiFi dongle used for this project was the TP-LINK TL-WN722N.
 
 Figure~\ref{ref:Hostapd} contains the configuration script used:
 
@@ -539,7 +539,7 @@ Figure~\ref{ref:latencyAccuracy} visualises the results in a single graph. The r
 \end{center}
 
 
-Figure~\ref{ref:latencyAccuracy} shows the dynamic form of issuing latency is overall more accurate in simulation. However, it is still not perfect and there seems to be a small overall error present. This performance is however, more than suitable for the scope of this project.
+Figure~\ref{ref:latencyAccuracy} shows the dynamic form of issuing latency is overall more accurate in simulation. It can be seen there is still a small overall error present, so the accuracy is not perfect. This performance however, is more than suitable for the scope of this project.
 
 \subsection{Visualising effects}
 \begin{wrapfigure}{r}{5cm}
@@ -566,4 +566,4 @@ As you can see from both images, the 100ms has evidently been applied effectivel
 \end{center}
 \end{wrapfigure}
 
-Testing the effect of the UDP flooding required experimentation. A single target was selected on a network containing only the attacker and victim. Similar to previous tests, SpeedTest.Net was used to obtain bandwidth results. Each test was run with the same computers on the same network. As you can see from the two images the effect of the UDP flooding is devastating on a connections speed, taking a fast internet connection and reverting it to a crawl. If more computers running the script were active the internet connection could easily be blocked.
+Testing the effect of the UDP flooding required experimentation. A single target was selected on a network containing only the attacker and victim. Similar to previous tests, SpeedTest.Net was used to obtain bandwidth results. Each test was run with the same computers on the same network. As you can see from the two images the effect of the UDP flooding caused a 95+\% reduction in the download speed, taking a fast internet connection and reverting it to a crawl. If more computers running the script were active the internet connection could easily be blocked.

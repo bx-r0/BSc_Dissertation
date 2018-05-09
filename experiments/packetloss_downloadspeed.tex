@@ -11,7 +11,8 @@ Figure~\ref{ref:PacketLossDownload} below shows the download speed measured in M
 			ymin=0,
 			xlabel=Packet Loss (\%),
 			ylabel=Download Speed (Mbps)]
-			\addplot table [mark=none, search path=csv_data, col sep=comma]{PacketLossDownload.csv};
+			\addplot+ [mark=none]
+			table [search path=csv_data, col sep=comma]{PacketLossDownload.csv};
 		 \end{axis}
  	\end{tikzpicture}
 \end{center}
@@ -30,7 +31,6 @@ The test devised to prove this hypothesis once again involves an iperf client an
 \begin{center}
 	\begin{tikzpicture}[ every axis plot/.append style={thick}]
 		\begin{axis}[
-			mark=square,
 			width=\linewidth,
 			height=10cm, 
 			ymin=0, ymax=3400,
@@ -38,7 +38,8 @@ The test devised to prove this hypothesis once again involves an iperf client an
 			grid=major,
 			xlabel=Time (Seconds),
 			ylabel=Cwnd]
-			\addplot table [mark=none, search path=csv_data, col sep=comma]{PacketLossCwnd.csv};
+			\addplot+ [mark=x]
+			table [search path=csv_data, col sep=comma]{PacketLossCwnd.csv};
 		 \end{axis}
  	\end{tikzpicture}
 \end{center}
@@ -55,7 +56,6 @@ This is known in live networks as the `sawtooth' pattern where the client is pro
 \begin{center}
 	\begin{tikzpicture}[every axis plot/.append style={thick}]
 		\begin{axis}[
-			mark=square,
 			width=\linewidth,
 			height=10cm, 
 			ymin=0, 
@@ -63,7 +63,8 @@ This is known in live networks as the `sawtooth' pattern where the client is pro
 			grid=major,
 			xlabel=Time (Seconds),
 			ylabel=Cwnd]
-			\addplot table [mark=none, search path=csv_data, col sep=comma]{PacketLossLiveNetworkCwnd.csv};
+			\addplot+ [mark=none]
+			table [search path=csv_data, col sep=comma] {PacketLossLiveNetworkCwnd.csv};
 		 \end{axis}
  	\end{tikzpicture}
 \end{center}
@@ -86,7 +87,8 @@ From the period of 3 seconds onwards is the main operation of the TCP protocol t
 			grid=major,
 			xlabel=Time (Seconds),
 			ylabel=Cwnd]
-			\addplot table [mark=none, search path=csv_data, col sep=comma]{PacketLossCwnd.csv};
+			\addplot+ [mark=none]
+			table[search path=csv_data, col sep=comma]{PacketLossCwnd.csv};
 		 \end{axis}
  	\end{tikzpicture}
 \end{center}

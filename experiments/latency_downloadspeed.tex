@@ -11,7 +11,8 @@ Figure~\ref{ref:LatencyDownload} shows the impact of latency on the connections 
 			ymin=0,
 			xlabel=Latency (ms),
 			ylabel=Throughput (Mbps)]
-			\addplot table [mark=none, search path=csv_data, col sep=comma]{LatencyDownload.csv};
+			\addplot+ [mark=none]
+			table[search path=csv_data, col sep=comma]{LatencyDownload.csv};
 		 \end{axis}
  	\end{tikzpicture}
 \end{center}

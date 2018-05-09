@@ -18,9 +18,11 @@ A test has be devised to demonstrate the ability of the tool to simulate a certa
 			xlabel=Time (ms),
 			ylabel=Cwnd,
 			legend style={at={(0.25,0.95)}}]
-			\addplot table [x index=0, y index=1, mark=none, search path=csv_data, col sep=comma]{SlowStart.csv};	
+			\addplot+ [mark=none]
+			table[x index=0, y index=1, search path=csv_data, col sep=comma]{SlowStart.csv};	
 			\addlegendentry{200ms RTT}	
-			\addplot table [x index=0, y index=2, mark=none, search path=csv_data, col sep=comma]{SlowStart.csv};	
+			\addplot+ [mark=none]
+			table[x index=0, y index=2, search path=csv_data, col sep=comma]{SlowStart.csv};	
 			\addlegendentry{400ms RTT}	
 		 \end{axis}
  	\end{tikzpicture}
