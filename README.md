@@ -1,5 +1,11 @@
 # "Compromised and Degraded Network Simulation"
-Project code for final year dissertation project. 
+
+The aim of the dissertation was:
+
+**_"Create a custom simulated network that can demonstrate and visualise network degradation and common DoS attacks, so that network engineers can identify weak spots and points of strain"_**
+
+# Repository Layout
+Project code for the project:
 
   - /PacketCapture - Contains the script that perfoms different degradation effects on a network connection
   - /ClientServer - Contains the programs used in the test network
