@@ -5,7 +5,7 @@ The aim of the dissertation was:
 _"Create a custom simulated network that can demonstrate and visualise network degradation and common DoS attacks, so that network engineers can identify weak spots and points of strain"_
 
 ## Report Download
-The dissertation report that this project is based of can be downloaded **[here](https://github.com/AidanFray/Dissertation_Report/releases)**
+TODO - Compile report and link here
 
 ## Repository Layout
 Project code for the project:
