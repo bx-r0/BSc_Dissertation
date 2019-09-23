@@ -1,0 +1,25 @@
+\begin{tikzpicture}
+
+	\node (start) [shape=circle, fill=black]{};
+	
+	\node (command) [normal, right of=start, xshift=\width]{Command is entered};
+	\node (parse) [normal, right of=command, xshift=\width]{Parameters are parsed};
+	
+	\node (correctParam) [decision, below of=parse, yshift=\width * -1]{Parameters Correct?};
+	\node (showUsage) [normal, below of=correctParam, yshift=-\width, fill=red!15]{Show Usage and quit};
+	\node (saveParam) [normal, left of=correctParam, xshift=-\width * 2]
+	{Call coresponding 'Mode' with parsed arguments};
+
+	\node (end) [shape=circle, fill=black, below of=saveParam, yshift=-\width]{};
+
+	\draw[->] (start)--(command);
+	\draw[->] (command)--(parse);
+	\draw[->] (parse)--(correctParam);
+	
+	\draw[->] (correctParam)--node[fill=white]{No}(showUsage);
+	\draw[->] (correctParam)--node[fill=white]{Yes}(saveParam);
+	
+	\draw[->] (saveParam)--(end);
+	\draw[->] (showUsage)--(end);
+
+\end{tikzpicture}
