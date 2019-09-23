@@ -1,29 +1,29 @@
-# "Compromised and Degraded Network Simulation"
+# Compromised and Degraded Network Simulation
 
 The aim of the dissertation was:
 
-**_"Create a custom simulated network that can demonstrate and visualise network degradation and common DoS attacks, so that network engineers can identify weak spots and points of strain"_**
+_"Create a custom simulated network that can demonstrate and visualise network degradation and common DoS attacks, so that network engineers can identify weak spots and points of strain"_
 
-# Repository Layout
+## Report Download
+The dissertation report that this project is based of can be downloaded **[here](https://github.com/AidanFray/Dissertation_Report/releases)**
+
+## Repository Layout
 Project code for the project:
 
-  - /PacketCapture - Contains the script that perfoms different degradation effects on a network connection
-  - /ClientServer - Contains the programs used in the test network
+  - `/PacketCapture` - Contains the script that perfoms different degradation effects on a network connection
+  - `/ClientServer` - Contains the programs used in the test network
 
-# Report download
-The dissertation report that this project is based of can be downloaded [here](https://github.com/AidanFray/Dissertation_Report/releases)
+## Required Packages and Install
 
-# Required Packages and Install
-
-## Ubuntu or Debian
+### Ubuntu or Debian
 
   ```sudo apt-get install build-essential python-dev libnetfilter-queue-dev```
   
-## Arch
+### Arch
 
   ```sudo pacman -Sy build-essential python-dev libnetfilter-queue-dev ```
   
-# Install for Python
+## Install for Python
 
 Note: Python 3.6 is required
 
@@ -35,12 +35,12 @@ Note: Python 3.6 is required
   sudi pip install gi
   ```
 
-# Configuring PI as a router
+## Configuring PI as a router
 https://jacobsalmela.com/2014/05/19/raspberry-pi-and-routing-turning-a-pi-into-a-router/
 https://raspberrypihq.com/how-to-turn-a-raspberry-pi-into-a-wifi-router/
 
 
-# Hostapd Settings
+## Hostapd Settings
 ```
   interface=wlan0
   driver=rtl871xdrv
@@ -55,7 +55,7 @@ https://raspberrypihq.com/how-to-turn-a-raspberry-pi-into-a-wifi-router/
   auth_algs=1
   macaddr_acl=0
 ````
-# DHCP Settings
+## DHCP Settings
 ```
 ddns-update-style none;
 
