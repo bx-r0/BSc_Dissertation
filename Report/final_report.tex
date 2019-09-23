@@ -1,0 +1,144 @@
+\documentclass[a4paper,smallheadings,11pt,oneside,bibliography=totoc]{scrreprt}
+\addtokomafont{disposition}{\rmfamily}
+\usepackage[utf8x]{inputenc}
+\usepackage[english]{babel}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{amsmath}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{graphicx}
+\usepackage{microtype}
+\usepackage{palatino}
+\usepackage[round,colon]{natbib}
+\usepackage[hidelinks]{hyperref}
+\usepackage[titletoc]{appendix}
+\usepackage{pgfplots}
+\pagestyle{headings}
+\usepackage{parskip}
+\usepackage{tikz-uml}
+\usepackage{tikz}
+\usepackage{tcolorbox}
+\usepackage{longtable}
+\tcbuselibrary{listings,skins}
+\usetikzlibrary{calc}
+\usetikzlibrary{arrows.meta}
+\usetikzlibrary{chains}
+\usepackage{epstopdf}
+\usepackage{colortbl}
+\usepackage{hhline}
+\usepackage{wrapfig}
+\usepackage[font=footnotesize,labelfont=bf]{caption}
+\newcommand{\comments}[1]{\textcolor{OliveGreen}{[\emph{#1}]}}
+
+\graphicspath{{images/}}
+\newcommand{\cisco}{cisco_images}
+\newcommand{\ciscoImageScale}{0.7}
+
+\setcounter{secnumdepth}{3} 
+\setcounter{tocdepth}{3}
+
+% Custom fonts
+\newenvironment{console_font}{\fontfamily{pcr}\selectfont}{\par}
+\newcommand*{\code}{\ttfamily\selectfont}
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\newcommand{\Fail}{\cellcolor{red!15} Fail}
+\newcommand{\Pass}{\cellcolor{green!15} Pass}
+\newcommand{\header}[1]{\cellcolor{blue!10} #1 & \cellcolor{blue!10} & \cellcolor{blue!10} \\ \lineend}
+\newcommand{\lineend}{\hhline{|-|-|-|}}
+ 
+\lstdefinestyle{mystyle}{
+    commentstyle=\color{codegreen},
+    keywordstyle={\bf \color{blue}},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\footnotesize\ttfamily,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left, 
+    columns=fixed,                                   
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=7,
+    language=Python,
+    numberstyle=\tiny, 
+	numbersep=8pt
+}
+
+%Used to format code listings
+\newtcblisting{Code}[2][]{
+	top=0cm,
+	bottom=0cm,
+	left=0.5cm,
+	right=0cm,
+	colback=white,
+	colframe=black,
+    arc=1pt, outer arc=1pt,
+    listing only, 
+    listing style=mystyle,
+    title= ,
+    #1
+}
+
+\newtcblisting{Scripts}[2][]{
+	top=0cm,
+	bottom=0cm,
+	left=0.5cm,
+	right=0cm,
+	colback=white,
+	colframe=black,
+    arc=1pt, outer arc=1pt,
+    listing only, 
+    listing style={mystyle, language= },
+    title=,
+    #1
+}
+
+\newcommand{\width}{3cm}
+\tikzset{%
+	>={Latex[width=2mm,length=2mm]},
+	% Specifications for style of nodes:
+            base/.style = {draw=black,
+                           minimum width=\width, 
+                           text width=\width, 
+                           minimum height=1cm, 
+                           text centered},                           
+            decision/.style = {base, diamond, fill=yellow!15, draw=red},
+            normal/.style = {base, rectangle, rounded corners}}
+            
+\newcommand{\yesLink}[1]{--node[fill=white]{Yes}(#1)}
+\newcommand{\noLink}[1]{--node[fill=white]{No}(#1)}
+
+\begin{document}
+
+	%Title Page
+	\title{Compromised and Degraded Network Simulation}
+	\newcommand{\reporttype}{Final Report}
+	\newcommand{\degreetitle}{BSc}
+	\newcommand{\progname}{Computer Science}
+	\author{Aidan Fray}
+	\newcommand{\wordcount}{13655}
+
+	% Document format
+	\input{title_page/page}		
+	\newpage
+	\tableofcontents
+	\input{chapters/introduction}
+	\input{chapters/aim_objectives}
+	\input{chapters/background}
+	\input{chapters/technical_development}
+	\input{chapters/evaluation}
+	\input{chapters/conclusion}
+	\input{chapters/appendix}
+	
+	\bibliographystyle{hull}
+	\bibliography{report}
+	
+\end{document}

@@ -1,0 +1,39 @@
+Slow start (See Section~\ref{ref:slowstart}) is used to slowly ramp up the congestion window size until a suitable level is found. The most recent RFC 5681 \citep{allman2009tcp} that defines the Slow Start mechanism states the behaviour as:
+
+{\it During slow start, a TCP increments cwnd by at most SMSS bytes for	each ACK received that cumulatively acknowledges new data. }
+
+Each ACKs frequency therefore is determined by the RTT, i.e. the time it takes for a segment to be sent plus the time required to acknowledge that segment.
+
+A test has be devised to demonstrate the ability of the tool to simulate a certain RTT and therefore affect the slow start, thus showing how the protocol functions.
+
+%Graph
+\begin{center}
+	\begin{tikzpicture}[ every axis plot/.append style={thick}]
+		\begin{axis}[
+			width=\linewidth,
+			height=10cm,
+			grid=major,
+			xmin=0, xmax=2200,
+			ymin=0, ymax=10000,
+			xlabel=Time (ms),
+			ylabel=Cwnd,
+			legend style={at={(0.25,0.95)}}]
+			\addplot+ [mark=none]
+			table[x index=0, y index=1, search path=csv_data, col sep=comma]{SlowStart.csv};	
+			\addlegendentry{200ms RTT}	
+			\addplot+ [mark=none]
+			table[x index=0, y index=2, search path=csv_data, col sep=comma]{SlowStart.csv};	
+			\addlegendentry{400ms RTT}	
+		 \end{axis}
+ 	\end{tikzpicture}
+\end{center}
+\begin{figure}[h]
+	\caption{Graph displaying Cwnd in the Slow Start period with two different RTT values}
+	\label{ref:CwndSlowStart}
+\end{figure}
+
+Figure~\ref{ref:CwndSlowStart} shows the result of the experiment. The RTT was simulated using the latency effect of the script where the latency is doubled when forming the RTT (two equal distances). Therefore 200ms RTT was simulated using 100ms on the script.
+
+As you can see from both lines the increase in Cwnd value occurs in intervals of the respective RTT values. This is as expected due to the statement contained in the RFC document. Doubling the value of the RTT doubles the time taken to finish the slow start of a connection. Thus the increase is a linear relationship.
+
+The overall error in simulating RTT was also recorded and the overall error was 1.258\% and 1.151\% respectively for each plot. The error was calculated using the average RTT.
