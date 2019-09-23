@@ -12,6 +12,7 @@ Project code for the project:
 
   - `/PacketCapture` - Contains the script that perfoms different degradation effects on a network connection
   - `/ClientServer` - Contains the programs used in the test network
+  - `/Report`       - Write up for the project
 
 ## Required Packages and Install
 
